@@ -1,0 +1,20 @@
+version: "3.7"
+
+services:
+  startrail-hardhat:
+    container_name: startrail-hardhat
+    image: node:16.13-alpine
+    volumes:
+      - type: bind
+        source: ../
+        target: /startrail
+    ports:
+      - 8545:8545
+      - 8546:8546
+    working_dir: /startrail
+    command: yarn run node-for-stack
+
+networks:
+  default:
+    external:
+      name: startrail

@@ -1,0 +1,221 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@4.9.0
+
+executors:
+  default:
+    docker:
+      - image: cimg/node:16.13
+
+commands:
+  #
+  # Shared Commands
+  #
+  restore_node_dependencies:
+    steps:
+      - restore_cache:
+          name: Restore node dependencies cache
+          keys:
+            - v3-node-dependencies-{{ checksum "yarn.lock" }}-{{ checksum "subgraph/yarn.lock" }}
+  install_node_dependencies:
+    steps:
+      - run:
+          name: Install Startrail node dependencies
+          # Run yarn 3 times to workaround bug: https://github.com/yarnpkg/yarn/issues/4563#issuecomment-552256526
+          #
+          # Yarn 2 could be another solution but it has an issue with git urls so can't install startrail-common-js:
+          #   https://github.com/yarnpkg/berry/issues/2240
+          #
+          # Npm could be another solution but the startrail-common-js `prepare` script only runs from Yarn (API-1012)
+          command: yarn || yarn || yarn
+      - run:
+          name: Install Subgraph node dependencies
+          command: cd subgraph && yarn --ignore-optional
+  save_node_dependencies:
+    steps:
+      - save_cache:
+          name: Save node dependencies cache
+          key: v3-node-dependencies-{{ checksum "yarn.lock" }}-{{ checksum "subgraph/yarn.lock" }}
+          paths:
+            - node_modules
+            - subgraph/node_modules
+            - ~/.cache/yarn
+
+  #
+  # Startrail Commands
+  #
+  run_hardhat_compile:
+    steps:
+      - run:
+          name: Compile Contracts
+          command: npx hardhat compile
+  run_hardhat_unit_test:
+    steps:
+      - run:
+          name: Startrail Unit tests
+          command: REPORT_GAS=true npx hardhat test
+  run_solidity_coverage:
+    steps:
+      - run:
+          name: Solidity Code Coverage
+          command: npx hardhat coverage
+  start_stack:
+    steps:
+      - run:
+          name: Create docker network
+          command: docker network create startrail
+      - run:
+          name: Start Startrail
+          command: yarn run hardhat-up-bg
+          background: true
+      - run:
+          name: Start Subgraph
+          command: cd subgraph && yarn run graph-up-bg
+          background: true
+      - run:
+          name: Wait for Subgraph to be ready
+          command: subgraph/bin/wait_for_subgraph
+  run_startrail_deploy_and_seed:
+    steps:
+      - run:
+          name: Deploy Local
+          command: yarn deploy-local
+      - run:
+          name: Seed Minimal
+          command: yarn seed-minimal
+      - run:
+          name: Seed Extended
+          command: yarn seed-extended
+  run_subgraph_deploy:
+    steps:
+      - run:
+          name: Create Subgraph
+          command: cd subgraph && yarn create-local
+      - run:
+          name: Deploy Subgraph
+          command: cd subgraph && yarn deploy-local
+
+  #
+  # Subgraph commands
+  #
+  build_subgraph_source:
+    steps:
+      - run:
+          name: Build subgraph source and generate code
+          command: |
+            cd subgraph && yarn run codegen-develop && yarn run build-develop
+  run_subgraph_test:
+    steps:
+      - run:
+          name: Run subgraph tests
+          command: |
+            cd subgraph && yarn test
+  deploy_develop:
+    steps:
+      - run:
+          name: deploy mumbai develop subgraph into public node
+          command: cd subgraph && yarn run deploy-develop
+  deploy_release:
+    steps:
+      - run:
+          name: deploy mumbai release subgraph into public node
+          command: cd subgraph && yarn run deploy-release
+
+  deploy_master:
+    steps:
+      - run:
+          name: deploy mainnet master subgraph into public node
+          command: cd subgraph && yarn run deploy-master
+
+jobs:
+  #
+  # Shared Jobs
+  #
+  install_dependencies:
+    executor: default
+    steps:
+      - checkout
+      - restore_node_dependencies
+      - install_node_dependencies
+      - save_node_dependencies
+
+  #
+  # Startrail Jobs
+  #
+  build_startrail:
+    executor: default
+    steps:
+      - checkout
+      - restore_node_dependencies
+      - install_node_dependencies
+      - save_node_dependencies
+      - run_hardhat_compile
+  test_startrail:
+    executor: default
+    steps:
+      - checkout
+      - restore_node_dependencies
+      - install_node_dependencies
+      - save_node_dependencies
+      - run_hardhat_unit_test
+
+  test_subgraph:
+    machine:
+      image: ubuntu-2004:202111-01
+    resource_class: medium
+    steps:
+      - node/install:
+          install-npm: false # saves ~9seconds
+          install-yarn: true
+          node-version: 16.13.2
+      - checkout
+      - restore_node_dependencies
+      - install_node_dependencies
+      - save_node_dependencies
+      - start_stack
+      - run_startrail_deploy_and_seed
+      - run_subgraph_deploy
+      - run_subgraph_test
+
+  #
+  # Subgraph Jobs
+  #
+  build_subgraph:
+    executor: default
+    steps:
+      - checkout
+      - restore_node_dependencies
+      - install_node_dependencies
+      - save_node_dependencies
+      - build_subgraph_source
+  mumbai_develop:
+    executor: default
+    steps:
+      - deploy_develop
+  mumbai_release:
+    executor: default
+    steps:
+      - deploy_release
+  mainnet_master:
+    executor: default
+    steps:
+      - deploy_master
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - install_dependencies
+      - build_startrail:
+          requires:
+            - install_dependencies
+      - build_subgraph:
+          requires:
+            - install_dependencies
+      - test_startrail:
+          requires:
+            - build_startrail
+      - test_subgraph:
+          requires:
+            - build_subgraph

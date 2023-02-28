@@ -1,0 +1,15 @@
+build/
+generated/
+node_modules/
+
+subgraph.*.yaml
+!subgraph.template.yaml
+
+docker/data
+
+package-lock.json
+
+.serverless/
+.env
+.env.setup*
+.env.qa

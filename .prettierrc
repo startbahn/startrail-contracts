@@ -1,0 +1,27 @@
+{
+  "overrides": [
+    {
+      "files": "*.sol",
+      "options": {
+        "printWidth": 80,
+        "tabWidth": 4,
+        "useTabs": false,
+        "singleQuote": false,
+        "bracketSpacing": false,
+        "explicitTypes": "always",
+        "trailingComma": "es5",
+        "semi": false
+      }
+    },
+    {
+      "files": ["*.js", "*.ts"],
+      "options": {
+        "arrowParens": "always",
+        "printWidth": 80,
+        "semi": false,
+        "singleQuote": true,
+        "trailingComma": "es5"
+      }
+    }
+  ]
+}

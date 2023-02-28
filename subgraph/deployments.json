@@ -1,0 +1,102 @@
+{
+  "mumbai-develop": {
+    "StartrailRegistry": {
+      "startBlock": 13142583
+    },
+    "LicensedUserManager": {
+      "startBlock": 13142583
+    },
+    "MetaTxForwarder": {
+      "startBlock": 13142583
+    },
+    "BulkIssue": {
+      "startBlock": 13142583
+    },
+    "BulkTransfer": {
+      "startBlock": 13142583
+    },
+    "Bulk": {
+      "startBlock": 13142583
+    }
+  },
+  "mumbai-release": {
+    "StartrailRegistry": {
+      "startBlock": 12378987
+    },
+    "LicensedUserManager": {
+      "startBlock": 12378987
+    },
+    "MetaTxForwarder": {
+      "startBlock": 12378987
+    },
+    "BulkIssue": {
+      "startBlock": 12378987
+    },
+    "BulkTransfer": {
+      "startBlock": 12378987
+    },
+    "Bulk": {
+      "startBlock": 12378987
+    }
+  },
+  "mumbai-staging": {
+    "StartrailRegistry": {
+      "startBlock": 15984927
+    },
+    "LicensedUserManager": {
+      "startBlock": 15984927
+    },
+    "MetaTxForwarder": {
+      "startBlock": 15984927
+    },
+    "BulkIssue": {
+      "startBlock": 15984927
+    },
+    "BulkTransfer": {
+      "startBlock": 15984927
+    },
+    "Bulk": {
+      "startBlock": 15984927
+    }
+  },
+  "polygon": {
+    "StartrailRegistry": {
+      "startBlock": 13286271
+    },
+    "LicensedUserManager": {
+      "startBlock": 13286271
+    },
+    "MetaTxForwarder": {
+      "startBlock": 13286271
+    },
+    "BulkIssue": {
+      "startBlock": 13286271
+    },
+    "BulkTransfer": {
+      "startBlock": 13286271
+    },
+    "Bulk": {
+      "startBlock": 13286271
+    }
+  },
+  "local": {
+    "StartrailRegistry": {
+      "startBlock": 1
+    },
+    "LicensedUserManager": {
+      "startBlock": 1
+    },
+    "MetaTxForwarder": {
+      "startBlock": 1
+    },
+    "BulkIssue": {
+      "startBlock": 1
+    },
+    "BulkTransfer": {
+      "startBlock": 1
+    },
+    "Bulk": {
+      "startBlock": 1
+    }
+  }
+}

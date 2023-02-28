@@ -1,0 +1,13 @@
+#!/bin/sh
+
+TIMEOUT=180
+
+for i in `seq $TIMEOUT` ; do
+  curl 'http://localhost:8030/graphql' --data-raw '{"query":"{indexingStatuses{node health}}"}' 2> /dev/null | grep "{\"data\":" > /dev/null
+  if [ $? = 0 ]; then
+    exit 0
+  fi
+  sleep 1
+done
+
+exit 1

@@ -1,0 +1,11 @@
+{
+  "requestTypeKey": "StartrailRegistryAddHistory",
+  "requestData": {
+    "tokenIds": [
+      628560438356
+    ],
+    "customHistoryIds": [
+      1
+    ]
+  }
+}

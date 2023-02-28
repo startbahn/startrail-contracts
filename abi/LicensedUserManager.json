@@ -1,0 +1,690 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "wallet",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "AddedOwner",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "wallet",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "threshold",
+        "type": "uint8"
+      }
+    ],
+    "name": "ChangedThreshold",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "walletAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address[]",
+        "name": "owners",
+        "type": "address[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "threshold",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "englishName",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "originalName",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum LicensedUserManager.UserType",
+        "name": "userType",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "salt",
+        "type": "bytes32"
+      }
+    ],
+    "name": "CreateLicensedUserWallet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "walletAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "originChain",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "originTimestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "MigrateLicensedUserWallet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "wallet",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "RemovedOwner",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "walletAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "key",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "value",
+        "type": "string"
+      }
+    ],
+    "name": "UpdateLicensedUserDetail",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "walletAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address[]",
+        "name": "owners",
+        "type": "address[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "threshold",
+        "type": "uint8"
+      }
+    ],
+    "name": "UpgradeLicensedUserWalletToMulti",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "PROXY_CODEHASH",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_walletAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      },
+      {
+        "internalType": "uint8",
+        "name": "_threshold",
+        "type": "uint8"
+      }
+    ],
+    "name": "addOwner",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_wallet",
+        "type": "address"
+      },
+      {
+        "internalType": "uint8",
+        "name": "_threshold",
+        "type": "uint8"
+      }
+    ],
+    "name": "changeThreshold",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address[]",
+            "name": "owners",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint8",
+            "name": "threshold",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum LicensedUserManager.UserType",
+            "name": "userType",
+            "type": "uint8"
+          },
+          {
+            "internalType": "string",
+            "name": "englishName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "originalName",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct LicensedUserManager.LicensedUserDto",
+        "name": "_details",
+        "type": "tuple"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "_salt",
+        "type": "bytes32"
+      }
+    ],
+    "name": "createWallet",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "walletAddress",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address[]",
+            "name": "owners",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint8",
+            "name": "threshold",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum LicensedUserManager.UserType",
+            "name": "userType",
+            "type": "uint8"
+          },
+          {
+            "internalType": "string",
+            "name": "englishName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "originalName",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct LicensedUserManager.LicensedUserDto",
+        "name": "_details",
+        "type": "tuple"
+      },
+      {
+        "internalType": "address",
+        "name": "_walletAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "_originChain",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_originTimestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "createWalletFromMigration",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_walletAddress",
+        "type": "address"
+      }
+    ],
+    "name": "getLicensedUser",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "owners",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint8",
+        "name": "threshold",
+        "type": "uint8"
+      },
+      {
+        "internalType": "bool",
+        "name": "active",
+        "type": "bool"
+      },
+      {
+        "internalType": "enum LicensedUserManager.UserType",
+        "name": "userType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "string",
+        "name": "englishName",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "originalName",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_walletAddress",
+        "type": "address"
+      }
+    ],
+    "name": "getOwners",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "owners",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_walletAddress",
+        "type": "address"
+      }
+    ],
+    "name": "getThreshold",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getTrustedForwarder",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "trustedForwarder",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_nameRegistryAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_trustedForwarder",
+        "type": "address"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_walletAddress",
+        "type": "address"
+      }
+    ],
+    "name": "isActiveWallet",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_walletAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      }
+    ],
+    "name": "isOwner",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_walletAddress",
+        "type": "address"
+      }
+    ],
+    "name": "isSingleOwner",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "forwarder",
+        "type": "address"
+      }
+    ],
+    "name": "isTrustedForwarder",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_walletAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "_hash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes",
+        "name": "_signatures",
+        "type": "bytes"
+      }
+    ],
+    "name": "isValidSignatureSet",
+    "outputs": [
+      {
+        "internalType": "bytes4",
+        "name": "",
+        "type": "bytes4"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "nameRegistryAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_wallet",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_prevOwner",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      },
+      {
+        "internalType": "uint8",
+        "name": "_threshold",
+        "type": "uint8"
+      }
+    ],
+    "name": "removeOwner",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_walletAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
+      }
+    ],
+    "name": "setEnglishName",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_walletAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
+      }
+    ],
+    "name": "setOriginalName",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_wallet",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_prevOwner",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_oldOwner",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "swapOwner",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_walletAddress",
+        "type": "address"
+      }
+    ],
+    "name": "walletExists",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

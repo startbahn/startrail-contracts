@@ -1,0 +1,11 @@
+{
+  "requestTypeKey": "WalletSetOriginalName",
+  "_comment": [
+    "requestData.wallet defaults to luwAddress passed to send-meta-tx.ts ",
+    "because a wallet can only change it's own wallet. the exception is ",
+    "the administrator but that method does not use a meta-tx"
+  ],
+  "requestData": {
+    "name": "New Original Name"
+  }
+}

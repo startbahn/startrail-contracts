@@ -1,0 +1,39 @@
+# {{=it.name}}
+
+## Title
+{{=it.devdoc.title}}
+
+## Description
+{{=it.devdoc.details}}
+
+## Author
+{{=it.devdoc.author}}
+
+## Methods
+
+{{~ Object.keys(it.devdoc.methods) :key}}
+[{{=key}}](#{{=key}})
+{{~}}
+
+{{~ Object.keys(it.devdoc.methods) :key}}
+### {{=key}}
+
+{{=it.devdoc.methods[key].details}}
+
+
+  {{? it.devdoc.methods[key].params}} 
+Params:
+    {{~ Object.keys(it.devdoc.methods[key].params) :paramKey}}
+- **{{=paramKey}}**: {{=it.devdoc.methods[key].params[paramKey]}}
+    {{~}}
+  {{?}}
+
+
+  {{? it.devdoc.methods[key].returns }} 
+Returns:
+    {{~ Object.keys(it.devdoc.methods[key].returns) :retKey}}
+- **{{=retKey}}**: {{=it.devdoc.methods[key].returns[retKey]}}
+    {{~}}
+  {{?}}
+
+{{~}}

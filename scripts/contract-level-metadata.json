@@ -1,0 +1,8 @@
+{
+  "name": "Startrail",
+  "description": "Startrail is a sustainable and scalable blockchain infrastructure that assures the reliability, authenticity, and traceability of artworks, including NFTs. It has a strong focus on the art ecosystem that even leads to adding value to art in the long term. Startrail maintains and assures the value of artworks by permanently recording provenance and other types of histories for the artwork such as auction or exhibition. Also, artists can set terms of each artwork which applies even after the primary sale, including royalty rights.",
+  "image": "https://static-files.startrail.io/startrail-black-logo.png",
+  "external_link": "https://startrail.io/en/",
+  "seller_fee_basis_points": 200,
+  "fee_recipient": "0x177c6F3A1A35EAc847362970E236032e77746Df9"
+}

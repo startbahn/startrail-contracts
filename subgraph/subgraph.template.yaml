@@ -1,0 +1,219 @@
+specVersion: 0.0.2
+description: Startrail Ethereum Subgraph
+repository: https://github.com/startbahn/startrail-subgraph
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: LicensedUserManager
+    network: ##AUTOFILL##
+    source:
+      address: ##AUTOFILL##
+      abi: LicensedUserManager
+      startBlock: ##AUTOFILL##
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - LicensedUserWallet
+      abis:
+        - name: LicensedUserManager
+          file: ./abis/LicensedUserManager.json
+      eventHandlers:
+        - event: CreateLicensedUserWallet(indexed address,address[],uint8,string,string,uint8,bytes32)
+          handler: handleCreateLicensedUserWallet
+        - event: UpgradeLicensedUserWalletToMulti(indexed address,address[],uint8)
+          handler: handleUpgradeLicensedUserWalletToMulti
+        - event: UpdateLicensedUserDetail(indexed address,string,string)
+          handler: handleUpdateLicensedUserDetail
+        - event: AddedOwner(indexed address,address)
+          handler: handleAddedOwner
+        - event: RemovedOwner(indexed address,address)
+          handler: handleRemovedOwner
+        - event: ChangedThreshold(indexed address,uint8)
+          handler: handleChangedThreshold
+        - event: MigrateLicensedUserWallet(indexed address,string,uint256)
+          handler: handleMigrateLicensedUser
+      file: ./src/luw-mapping.ts
+
+  - kind: ethereum/contract
+    name: MetaTxForwarder
+    network: ##AUTOFILL##
+    source:
+      address: ##AUTOFILL##
+      abi: MetaTxForwarder
+      startBlock: ##AUTOFILL##
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - MetaTxForwarder
+      abis:
+        - name: MetaTxForwarder
+          file: ./abis/MetaTxForwarder.json
+      eventHandlers:
+        - event: RequestTypeRegistered(indexed bytes32,string)
+          handler: handleRequestTypeRegistered
+        - event: RequestTypeUnregistered(indexed bytes32)
+          handler: handleRequestTypeUnregistered
+        - event: ExecutionSuccess(bytes32)
+          handler: handleExecutionSuccess
+      file: ./src/mtf-mapping.ts
+
+  - kind: ethereum/contract
+    name: StartrailRegistry
+    network: ##AUTOFILL##
+    source:
+      address: ##AUTOFILL##
+      abi: StartrailRegistry
+      startBlock: ##AUTOFILL##
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - SRR
+      abis:
+        - name: StartrailRegistry
+          file: ./abis/StartrailRegistry.json
+      file: ./src/srr-mapping.ts
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+        - event: CreateSRR(indexed uint256,(bool,address,address),bytes32)
+          handler: handleCreateSRR
+        - event: CreateSRR(indexed uint256,(bool,address,address),bytes32,bool)
+          handler: handleCreateSRRWithLockExternalTransfer
+        - event: UpdateSRR(indexed uint256,(bool,address,address))
+          handler: handleUpdateSRR
+        - event: UpdateSRR(indexed uint256,bool,address,address)
+          handler: handleUpdateSRRWithSender
+        - event: Provenance(indexed uint256,indexed address,indexed address,string,string)
+          handler: handleSRRProvenance
+        - event: Provenance(indexed uint256,indexed address,indexed address,uint256,string,string)
+          handler: handleSRRProvenanceWithCustomHistory
+        - event: Provenance(indexed uint256,indexed address,indexed address,string,string,bool)
+          handler: handleSRRProvenanceWithIntermediary
+        - event: Provenance(indexed uint256,indexed address,indexed address,uint256,string,string,bool)
+          handler: handleSRRProvenanceWithCustomHistoryAndIntermediary
+        - event: SRRCommitment(indexed uint256,address,bytes32)
+          handler: handleSRRCommitment
+        - event: SRRCommitment(indexed uint256,address,bytes32,uint256)
+          handler: handleSRRCommitmentWithCustomHistory
+        - event: SRRCommitmentCancelled(indexed uint256)
+          handler: handleSRRCommitmentCancelled
+        - event: UpdateSRRMetadataDigest(indexed uint256,bytes32)
+          handler: handleUpdateSRRMetadataDigest
+        - event: CreateCustomHistoryType(indexed uint256,string)
+          handler: handleCustomHistoryType
+        - event: CreateCustomHistory(indexed uint256,string,uint256,bytes32)
+          handler: handleCreateCustomHistory
+        - event: 'UpdateCustomHistory(indexed uint256,bytes32)'
+          handler: handleUpdateCustomHistory
+        - event: History(uint256[],uint256[])
+          handler: handleSRRHistory
+        - event: LockExternalTransfer(indexed uint256,bool)
+          handler: handleLockExternalTransfer
+
+        #
+        # Events related to the migration
+        #
+        - event: MigrateSRR(indexed uint256,string)
+          handler: handleMigrateSRR
+        - event: TransferFromMigration(indexed address,indexed address,indexed uint256,uint256,bytes32)
+          handler: handleTransferFromMigration
+        - event: CreateSRRFromMigration(indexed uint256,(bool,address,address),bytes32,uint256,bytes32)
+          handler: handleCreateSRRFromMigration
+        - event: UpdateSRRFromMigration(indexed uint256,(bool,address,address),uint256,bytes32)
+          handler: handleUpdateSRRFromMigration
+        - event: ProvenanceFromMigration(indexed uint256,indexed address,indexed address,uint256,string,string,uint256,bytes32)
+          handler: handleSRRProvenanceFromMigration
+        - event: ProvenanceFromMigration(indexed uint256,indexed address,indexed address,uint256,uint256,string,string,uint256,bytes32)
+          handler: handleSRRProvenanceWithCustomHistoryFromMigration
+        - event: SRRCommitmentFromMigration(address,bytes32,uint256,uint256,bytes32)
+          handler: handleSRRCommitmentFromMigration
+        - event: SRRCommitmentFromMigration(address,bytes32,uint256,uint256,uint256,bytes32)
+          handler: handleSRRCommitmentWithCustomHistoryFromMigration
+        - event: SRRCommitmentCancelledFromMigration(uint256,uint256,bytes32)
+          handler: handleSRRCommitmentCancelledFromMigration
+        - event: UpdateSRRMetadataDigestFromMigration(indexed uint256,bytes32,uint256,bytes32)
+          handler: handleUpdateSRRMetadataDigestFromMigration
+        - event: CreateCustomHistoryFromMigration(indexed uint256,string,uint256,bytes32,string,uint256,bytes32)
+          handler: handleCreateCustomHistoryFromMigration
+        - event: ProvenanceDateMigrationFix(indexed uint256,uint256)
+          handler: handleProvenanceDateMigrationFix
+
+  - kind: ethereum/contract
+    name: BulkIssue
+    network: ##AUTOFILL##
+    source:
+      address: ##AUTOFILL##
+      abi: BulkIssue
+      startBlock: ##AUTOFILL##
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - SRR
+      abis:
+        - name: BulkIssue
+          file: ./abis/BulkIssue.json
+      file: ./src/bulk-mapping.ts
+      eventHandlers:
+        - event: BatchPrepared(indexed bytes32,indexed address)
+          handler: handleBatchPrepared
+        - event: CreateSRRWithProof(indexed bytes32,indexed uint256,bytes32)
+          handler: handleCreateSRRWithProof
+        - event: MigrateBatch(indexed bytes32,bytes32[],address,uint256,uint256)
+          handler: handleMigrateBatch
+  - kind: ethereum/contract
+    name: BulkTransfer
+    network: ##AUTOFILL##
+    source:
+      address: ##AUTOFILL##
+      abi: BulkTransfer
+      startBlock: ##AUTOFILL##
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - SRR
+      abis:
+        - name: BulkTransfer
+          file: ./abis/BulkTransfer.json
+      file: ./src/bulk-transfer-mapping.ts
+      eventHandlers:
+        - event: BatchPrepared(indexed bytes32,indexed address)
+          handler: handleBatchPrepared
+        - event: ApproveSRRByCommitmentWithProof(indexed bytes32,indexed uint256,bytes32)
+          handler: handleApproveSRRByCommitmentWithProof
+  - kind: ethereum/contract
+    name: Bulk
+    network: ##AUTOFILL##
+    source:
+      address: ##AUTOFILL##
+      abi: Bulk
+      startBlock: ##AUTOFILL##
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - SRR
+      abis:
+        - name: Bulk
+          file: ./abis/Bulk.json
+      file: ./src/generalized-bulk-mapping.ts
+      eventHandlers:
+        - event: BatchPrepared(indexed bytes32,indexed address)
+          handler: handleBatchPrepared
+        - event: CreateSRRWithProof(indexed bytes32,indexed uint256,bytes32)
+          handler: handleCreateSRRWithProof
+        - event: ApproveSRRByCommitmentWithProof(indexed bytes32,indexed uint256,bytes32)
+          handler: handleApproveSRRByCommitmentWithProof
+        - event: TransferFromWithProvenanceWithProof(indexed bytes32,indexed uint256,bytes32)
+          handler: handleTransferFromWithProvenanceWithProof

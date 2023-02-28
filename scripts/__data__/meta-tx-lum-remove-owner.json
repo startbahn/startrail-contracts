@@ -1,0 +1,9 @@
+{
+  "requestTypeKey": "WalletRemoveOwner",
+  "requestData": {
+    "wallet": "0x1C1De67eD470b981C252CDB723A2b12Ea4Cc8993",
+    "prevOwner": "0x88f7c48e2A696276D13004c7bd32EAE05E4f2bE1",
+    "owner": "0xcDF95a0c22744b36861111cd8C498D95ebC7f27B",
+    "threshold": 1
+  }
+}

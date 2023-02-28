@@ -1,0 +1,8 @@
+{
+  "requestTypeKey": "WalletAddOwner",
+  "requestData": {
+    "wallet": "0x1485889A48DBfDA91fDE7E4eeb1Dc9493664DB06",
+    "owner": "0x088cd0AA356D65Ac95cDE82ced35e3641D00b4Ba",
+    "threshold": 1
+  }
+}

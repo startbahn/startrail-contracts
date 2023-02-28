@@ -1,0 +1,15 @@
+#!/bin/sh
+
+REPO_ROOT=`dirname "$0"`/..
+
+updateDependenciesInPath() {
+  cd $REPO_ROOT/$1 && yarn || exit 1
+  cd $OLDPWD
+}
+
+updateDependenciesInAll() {
+  echo "\n========  Updating dependencies  ========\n"
+  updateDependenciesInPath subgraph
+  updateDependenciesInPath .
+}
+

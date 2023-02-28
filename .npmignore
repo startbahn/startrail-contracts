@@ -1,0 +1,9 @@
+# ignore everything
+*
+
+# include these
+!abi/**
+!deployments/*/deploy.json
+
+# but not these
+deployments/hardhat

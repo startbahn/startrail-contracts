@@ -1,0 +1,416 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "merkleRoot",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      }
+    ],
+    "name": "BatchPrepared",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "merkleRoot",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "srrHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "CreateSRRWithProof",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "merkleRoot",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32[]",
+        "name": "processedLeaves",
+        "type": "bytes32[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "issuer",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "originTimestampCreated",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "originTimestampUpdated",
+        "type": "uint256"
+      }
+    ],
+    "name": "MigrateBatch",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "name": "batches",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "prepared",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "issuer",
+        "type": "address"
+      },
+      {
+        "internalType": "uint8",
+        "name": "processedCount",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32[]",
+        "name": "merkleProof",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "merkleRoot",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "srrHash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bool",
+        "name": "isPrimaryIssuer",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "artistAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "metadataDigest",
+        "type": "bytes32"
+      }
+    ],
+    "name": "createSRRWithProof",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32[]",
+        "name": "merkleProof",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "merkleRoot",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "srrHash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bool",
+        "name": "isPrimaryIssuer",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "artistAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "metadataDigest",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bool",
+        "name": "lockExternalTransfer",
+        "type": "bool"
+      }
+    ],
+    "name": "createSRRWithProof",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32[][]",
+        "name": "merkleProofs",
+        "type": "bytes32[][]"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "merkleRoot",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "srrHashes",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "bool[]",
+        "name": "isPrimaryIssuers",
+        "type": "bool[]"
+      },
+      {
+        "internalType": "address[]",
+        "name": "artistAddresses",
+        "type": "address[]"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "metadataDigests",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "bool[]",
+        "name": "lockExternalTransfers",
+        "type": "bool[]"
+      }
+    ],
+    "name": "createSRRWithProofMulti",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "tokenIds",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getTrustedForwarder",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "trustedForwarder",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_nameRegistry",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_trustedForwarder",
+        "type": "address"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "forwarder",
+        "type": "address"
+      }
+    ],
+    "name": "isTrustedForwarder",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "nameRegistryAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "merkleRoot",
+        "type": "bytes32"
+      }
+    ],
+    "name": "prepareBatchFromLicensedUser",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "forwarder",
+        "type": "address"
+      }
+    ],
+    "name": "setTrustedForwarder",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "srrHash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bool",
+        "name": "isPrimaryIssuer",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "artistAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "metadataDigest",
+        "type": "bytes32"
+      }
+    ],
+    "name": "verifySRRHash",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "hashMatches",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "srrHash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bool",
+        "name": "isPrimaryIssuer",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "artistAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "metadataDigest",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bool",
+        "name": "lockExternalTransfer",
+        "type": "bool"
+      }
+    ],
+    "name": "verifySRRHash",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "hashMatches",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  }
+]

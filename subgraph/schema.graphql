@@ -1,0 +1,222 @@
+type LicensedUserWallet @entity {
+  id: ID! # walletAddress.toHexString()
+  walletAddress: Bytes!
+
+  threshold: Int!
+  englishName: String!
+  originalName: String!
+  userType: String!
+  owners: [Bytes!]!
+  salt: Bytes!
+
+  issuedSRRs: [SRR!]! @derivedFrom(field: "issuer")
+
+  # How to map this:
+  # ownedSRRs: [SRR!]! @derivedFrom(field: "ownerAddress")
+
+  # chain where the SRR was issued
+  originChain: String
+
+  createdAt: BigInt! # block.timestamp when entity created
+  updatedAt: BigInt! # block.timestamp when entity last updated
+  createdAtStr: String! # createdAt in UTC string
+  updatedAtStr: String! # updatedAt in UTC string
+}
+
+#
+# Startrail Registry Record (SRR) - ERC721 Token
+#
+# NOTE: a number of fields are nullable because the SRR is initially created
+#       from the Transfer event which has only tokenId and ownerAddress
+#       additionally ownerAddress can be null when created by CreateSRR first
+#       (this is the case when parsing token events fired from the old scheme
+#        see comments on handleCreateSRR for details)
+#
+type SRR @entity {
+  id: ID! # tokenId.toString()
+  tokenId: String # ERC721 token id
+  isPrimaryIssuer: Boolean
+  artist: LicensedUserWallet
+  artistAddress: Bytes
+  issuer: LicensedUserWallet
+  ownerAddress: Bytes
+  metadataDigest: Bytes # sha256 hash of metadata JSON file
+  transferCommitment: Bytes # keccak256 hash transfer commitment
+  provenance: [SRRProvenance!]! @derivedFrom(field: "srr")
+  metadataHistory: [SRRMetadataHistory!]! @derivedFrom(field: "srr")
+  history: [SRRHistory!]! @derivedFrom(field: "srr")
+
+  # chain and tx hash where the SRR was issued
+  # a number of SRRs were issued on Ethereum mainnet then moved to Polygon
+  originChain: String
+  originTxHash: Bytes
+
+  # lockExternalTransfer # default is false
+  lockExternalTransfer: Boolean
+
+  createdAt: BigInt! # block.timestamp when entity created
+  updatedAt: BigInt! # block.timestamp when entity last updated
+  createdAtStr: String! # createdAt in UTC string
+  updatedAtStr: String! # updatedAt in UTC string
+}
+
+type CustomHistory @entity {
+  id: ID! # event CreateCustomHistory.id
+  historyType: CustomHistoryType!
+  name: String!
+  metadataDigest: Bytes!
+
+  srrHistory: [SRRHistory!]! @derivedFrom(field: "customHistory")
+  srrProvenance: [SRRProvenance!] @derivedFrom(field: "customHistory")
+  metadataHistory: [CustomHistoryMetadataHistory!]
+    @derivedFrom(field: "customHistory")
+
+  originChain: String
+  originTxHash: Bytes
+
+  createdAt: BigInt! # block.timestamp when entity created
+  createdAtStr: String! # createdAt in UTC string
+  updatedAt: BigInt! # block.timestamp when entity updated
+  updatedAtStr: String! # updatedAt in UTC string
+}
+
+type CustomHistoryMetadataHistory @entity {
+  id: ID!
+  metadataDigest: Bytes!
+  customHistory: CustomHistory! # CustomHistory object this MetadataHistory belongs to
+  createdAt: BigInt! # block.timestamp when entity created
+  createdAtStr: String! # createdAt in UTC string
+}
+
+type CustomHistoryType @entity {
+  id: ID! # event CreateCustomHistoryType.id
+  name: String!
+  createdAt: BigInt! # block.timestamp when entity created
+  createdAtStr: String! # createdAt in UTC string
+}
+
+type SRRHistory @entity {
+  id: ID! # keccak256(tokenId,customHistory.id)
+  srr: SRR!
+  customHistory: CustomHistory
+  createdAt: BigInt! # block.timestamp when entity created
+  createdAtStr: String! # createdAt in UTC string
+}
+
+type SRRProvenance @entity {
+  id: ID! # keccak256(tokenId,timestamp)
+  timestamp: BigInt! # event Provenance.timestamp (block.timestamp)
+  srr: SRR! # SRR for event Provenance.tokenId
+  from: Bytes! # event Provenance.from - ownership transferred from
+  to: Bytes! # event Provenance.to - ownership transferred to
+  metadataDigest: Bytes! # event Provenance.metadataDigest
+  metadataURI: String! # event Provenance.metadataURI
+  customHistory: CustomHistory # event Provenance.customHistoryId (in overloaded event only)
+  isIntermediary: Boolean # event Provenance.isIntermediary
+  # NOTE: this is redundant because we have timestamp above but it's included
+  #       for consistency as all entities have createdAt
+  createdAt: BigInt! # block.timestamp when entity created
+  createdAtStr: String! # createdAt in UTC string
+}
+
+type SRRApproval @entity {
+  id: ID! # keccak256(tokenId,timestamp)
+  srr: SRR! # SRR for event Provenance.tokenId
+  owner: Bytes! # event Approval.owner - ownership Approved from
+  approved: Bytes! # event Provenance.approved - ownership Approved to
+  createdAt: BigInt! # block.timestamp when entity created
+  createdAtStr: String! # createdAt in UTC string
+}
+
+type SRRMetadataHistory @entity {
+  id: ID! # keccak256(tokenId,metadataDigest)
+  srr: SRR! # SRR for event Provenance.tokenId
+  metadataDigest: Bytes! # event Provenance.metadataDigest
+  createdAt: BigInt! # block.timestamp when entity created
+  createdAtStr: String! # createdAt in UTC string
+}
+
+enum TransferCommitLastAction {
+  approve
+  cancel
+  transfer
+}
+
+type SRRTransferCommit @entity {
+  id: ID! # tokenId.toString()
+  commitment: Bytes # event Provenance.from - ownership transferred from
+  customHistory: CustomHistory
+  lastAction: TransferCommitLastAction!
+  createdAt: BigInt! # block.timestamp when entity created
+  updatedAt: BigInt! # block.timestamp when entity last updated
+  createdAtStr: String! # createdAt in UTC string
+  updatedAtStr: String! # updatedAt in UTC string
+}
+
+type BulkIssue @entity {
+  id: ID! # merkleRoot.toHexString()
+  merkleRoot: Bytes! # batch merkle root
+  srrs: [BulkIssueSRR!]! @derivedFrom(field: "bulkIssue")
+  issuer: Bytes! # batchprepared issuer
+  createdAt: BigInt! # block.timestamp when entity created
+  updatedAt: BigInt! # block.timestamp when entity last updated
+  createdAtStr: String! # createdAt in UTC string
+  updatedAtStr: String! # updatedAt in UTC string
+}
+
+type BulkIssueSRR @entity {
+  id: ID! # merkleRoot.toHexString()
+  hash: Bytes! # hash of SRR props isPrimaryIssuer, artistAddress and metadataDigest
+  tokenId: String # ERC721 token id for createSRRwithProof event
+  bulkIssue: BulkIssue! # BulkIssue this entity belongs too
+  createdAt: BigInt! # block.timestamp when entity created
+  createdAtStr: String! # createdAt in UTC string
+}
+
+type BulkTransfer @entity {
+  id: ID! # merkleRoot.toHexString()
+  merkleRoot: Bytes! # batch merkle root
+  srrApproveHashes: [Bytes!] # Hashes of ApproveSRRs processed
+  sender: Bytes! # batchprepared sender
+  tokenId: String # ERC721 token id for ApproveSRRCommitmentWithProof event
+  createdAt: BigInt! # block.timestamp when entity created
+  updatedAt: BigInt! # block.timestamp when entity last updated
+  createdAtStr: String! # createdAt in UTC string
+  updatedAtStr: String! # updatedAt in UTC string
+}
+
+type Bulk @entity {
+  id: ID! # merkleRoot.toHexString()
+  merkleRoot: Bytes! # batch merkle root
+  srrs: [BulkSRR!]! @derivedFrom(field: "bulk")
+  sender: Bytes! # batchprepared sender
+  tokenId: String # ERC721 token id for ApproveSRRCommitmentWithProof event
+  createdAt: BigInt! # block.timestamp when entity created
+  updatedAt: BigInt! # block.timestamp when entity last updated
+  createdAtStr: String! # createdAt in UTC string
+  updatedAtStr: String! # updatedAt in UTC string
+}
+
+type BulkSRR @entity {
+  id: ID! # merkleRoot.toHexString()
+  hash: Bytes! # hash of function props
+  tokenId: String # ERC721 token id
+  bulk: Bulk! # Bulk this entity belongs too
+  createdAt: BigInt! # block.timestamp when entity created
+  createdAtStr: String! # createdAt in UTC string
+}
+
+type MetaTxRequestType @entity {
+  id: ID! # typeHash.toHexString()
+  typeHash: Bytes!
+  typeString: String!
+  createdAt: BigInt! # block.timestamp when entity created
+  createdAtStr: String! # createdAt in UTC string
+}
+
+type MetaTxExecution @entity {
+  id: ID! # txHash.toHexString()
+  txHash: Bytes!
+  createdAt: BigInt! # block.timestamp when entity created
+  createdAtStr: String! # createdAt in UTC string
+}

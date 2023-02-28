@@ -1,0 +1,100 @@
+{
+  "name": "@startbahn/startrail-contracts",
+  "version": "1.12.0-beta-1",
+  "description": "Startrail smart contracts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/startbahn/startrail-contracts.git"
+  },
+  "author": "Startbahn, Inc.",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/startbahn/startrail-contracts/issues"
+  },
+  "homepage": "https://github.com/startbahn/startrail-contracts#readme",
+  "engines": {
+    "node": "16"
+  },
+  "scripts": {
+    "accounts": "hardhat accounts 2> /dev/null",
+    "clean": "hardhat clean && rimraf cache",
+    "compile": "hardhat compile",
+    "console": "hardhat --network localhost console",
+    "coverage": "hardhat coverage",
+    "deploy-local": "bin/deploy-local.sh",
+    "down": "bin/hardhat-and-graph-down.sh",
+    "up": "bin/hardhat-and-graph-up.sh",
+    "generate-docs": "bin/generate-docs.sh",
+    "generate-flattened": "bin/generate-flattened.sh",
+    "hardhat-up": "docker-compose -f docker/docker-compose.yml up",
+    "hardhat-up-bg": "docker-compose -f docker/docker-compose.yml up -d",
+    "hardhat-down": "docker-compose -f docker/docker-compose.yml rm -sfv",
+    "hardhat-log": "docker logs --tail 20 -f startrail-hardhat",
+    "info": "HARDHAT_NETWORK=localhost npx ts-node scripts/startrail-info.js",
+    "lint": "npx hardhat check",
+    "node-for-stack": "bin/start-for-stack.sh",
+    "node": "hardhat --config hardhat.config.stack.ts node --hostname 0.0.0.0 --port 8546",
+    "node-fork": "bin/node-fork.sh",
+    "npm-publish": "node bin/npm-publish",
+    "postinstall": "if [ ! -e .env ] && [ -e .env.sample ]; then cp .env.sample .env; fi",
+    "prettier": "prettier --write /contracts/**.sol",
+    "seed-minimal": "bin/seed-minimal.sh",
+    "seed-extended": "bin/seed-extended.sh",
+    "test": "hardhat test",
+    "prepare": "husky install"
+  },
+  "keywords": [
+    "ethereum",
+    "solidity",
+    "startrail",
+    "ERC721"
+  ],
+  "devDependencies": {
+    "@gnosis.pm/safe-contracts": "1.2.0",
+    "@nomiclabs/hardhat-ethers": "2.0.5",
+    "@nomiclabs/hardhat-solhint": "^2.0.0",
+    "@nomiclabs/hardhat-waffle": "2.0.1",
+    "@primitivefi/hardhat-dodoc": "^0.2.3",
+    "@types/chai": "^4.2.21",
+    "@types/chai-as-promised": "^7.1.4",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "16.11.7",
+    "chai": "4.3.4",
+    "chai-as-promised": "~7.1.1",
+    "colors": "~1.4.0",
+    "dot": "^2.0.0-beta.1",
+    "ethereum-waffle": "3.4.0",
+    "ethers": "5.5.2",
+    "ganache-http-proxy": "^1.0.7",
+    "glob": "^7.1.7",
+    "graphviz": "^0.0.9",
+    "hardhat": "2.8.4",
+    "hardhat-contract-sizer": "^2.5.1",
+    "hardhat-gas-reporter": "1.0.4",
+    "hardhat-log-remover": "2.0.2",
+    "husky": "^7.0.4",
+    "inquirer": "^8.0.0",
+    "mocha": "^8.3.2",
+    "readline-sync": "~1.4.10",
+    "rimraf": "^3.0.2",
+    "sol2uml": "1.1.29",
+    "solidity-coverage": "0.7.16",
+    "surya": "0.4.2",
+    "ts-node": "10.2.1",
+    "typescript": "4.3.5",
+    "lodash": "4.17.21",
+    "@types/lodash": "4.14.182"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "~3.1.0",
+    "@openzeppelin/contracts-ethereum-package": "~3.0.0",
+    "commander": "^7.2.0",
+    "dotenv": "~8.2.0",
+    "prettier": "~2.1.2",
+    "strip-hex-prefix": "^1.0.0"
+  },
+  "resolutions": {
+    "lodash": "4.17.21",
+    "elliptic": "6.5.4"
+  }
+}

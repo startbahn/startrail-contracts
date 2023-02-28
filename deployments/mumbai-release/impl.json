@@ -1,0 +1,8 @@
+{
+  "nameRegistryImplementationAddress": "0x0aA537b5ae415a4668Ab73386D89774B86405e03",
+  "metaTxForwarderImplementationAddress": "0x95980B119122665fC9Fc334ECFf803B75D491145",
+  "licensedUserManagerImplementationAddress": "0xCAFE33f4AD40b5E03E245F23A8684f3dFc289ec5",
+  "startrailRegistryImplementationAddress": "0x870242b92D56fB523409b83c5340218C29855C99",
+  "bulkIssueImplementationAddress": "0x663CF0A6E62aFFcebAa4D7aB24c4b4715AA9de6D",
+  "bulkTransferImplementationAddress": "0x1291c3b63c2Fb0a833dad7386261c79878c9f18C"
+}
