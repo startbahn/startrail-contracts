@@ -43,7 +43,7 @@ export function ethereumValueToString(v: ethereum.Value): string {
       valueStr = v.toString()
       break
     case ethereum.ValueKind.ADDRESS:
-      valueStr = v.toAddress().toHexString()
+      valueStr = v.toAddress().toHex()
       break
     case ethereum.ValueKind.INT:
     case ethereum.ValueKind.UINT:
@@ -51,7 +51,7 @@ export function ethereumValueToString(v: ethereum.Value): string {
       break
     case ethereum.ValueKind.BYTES:
     case ethereum.ValueKind.FIXED_BYTES:
-      valueStr = v.toBytes().toHexString()
+      valueStr = v.toBytes().toHex()
       break
     case ethereum.ValueKind.ARRAY:
     case ethereum.ValueKind.FIXED_ARRAY:
@@ -89,7 +89,7 @@ export function logInvocation(
   log.info('{} [params: {}] [tx: {}]', [
     handlerName,
     paramLog.toString(),
-    event.transaction.hash.toHexString(),
+    event.transaction.hash.toHex(),
   ])
 }
 

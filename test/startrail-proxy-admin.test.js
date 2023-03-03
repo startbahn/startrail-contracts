@@ -1,6 +1,6 @@
 const { expect, use } = require("chai");
 const chaiAsPromised = require("chai-as-promised");
-const waffle = require("ethereum-waffle");
+const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 const hre = require("hardhat");
 
 const {
@@ -16,7 +16,6 @@ const {
 } = require("../utils/hardhat-helpers");
 
 use(chaiAsPromised);
-use(waffle.solidity);
 
 // Signing wallets
 const wallets = getWallets(hre);
@@ -29,7 +28,7 @@ describe("StartrailProxyAdmin", () => {
   let administratorContract;
 
   beforeEach(async () => {
-    ({ startrailProxyAdmin, nameRegistry } = await hre.waffle.loadFixture(
+    ({ startrailProxyAdmin, nameRegistry } = await loadFixture(
       fixtureDefault
     ));
     administratorContract = await getAdministratorInstance(hre);

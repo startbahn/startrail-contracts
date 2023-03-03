@@ -19,6 +19,18 @@ const srrIdComputeInternal = (
   return BigNumber.from(idHash).mod(modulus).toNumber()
 }
 
+const srrIdComputeInternalWithCID = (
+  artistAddress: string,
+  metadataCID: string,
+  modulus: BigNumber
+): number => {
+  const idHash = ethers.utils.solidityKeccak256(
+    ['string', 'address'],
+    [metadataCID, artistAddress]
+  )
+  return BigNumber.from(idHash).mod(modulus).toNumber()
+}
+
 const srrIdCompute = (artistAddress: string, metadataDigest: string): number =>
   srrIdComputeInternal(artistAddress, metadataDigest, ID_CAP)
 
@@ -27,4 +39,7 @@ const srrIdV2Compute = (
   metadataDigest: string
 ): number => srrIdComputeInternal(artistAddress, metadataDigest, ID_CAP_V2)
 
-export { srrIdCompute, srrIdV2Compute }
+const srrIdV3Compute = (artistAddress: string, metadataCID: string): number =>
+  srrIdComputeInternalWithCID(artistAddress, metadataCID, ID_CAP_V2)
+
+export { srrIdCompute, srrIdV2Compute, srrIdV3Compute }

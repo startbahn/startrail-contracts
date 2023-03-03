@@ -19,3 +19,11 @@ npx hardhat run --network localhost scripts/deploy/014-deploy-bytecode-reduction
 npx hardhat run --network localhost scripts/deploy/015-deploy-custom-history-update.ts || exit $?
 npx hardhat run --network localhost scripts/deploy/016-deploy-update-srr-add-history-permission.ts || exit $?
 npx hardhat run --network localhost scripts/deploy/017-deploy-audit-fixes.ts || exit $?
+npx hardhat run --network localhost scripts/deploy/018-deploy-custom-history-name-update.ts || exit $?
+npx hardhat run --network localhost scripts/deploy/019-deploy-enable-ipfs.ts || exit $?
+npx hardhat run --network localhost scripts/deploy/020-deploy-royalty-erc2981.ts || exit $?
+npx hardhat run --network localhost scripts/deploy/021-deploy-change-ipfs-url.ts || exit $?
+npx hardhat run --network localhost scripts/deploy/022-deploy-royalty-receiver-multi-update.ts || exit $?
+
+# deployment not ready for qa but we add it here for unit testing:
+npx hardhat run --network localhost scripts/deploy/0nn-deploy-meta-tx-forwarder-collections.ts || exit $?

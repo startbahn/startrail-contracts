@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.6.11;
-pragma experimental ABIEncoderV2;
+pragma solidity 0.8.13;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
+import "../proxy/utils/InitializableWithGap.sol";
 import "../common/INameRegistry.sol";
 import "../common/IStartrailRegistryV9.sol";
 import "../lib/IDGeneratorV2.sol";
@@ -24,7 +23,7 @@ contract StartrailRegistryV9 is
     IERC2477,
     IStartrailRegistryV9,
     IStartrailRegistryMigrationV2,
-    Initializable,
+    InitializableWithGap,
     Storage,
     ERC721UpgradeSafe,
     EIP2771BaseRecipient
@@ -152,9 +151,9 @@ contract StartrailRegistryV9 is
      * This check will throw if the token does not exist (see ownerOf).
      */
     modifier onlySRROwnerOrAdministrator(uint256 tokenId) {
-        address owner = getSRROwner(tokenId);
+        address owner_ = getSRROwner(tokenId);
         require(
-            owner == msgSender() || isAdministrator(),
+            owner_ == msgSender() || isAdministrator(),
             "Sender is neither a SRR owner nor the admin"
         );
         _;
@@ -243,65 +242,24 @@ contract StartrailRegistryV9 is
         return _nameRegistry().administrator() == msgSender();
     }
 
-    function supportsInterface(bytes4 interfaceID)
-        external
-        override
-        view
-        returns (bool)
-    {
-        return
-            // bytes4(keccak256('supportsInterface(bytes4)')) == 0x01ffc9a7
-            interfaceID == 0x01ffc9a7 || // ERC165
-            /*
-             *   bytes4(keccak256('tokenURIIntegrity(uint256)')) == 0x49846680
-             *   bytes4(keccak256('tokenURISchemaIntegrity(uint256)')) == 0xcaae188e
-             *
-             *   => 0x49846680 ^ 0xcaae188e == 0x832a7e0e
-             */
-            interfaceID == 0x832a7e0e || // ERC2477
-            /*
-             *     bytes4(keccak256('balanceOf(address)')) == 0x70a08231
-             *     bytes4(keccak256('ownerOf(uint256)')) == 0x6352211e
-             *     bytes4(keccak256('approve(address,uint256)')) == 0x095ea7b3
-             *     bytes4(keccak256('getApproved(uint256)')) == 0x081812fc
-             *     bytes4(keccak256('setApprovalForAll(address,bool)')) == 0xa22cb465
-             *     bytes4(keccak256('isApprovedForAll(address,address)')) == 0xe985e9c5
-             *     bytes4(keccak256('transferFrom(address,address,uint256)')) == 0x23b872dd
-             *     bytes4(keccak256('safeTransferFrom(address,address,uint256)')) == 0x42842e0e
-             *     bytes4(keccak256('safeTransferFrom(address,address,uint256,bytes)')) == 0xb88d4fde
-             *
-             *     => 0x70a08231 ^ 0x6352211e ^ 0x095ea7b3 ^ 0x081812fc ^
-             *        0xa22cb465 ^ 0xe985e9c ^ 0x23b872dd ^ 0x42842e0e ^ 0xb88d4fde == 0x80ac58cd
-             */
-            interfaceID == 0x80ac58cd || // ERC721
-            /*
-             *     bytes4(keccak256('name()')) == 0x06fdde03
-             *     bytes4(keccak256('symbol()')) == 0x95d89b41
-             *     bytes4(keccak256('tokenURI(uint256)')) == 0xc87b56dd
-             *
-             *     => 0x06fdde03 ^ 0x95d89b41 ^ 0xc87b56dd == 0x5b5e139f
-             */
-            interfaceID == 0x5b5e139f; // ERC721Metadata
-    }
-
     /**
      * @dev Creates a registryRecord of an artwork
      * @param isPrimaryIssuer boolean whether the user is a primary issuer
      * @param artistAddress address of the artist contract
      * @param metadataDigest bytes32 of metadata hash
-     * @param lockExternalTransfer bool of the flag to disable standard ERC721 transfer methods
+     * @param lockExternalTransfer_ bool of the flag to disable standard ERC721 transfer methods
      */
     function createSRR(
         bool isPrimaryIssuer,
         address artistAddress,
         bytes32 metadataDigest,
-        bool lockExternalTransfer
+        bool lockExternalTransfer_
     )
         public
         override(IStartrailRegistryV9)
         onlyAdministrator
     {
-        _createSRR(isPrimaryIssuer, artistAddress, metadataDigest, msg.sender, lockExternalTransfer);
+        _createSRR(isPrimaryIssuer, artistAddress, metadataDigest, msg.sender, lockExternalTransfer_);
     }
 
     /**
@@ -309,13 +267,13 @@ contract StartrailRegistryV9 is
      * @param isPrimaryIssuer address of the issuer user contract
      * @param artistAddress address of the artist contract
      * @param metadataDigest bytes32 of metadata hash
-     * @param lockExternalTransfer bool of the flag to disable standard ERC721 transfer methods
+     * @param lockExternalTransfer_ bool of the flag to disable standard ERC721 transfer methods
      */
     function createSRRFromLicensedUser(
         bool isPrimaryIssuer,
         address artistAddress,
         bytes32 metadataDigest,
-        bool lockExternalTransfer
+        bool lockExternalTransfer_
     )
         public
         override(IStartrailRegistryV9)
@@ -326,7 +284,7 @@ contract StartrailRegistryV9 is
             artistAddress,
             metadataDigest,
             msgSender(),
-            lockExternalTransfer
+            lockExternalTransfer_
         );
     }
 
@@ -335,7 +293,7 @@ contract StartrailRegistryV9 is
         address artistAddress,
         bytes32 metadataDigest,
         address issuerAddress,
-        bool lockExternalTransfer
+        bool lockExternalTransfer_
     ) public override(IStartrailRegistryV9) onlyBulkIssue returns (uint256) {
         return 
             _createSRR(
@@ -343,7 +301,7 @@ contract StartrailRegistryV9 is
                 artistAddress,
                 metadataDigest,
                 issuerAddress,
-                lockExternalTransfer
+                lockExternalTransfer_
             );
     }
 
@@ -768,12 +726,12 @@ contract StartrailRegistryV9 is
         address artistAddress,
         bytes32 metadataDigest,
         address sender,
-        bool lockExternalTransfer
+        bool lockExternalTransfer_
     ) private returns (uint256) {
         uint256 tokenId = _mint(sender, metadataDigest, artistAddress);
         _addressStorage[tokenId][_SRR][_ISSUER] = sender;
         _bytes32Storage[tokenId][_SRR][_METADATA_DIGEST] = metadataDigest;
-        _boolStorage[tokenId][_SRR][_LOCK_EXTERNAL_TRANSFER] = lockExternalTransfer;
+        _boolStorage[tokenId][_SRR][_LOCK_EXTERNAL_TRANSFER] = lockExternalTransfer_;
         require(
             _saveSRR(tokenId, isPrimaryIssuer, artistAddress),
             "fail to save Startrail Registry Record"
@@ -782,7 +740,7 @@ contract StartrailRegistryV9 is
             tokenId,
             SRR(isPrimaryIssuer, artistAddress, sender),
             metadataDigest,
-            lockExternalTransfer
+            lockExternalTransfer_
         );
         return tokenId;
     }
@@ -809,17 +767,17 @@ contract StartrailRegistryV9 is
         string memory historyMetadataDigest,
         uint256 customHistoryId
     ) private {
-        address owner = getSRROwner(tokenId);
+        address owner_ = getSRROwner(tokenId);
         if (_bytes32Storage[tokenId][_SRR][_COMMITMENT] != "") {
             emit SRRCommitmentCancelled(tokenId);
         }
         _bytes32Storage[tokenId][_SRR][_COMMITMENT] = commitment;
         _stringStorage[tokenId][_HISTORY][_METADATA_DIGEST] = historyMetadataDigest;
         if (customHistoryId == _NO_CUSTOM_HISTORY) {
-            emit SRRCommitment(tokenId, owner, commitment);
+            emit SRRCommitment(tokenId, owner_, commitment);
         } else {
             _uintStorage[tokenId][_HISTORY][_CUSTOM_HISTORY] = customHistoryId;
-            emit SRRCommitment(tokenId, owner, commitment, customHistoryId);
+            emit SRRCommitment(tokenId, owner_, commitment, customHistoryId);
         }
     }
     
@@ -1055,11 +1013,11 @@ contract StartrailRegistryV9 is
      * @param tokenId uint256 ID of the token to be approved
      */
     function approve(address to, uint256 tokenId) public externalTransferNotLocked(tokenId) override {
-        address owner = ownerOf(tokenId);
-        require(to != owner, "ERC721: approval to current owner");
+        address owner_ = ownerOf(tokenId);
+        require(to != owner_, "ERC721: approval to current owner");
 
         require(
-            _msgSender() == owner || isApprovedForAll(owner, _msgSender()) || isAdministrator(),
+            _msgSender() == owner_ || isApprovedForAll(owner_, _msgSender()) || isAdministrator(),
             "ERC721: approve caller is not owner nor approved for all"
         );
 
@@ -1272,7 +1230,7 @@ contract StartrailRegistryV9 is
      * not sure if OpenSea requires this getter to build the meta transaction
      * so making it public and available here to be sure.
      */
-    function getChainId() public pure returns (uint256) {
+    function getChainId() public view returns (uint256) {
         return OpenSeaMetaTransactionLibrary.getChainId();
     }
 
@@ -1303,7 +1261,7 @@ contract StartrailRegistryV9 is
         internal
         override
         view
-        returns (address payable sender)
+        returns (address sender)
     {
         return OpenSeaMetaTransactionLibrary.msgSenderFromEIP2771MsgData(msg.data);
     }

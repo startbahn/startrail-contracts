@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity ^0.6.11;
+pragma solidity 0.8.13;
 
 /**
  * @title A minimal proxy to install at LicensedUserLogic proxies.
@@ -18,7 +18,7 @@ contract WalletProxyMinimal {
   bytes32
     internal constant IMPLEMENTATION_SLOT = 0xc5f16f0fcc639fa48a6947836d9850f504798523bf8c9a3a87d5876cf622bcf7;
 
-  constructor(address contractLogic, bytes memory constructData) public {
+  constructor(address contractLogic, bytes memory constructData) {
     // save the code address
     assembly {
       // solium-disable-line

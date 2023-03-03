@@ -1,8 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.6.11;
-
-// Using ABIEncoderV2 to support using LicensedUserDto struct as calldata
-pragma experimental ABIEncoderV2;
+pragma solidity 0.8.13;
 
 import "@openzeppelin/contracts/utils/Create2.sol";
 
@@ -479,6 +476,16 @@ contract LicensedUserManager is
    *       leave this here as a possibility in a future release - an
    *       upgraded version of this contract could provide the code for
    *       this function.
+   *
+   *       If this feature is required ensure that the new version of this
+   *       contract imports the EXACT version of WalletProxyMimnimal used by
+   *       the first deployed version of this contract. This is essential to
+   *       ensure the create2 addresses are the same. One difference is the
+   *       SPDX license header should be changed back to UNLICENSED. Another
+   *       will be the compiler version should go back to the original 0.6.11.
+   *       These properties impact the deployedBytecode because a hash of
+   *       contract metadata is included and that metadata includes these
+   *       properties.
    *
    * "Eject" a wallet from this LicensedUser to it's own smart contract.
    *

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity >=0.5.0 <0.7.0;
+pragma solidity 0.8.13;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
+import "../proxy/utils/InitializableWithGap.sol";
 import "../common/INameRegistry.sol";
 import "../metaTx/eip2771/EIP2771BaseRecipient.sol";
 
@@ -18,7 +18,7 @@ import "../metaTx/eip2771/EIP2771BaseRecipient.sol";
  *    using new onlyWallet modifier (replaces SelfAuthorized.sol check)
  *  - use EIP2771 to receive calls from a Forwarder contract
  */
-contract OwnerManager is Initializable, EIP2771BaseRecipient {
+contract OwnerManager is InitializableWithGap, EIP2771BaseRecipient {
 
   event AddedOwner(address indexed wallet, address owner);
   event RemovedOwner(address indexed wallet, address owner);

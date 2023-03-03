@@ -33,7 +33,7 @@ export function handleCreateLicensedUserWallet(event: CreateLUWEvent): void {
   logInvocation('handleCreateLicensedUserWallet', event)
 
   let timestampMillis = eventUTCMillis(event)
-  let luwId = event.params.walletAddress.toHexString()
+  let luwId = event.params.walletAddress.toHex()
   let luw = LicensedUserWallet.load(luwId)
 
   // New wallet (not a migration from legacy)
@@ -62,7 +62,7 @@ export function handleCreateLicensedUserWallet(event: CreateLUWEvent): void {
 export function handleAddedOwner(event: AddedOwnerEvent): void {
   logInvocation('handleAddedOwner', event)
 
-  let luwId = event.params.wallet.toHexString()
+  let luwId = event.params.wallet.toHex()
   let luw = LicensedUserWallet.load(luwId)
 
   if (!luw) {
@@ -71,7 +71,7 @@ export function handleAddedOwner(event: AddedOwnerEvent): void {
   }
 
   let owner = event.params.owner
-  log.info('adding owner [{}] to LUW [{}]', [owner.toHexString(), luwId])
+  log.info('adding owner [{}] to LUW [{}]', [owner.toHex(), luwId])
 
   // this 3 step assign, push, reassign is necessary here:
   // (see https://thegraph.com/docs/assemblyscript-api#api-reference):
@@ -87,7 +87,7 @@ export function handleAddedOwner(event: AddedOwnerEvent): void {
 export function handleRemovedOwner(event: RemovedOwnerEvent): void {
   logInvocation('handleRemovedOwner', event)
 
-  let luwId = event.params.wallet.toHexString()
+  let luwId = event.params.wallet.toHex()
   let luw = LicensedUserWallet.load(luwId)
 
   if (!luw) {
@@ -99,12 +99,12 @@ export function handleRemovedOwner(event: RemovedOwnerEvent): void {
   let ownerIdx = luw.owners.indexOf(owner)
   if (ownerIdx == -1) {
     log.error('owner in RemovedOwner [{}] is not in the indexed owner list', [
-      owner.toHexString(),
+      owner.toHex(),
     ])
     return
   }
 
-  log.info('removing owner [{}] to LUW [{}]', [owner.toHexString(), luwId])
+  log.info('removing owner [{}] to LUW [{}]', [owner.toHex(), luwId])
 
   // assign to separate variable is required when updating array, see here:
   // (see https://thegraph.com/docs/assemblyscript-api#api-reference):
@@ -120,7 +120,7 @@ export function handleRemovedOwner(event: RemovedOwnerEvent): void {
 export function handleChangedThreshold(event: ChangedThresholdEvent): void {
   logInvocation('handleChangedThreshold', event)
 
-  let luwId = event.params.wallet.toHexString()
+  let luwId = event.params.wallet.toHex()
   let luw = LicensedUserWallet.load(luwId)
 
   if (!luw) {
@@ -143,7 +143,7 @@ export function handleUpgradeLicensedUserWalletToMulti(
 ): void {
   logInvocation('handleUpgradeLicensedUserWalletToMulti', event)
 
-  let luwId = event.params.walletAddress.toHexString()
+  let luwId = event.params.walletAddress.toHex()
   let luw = LicensedUserWallet.load(luwId)
   if (!luw) {
     log.error(
@@ -166,7 +166,7 @@ export function handleUpdateLicensedUserDetail(
 ): void {
   logInvocation('handleUpdateLicensedUserDetail', event)
 
-  let luwId = event.params.walletAddress.toHexString()
+  let luwId = event.params.walletAddress.toHex()
   let luw = LicensedUserWallet.load(luwId)
   if (!luw) {
     log.error('received UpdateLicensedUserDetail event for unknown LUW: {}', [
@@ -196,7 +196,7 @@ export function handleMigrateLicensedUser(
   event: MigrateLicensedUserWalletEvent
 ): void {
   logInvocation('handleMigrateLicensedUser', event)
-  let luwId = event.params.walletAddress.toHexString()
+  let luwId = event.params.walletAddress.toHex()
   let luw = LicensedUserWallet.load(luwId)
   if (!luw) {
     log.error('received handleMigrateLicensedUser event for unknown LUW: {}', [

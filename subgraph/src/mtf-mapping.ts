@@ -14,12 +14,12 @@ export function handleRequestTypeRegistered(
   logInvocation('handleRequestTypeRegistered', event)
 
   let typeHash = event.params.typeHash
-  let requestType = new MetaTxRequestType(typeHash.toHexString())
+  let requestType = new MetaTxRequestType(typeHash.toHex())
   requestType.typeHash = typeHash
   requestType.typeString = event.params.typeStr
 
   log.info('creating MetaTxRequestType hash [{}] typeString [{}]', [
-    requestType.typeHash.toHexString(),
+    requestType.typeHash.toHex(),
     requestType.typeString,
   ])
   requestType.createdAt = eventUTCMillis(event)
@@ -32,7 +32,7 @@ export function handleRequestTypeUnregistered(
 ): void {
   logInvocation('handleRequestTypeUnregistered', event)
 
-  let requestTypeId = event.params.typeHash.toHexString()
+  let requestTypeId = event.params.typeHash.toHex()
   let requestType = MetaTxRequestType.load(requestTypeId)
   if (!requestType) {
     log.error(
@@ -43,7 +43,7 @@ export function handleRequestTypeUnregistered(
   }
 
   log.info('removing MetaTxRequestType hash [{}] typeString [{}]', [
-    requestType.typeHash.toHexString(),
+    requestType.typeHash.toHex(),
     requestType.typeString,
   ])
   store.remove('MetaTxRequestType', requestTypeId)
@@ -53,9 +53,9 @@ export function handleExecutionSuccess(event: ExecutionSuccessEvent): void {
   logInvocation('handleExecutionSuccess', event)
 
   let txHash = event.params.txHash
-  let execution = new MetaTxExecution(txHash.toHexString())
+  let execution = new MetaTxExecution(txHash.toHex())
   execution.txHash = txHash
-  log.info('creating MetaTxExecution hash [{}]', [txHash.toHexString()])
+  log.info('creating MetaTxExecution hash [{}]', [txHash.toHex()])
   execution.createdAt = eventUTCMillis(event)
   execution.createdAtStr = toUTCString(execution.createdAt)
   execution.save()

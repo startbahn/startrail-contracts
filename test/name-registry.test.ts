@@ -1,6 +1,5 @@
 import { expect, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { solidity } from 'ethereum-waffle'
 import hre, { ethers } from 'hardhat'
 import { ContractKeys } from '../startrail-common-js/contracts/types'
 import { randomAddress } from '../startrail-common-js/test-helpers/test-utils'
@@ -8,7 +7,6 @@ import { randomAddress } from '../startrail-common-js/test-helpers/test-utils'
 import { getWallets } from '../utils/hardhat-helpers'
 
 use(chaiAsPromised);
-use(solidity);
 
 // Signing wallets
 const wallets = getWallets(hre);
@@ -29,7 +27,7 @@ describe("NameRegistry", () => {
       expect(
         nr.initialize(administratorWallet.address)
       ).to.eventually.be.rejectedWith(
-        `Contract instance has already been initialized`
+        `Initializable: contract is already initialized`
       ));
   });
 

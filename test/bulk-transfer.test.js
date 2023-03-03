@@ -3,7 +3,7 @@ const { ethers } = require("ethers");
 
 const { expect, use } = require("chai");
 const chaiAsPromised = require("chai-as-promised");
-const waffle = require("ethereum-waffle");
+const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 
 const { ContractKeys } = require("../startrail-common-js/contracts/types");
 const {
@@ -17,7 +17,6 @@ const { decodeEventLog, getWallets } = require("../utils/hardhat-helpers");
 const { nameRegistrySet } = require("../utils/name-registry-set");
 
 use(chaiAsPromised);
-use(waffle.solidity);
 
 // Signing wallets
 const wallets = getWallets(hre);
@@ -50,14 +49,14 @@ const generateApproveByCommitmentSRRs = (tokenIds, withCustomHistoryId) => {
     return tokenIds.map((v, i) => ({
       tokenId: v,
       commitment: commitment,
-      historyMetadataDigest: randomSha256().toString(),
+      historyMetadataHash: randomSha256().toString(),
       customHistoryId: randomTokenId(),
     }));
   } else {
     return tokenIds.map((v, i) => ({
       tokenId: v,
       commitment: commitment,
-      historyMetadataDigest: randomSha256().toString(),
+      historyMetadataHash: randomSha256().toString(),
       customHistoryId: 0,
     }));
   }
@@ -108,7 +107,7 @@ const createSRR = async () => {
 
 describe("BulkTransfer", () => {
   before(async () => {
-    ({ startrailRegistry, bulkTransfer: bulk, nameRegistry } = await hre.waffle.loadFixture(
+    ({ startrailRegistry, bulkTransfer: bulk, nameRegistry } = await loadFixture(
       fixtureDefault
     ));
 
@@ -133,7 +132,7 @@ describe("BulkTransfer", () => {
       expect(
         bulk.initialize(nameRegistry.address, trustedForwarderWallet.address)
       ).to.eventually.be.rejectedWith(
-        `Contract instance has already been initialized`
+        `Initializable: contract is already initialized`
       ));
   });
 
@@ -241,7 +240,7 @@ describe("BulkTransfer", () => {
         srrLeafString,
         srr.tokenId,
         srr.commitment,
-        srr.historyMetadataDigest,
+        srr.historyMetadataHash,
         0
       );
 
@@ -267,7 +266,7 @@ describe("BulkTransfer", () => {
         srrLeafString,
         srr.tokenId,
         srr.commitment,
-        srr.historyMetadataDigest,
+        srr.historyMetadataHash,
         srr.customHistoryId
       );
       await expect(txRspPromise)
@@ -290,7 +289,7 @@ describe("BulkTransfer", () => {
           srrLeafString,
           srr.tokenId,
           srr.commitment,
-          srr.historyMetadataDigest,
+          srr.historyMetadataHash,
           0
         );
       };
@@ -322,7 +321,7 @@ describe("BulkTransfer", () => {
           srrLeafString,
           srr.tokenId,
           srr.commitment,
-          srr.historyMetadataDigest,
+          srr.historyMetadataHash,
           0
         )
       ).to.eventually.be.rejectedWith(
@@ -347,7 +346,7 @@ describe("BulkTransfer", () => {
           srrLeafString,
           srr.tokenId,
           srr.commitment,
-          srr.historyMetadataDigest,
+          srr.historyMetadataHash,
           srr.customHistoryId
         )
       ).to.eventually.be.rejectedWith(
@@ -371,7 +370,7 @@ describe("BulkTransfer", () => {
           invalidSRRLeafString,
           srr.tokenId,
           srr.commitment,
-          srr.historyMetadataDigest,
+          srr.historyMetadataHash,
           0
         )
       ).to.eventually.be.rejectedWith(
@@ -395,7 +394,7 @@ describe("BulkTransfer", () => {
           invalidSRRLeafString,
           srr.tokenId,
           srr.commitment,
-          srr.historyMetadataDigest,
+          srr.historyMetadataHash,
           srr.customHistoryId
         )
       ).to.eventually.be.rejectedWith(

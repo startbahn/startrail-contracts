@@ -18,9 +18,6 @@ const getNetworkConfig = (hre) => hre.config.networks[hre.network.name];
 
 /**
  * Get ethers.Wallet instances for all accounts defined in hardhat.config.ts.
- *
- * NOTE: hardhat-waffle provides a similar function however we want this
- * available in and outside of tests so this function is implemented here.
  */
 const getWallets = (
   hre: HardhatRuntimeEnvironment
@@ -155,6 +152,14 @@ const getContractNameLatest = (contractName) => {
     : contractName;
 };
 
+/**
+ * Helper that gets a list of all collection feature contract names.
+ * @return Names of all Feature contracts
+ */
+ const getCollectionFeatureContractNames = (): ReadonlyArray<string> => {
+  return glob.sync(`contracts/collection/features/*.sol`)
+}
+
 const sortByNumber = (filenames: string[]) => filenames.sort((a, b) => {
   const a1 = parseInt(a.replace(/[^0-9]/g, ''), 10);
   const b1 = parseInt(b.replace(/[^0-9]/g, ''), 10);
@@ -170,6 +175,7 @@ const sortByNumber = (filenames: string[]) => filenames.sort((a, b) => {
   }
   return 0;
 });
+
 /**
  * Helper that wraps hre.ethers.getContractAt to get a contract handle.
  *
@@ -189,6 +195,10 @@ const getContract = (
   switch (contractName) {
     case `StartrailProxyAdmin`:
       deployJSONKey = `proxyAdminAddress`;
+      break;
+    case `CollectionFactory`:
+    case `StartrailCollectionFeatureRegistry`:
+      deployJSONKey = `${lowerFirst(contractName)}Address`;
       break;
     default:
       deployJSONKey = `${lowerFirst(contractName)}ProxyAddress`;
@@ -347,6 +357,7 @@ export {
   decodeEventLog,
   getAdministratorSigner,
   getAdministratorInstance,
+  getCollectionFeatureContractNames,
   getContract,
   getContractNameLatest,
   getDeployer,

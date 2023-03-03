@@ -41,8 +41,9 @@ sendMetaTx sr-issue
 sendMetaTx sr-approve-by-commit
 $NODE scripts/srr-transfer-by-reveal scripts/__data__/sr-transfer-by-reveal.json || exit $?
 
-sendMetaTx bulk-prepare 
-$NODE scripts/bulk-create-srr scripts/__data__/bulk-create-srr.json || exit $?
+# remove the createSRRWithProof from bulk issue
+# sendMetaTx bulk-prepare 
+# $NODE scripts/bulk-create-srr scripts/__data__/bulk-create-srr.json || exit $?
 
 sendMetaTx lum-set-english-name 
 sendMetaTx lum-set-original-name 
@@ -70,16 +71,16 @@ $NODE scripts/lum-remove-owner $LUW_ADDRESS $AN_OWNER
 $NODE scripts/admin-multi-send -b 2 -i scripts/__data__/admin-multi-send-update-srr.json || exit $?
 
 # approve and transfer for marketplaces
-$NODE scripts/sr-approve.js 3 4 151267251424 # approve Account #4 with signer Account #3
-$NODE scripts/sr-safe-transfer-from.js 4 3 4 151267251424 # transfer Account #3 -> Account #4 with signer Account #4
+$NODE scripts/sr-approve.js 3 4 762614211005 # approve Account #4 with signer Account #3
+$NODE scripts/sr-safe-transfer-from.js 4 3 4 762614211005 # transfer Account #3 -> Account #4 with signer Account #4
 
 # setApprovalForAll and transfer for marketplace
 $NODE scripts/sr-set-approval-for-all.js 4 3 true # setApprovalForAll Account #4 with signer Account #5
-$NODE scripts/sr-safe-transfer-from.js 3 4 5 151267251424 # transfer Account #5 -> Account #3 with signer Account #3
+$NODE scripts/sr-safe-transfer-from.js 3 4 5 762614211005 # transfer Account #5 -> Account #3 with signer Account #3
 
 # setLockExternalTransfer
-$NODE scripts/sr-set-lock-external-transfer.js 151267251424 true
-$NODE scripts/sr-set-lock-external-transfer.js 151267251424 false
+$NODE scripts/sr-set-lock-external-transfer.js 762614211005 true
+$NODE scripts/sr-set-lock-external-transfer.js 762614211005 false
 
 # transferFromWithProvenance
 sendMetaTx sr-issue3
@@ -89,9 +90,11 @@ sendMetaTx sr-transfer-from-with-provenance
 $NODE scripts/sr-transfer-ownership.js 0x6a36eb43496f23eed13636823a8288d28613a874
 
 # generalized bulk
+# 482308692111
 sendMetaTx sr-issue4
+# 129020582412
 sendMetaTx sr-issue5
-sendMetaTx generalized-bulk-prepare 
+sendMetaTx generalized-bulk-prepare
 $NODE scripts/generalized-bulk-approve-by-commitment scripts/__data__/generalized-bulk-approve-by-commitment.json || exit $?
 $NODE scripts/generalized-bulk-transfer-from-with-provenance scripts/__data__/generalized-bulk-transfer-from-with-provenance.json || exit $?
 
@@ -99,4 +102,15 @@ $NODE scripts/generalized-bulk-transfer-from-with-provenance scripts/__data__/ge
 sendMetaTx sr-issue-to-another-recipient
 
 # update custom history
-$NODE scripts/sr-update-custom-history 1 0x001c7d6fdb9885b02689d0d76b34fe73e7706b3e9e841c16a8f8264077d197cd || exit $?
+$NODE scripts/sr-update-custom-history 1 "GOMA Australia" 0x001c7d6fdb9885b02689d0d76b34fe73e7706b3e9e841c16a8f8264077d197cd || exit $?
+
+# enable ipfs
+sendMetaTx sr-issue6-with-cid
+sendMetaTx sr-transfer-from-with-provenance-with-cid
+sendMetaTx sr-issue7-with-cid-to-another-recipient
+$NODE scripts/sr-write-custom-history-with-cid "GOMA China" 2 bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsq || exit $?
+$NODE scripts/sr-update-custom-history-with-cid 1  "GOMA Japan" bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsq || exit $?
+
+# create collection with an SRR
+sendMetaTx collection-create
+sendMetaTx collection-sr-issue

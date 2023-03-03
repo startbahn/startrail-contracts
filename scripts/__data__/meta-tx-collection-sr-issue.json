@@ -1,0 +1,13 @@
+{
+  "requestTypeKey": "CollectionCreateSRR",
+  "requestData": {
+    "destination": "0xd5a7e49b3cbe731838fcffcee5ce947497061585",
+    "isPrimaryIssuer": false,
+    "artistAddress": "0xeBA6851DB73174C0Bb847C0172721836b3ba267C",
+    "metadataCID": "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi",
+    "lockExternalTransfer": false,
+    "to": "0x0000000000000000000000000000000000000000",
+    "royaltyReceiver": "0xC18fD8c2BA912C8687b005056121E87731612Cc9",
+    "royaltyPercentage": 500
+  }
+}

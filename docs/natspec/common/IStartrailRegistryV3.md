@@ -124,7 +124,7 @@ function cancelSRRCommitment(uint256 tokenId) external nonpayable
 ### createSRR
 
 ```solidity
-function createSRR(bool isPrimaryIssuer, address artistAddress, bytes32 metadataDigest) external nonpayable returns (uint256)
+function createSRR(bool isPrimaryIssuer, address artistAddress, bytes32 metadataDigest) external nonpayable
 ```
 
 Functions
@@ -138,12 +138,6 @@ Functions
 | isPrimaryIssuer | bool | undefined |
 | artistAddress | address | undefined |
 | metadataDigest | bytes32 | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | undefined |
 
 ### createSRRFromBulk
 

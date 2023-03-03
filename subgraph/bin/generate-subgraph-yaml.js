@@ -6,9 +6,9 @@
  * Uses deployments.json for contract addresses etc.
  */
 const fs = require('fs')
-const os = require('os')
 const path = require('path')
 const yaml = require('js-yaml')
+const lowerFirst = require('lodash/lowerFirst')
 
 const rootDir = path.dirname(path.dirname(require.main.filename))
 const rootPath = (rootFile) => path.join(rootDir, rootFile)
@@ -95,19 +95,26 @@ const subgraphYamlTemplate = yaml.safeLoad(
 )
 
 subgraphYamlTemplate.dataSources.forEach((ds) => {
+  const contractName = ds.name
+  const isCollection = contractName === `Collection`
+
   //
   // Get contractAddress
   //
-  const contractName = ds.name
-  const addressKey = `${contractName[0].toLowerCase()}${contractName.substring(
-    1
-  )}ProxyAddress`
-  const contractAddress = contractAddresses[addressKey]
-  if (!contractAddress) {
-    console.error(
-      `ERROR: contract address not set for contract '${contractName}'\n`
-    )
-    process.exit(4)
+  let contractAddress
+  if (!isCollection) {
+    const addressKey = `${lowerFirst(contractName)}${
+      contractName === 'CollectionFactory' ? '' : 'Proxy'
+    }Address`
+
+    contractAddress = contractAddresses[addressKey]
+
+    if (!contractAddress) {
+      console.error(
+        `ERROR: contract address not set for contract '${contractName}'\n`
+      )
+      process.exit(4)
+    }
   }
 
   //
@@ -127,37 +134,41 @@ subgraphYamlTemplate.dataSources.forEach((ds) => {
   }
 
   //
-  // ABI file path AND BulkIssue.json and Bulk.json 2d array workaround
+  // ABI file path
   //
-  let abiFilePath = path.join(abisPath, `${contractName}.json`)
-  if (contractName === 'BulkIssue') {
+  const abiFilename = !isCollection
+    ? contractName
+    : `CollectionProxyFeaturesAggregate`
+  let abiFilePath = path.join(abisPath, `${abiFilename}.json`)
+
+  // Patch Bulk.json and BulkIssue.json for 2d array workaround
+  if (contractName === 'Bulk' || contractName === 'BulkIssue') {
     // graph-cli does not support Solidity 2d arrays
     // see https://github.com/graphprotocol/graph-cli/issues/342
     // so here, strip out the ABI for the function using the 2d array.
     // it's not required by the subgraph.
-    const bulkIssueABI = JSON.parse(fs.readFileSync(abiFilePath))
-    const bulkissueABIModified = bulkIssueABI.filter(
-      (e) => e.name !== 'createSRRWithProofMulti'
-    )
-    abiFilePath = path.join(os.tmpdir(), `BulkIssue.json`)
-    fs.writeFileSync(abiFilePath, JSON.stringify(bulkissueABIModified, null, 2))
-  }
-  if (contractName === 'Bulk') {
     const bulkABI = JSON.parse(fs.readFileSync(abiFilePath))
     const bulkABIModified = bulkABI.filter(
       (e) => e.name !== 'createSRRWithProofMulti'
     )
-    abiFilePath = path.join(os.tmpdir(), `Bulk.json`)
+    // abiFilePath = path.join(os.tmpdir(), `BulkIssue.json`)
+    abiFilePath = path.join(`modifyBuild/abi/`, `${abiFilename}.json`)
     fs.writeFileSync(abiFilePath, JSON.stringify(bulkABIModified, null, 2))
   }
 
   //
   // Set dataSource properties
   //
-  ds.network = network
-  ds.source.address = contractAddress
-  ds.source.startBlock = startBlock
   ds.mapping.abis[0].file = abiFilePath
+  ds.network = network
+  ds.source.startBlock = startBlock
+
+  if (!isCollection) {
+    ds.source.address = contractAddress
+  } else {
+    // data source template - multiple address so don't include it
+    delete ds.source.address
+  }
 })
 
 fs.writeFileSync(

@@ -493,6 +493,22 @@ event CreateLicensedUserWallet(address indexed walletAddress, address[] owners, 
 | userType  | enum LicensedUserManager.UserType | undefined |
 | salt  | bytes32 | undefined |
 
+### Initialized
+
+```solidity
+event Initialized(uint8 version)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| version  | uint8 | undefined |
+
 ### MigrateLicensedUserWallet
 
 ```solidity

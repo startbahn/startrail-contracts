@@ -236,7 +236,7 @@ function contractURI() external view returns (string)
 ### createSRR
 
 ```solidity
-function createSRR(bool isPrimaryIssuer, address artistAddress, bytes32 metadataDigest, bool lockExternalTransfer) external nonpayable
+function createSRR(bool isPrimaryIssuer, address artistAddress, bytes32 metadataDigest, bool lockExternalTransfer_) external nonpayable
 ```
 
 
@@ -250,12 +250,12 @@ function createSRR(bool isPrimaryIssuer, address artistAddress, bytes32 metadata
 | isPrimaryIssuer | bool | boolean whether the user is a primary issuer |
 | artistAddress | address | address of the artist contract |
 | metadataDigest | bytes32 | bytes32 of metadata hash |
-| lockExternalTransfer | bool | bool of the flag to disable standard ERC721 transfer methods |
+| lockExternalTransfer_ | bool | bool of the flag to disable standard ERC721 transfer methods |
 
 ### createSRRFromBulk
 
 ```solidity
-function createSRRFromBulk(bool isPrimaryIssuer, address artistAddress, bytes32 metadataDigest, address issuerAddress, bool lockExternalTransfer) external nonpayable returns (uint256)
+function createSRRFromBulk(bool isPrimaryIssuer, address artistAddress, bytes32 metadataDigest, address issuerAddress, bool lockExternalTransfer_) external nonpayable returns (uint256)
 ```
 
 
@@ -270,7 +270,7 @@ function createSRRFromBulk(bool isPrimaryIssuer, address artistAddress, bytes32 
 | artistAddress | address | undefined |
 | metadataDigest | bytes32 | undefined |
 | issuerAddress | address | undefined |
-| lockExternalTransfer | bool | undefined |
+| lockExternalTransfer_ | bool | undefined |
 
 #### Returns
 
@@ -281,7 +281,7 @@ function createSRRFromBulk(bool isPrimaryIssuer, address artistAddress, bytes32 
 ### createSRRFromLicensedUser
 
 ```solidity
-function createSRRFromLicensedUser(bool isPrimaryIssuer, address artistAddress, bytes32 metadataDigest, bool lockExternalTransfer) external nonpayable
+function createSRRFromLicensedUser(bool isPrimaryIssuer, address artistAddress, bytes32 metadataDigest, bool lockExternalTransfer_) external nonpayable
 ```
 
 
@@ -295,7 +295,7 @@ function createSRRFromLicensedUser(bool isPrimaryIssuer, address artistAddress, 
 | isPrimaryIssuer | bool | address of the issuer user contract |
 | artistAddress | address | address of the artist contract |
 | metadataDigest | bytes32 | bytes32 of metadata hash |
-| lockExternalTransfer | bool | bool of the flag to disable standard ERC721 transfer methods |
+| lockExternalTransfer_ | bool | bool of the flag to disable standard ERC721 transfer methods |
 
 ### customHistoryTypeIdByName
 
@@ -392,7 +392,7 @@ function getApproved(uint256 tokenId) external view returns (address)
 ### getChainId
 
 ```solidity
-function getChainId() external pure returns (uint256)
+function getChainId() external view returns (uint256)
 ```
 
 
@@ -959,18 +959,18 @@ function setTrustedForwarder(address forwarder) external nonpayable
 ### supportsInterface
 
 ```solidity
-function supportsInterface(bytes4 interfaceID) external view returns (bool)
+function supportsInterface(bytes4 interfaceId) external view returns (bool)
 ```
 
 
 
-
+*See {IERC165-supportsInterface}.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| interfaceID | bytes4 | undefined |
+| interfaceId | bytes4 | undefined |
 
 #### Returns
 
@@ -1395,6 +1395,22 @@ event History(uint256[] tokenIds, uint256[] customHistoryIds)
 |---|---|---|
 | tokenIds  | uint256[] | undefined |
 | customHistoryIds  | uint256[] | undefined |
+
+### Initialized
+
+```solidity
+event Initialized(uint8 version)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| version  | uint8 | undefined |
 
 ### LockExternalTransfer
 

@@ -1,9 +1,10 @@
 import { TypedDataUtils } from 'eth-sig-util'
 import { ethers } from 'ethers'
+import _ from 'lodash'
 
 import { TypedDataField } from '@ethersproject/abstract-signer'
 
-import { getFunctionSignatureHash } from '../contracts/utils'
+import { getFunctionSelector as getFunctionSelector } from '../contracts/utils'
 import MessageTypesRegistry, { GenericParamTypes } from './eip712-message-types'
 import { DestinationContract, MetaTxRequest, MetaTxRequestType } from './types'
 
@@ -71,30 +72,96 @@ const buildSuffixTypeString = (types: ReadonlyArray<TypedDataField>): string =>
  * Build a MetaTxRequest record for a single request type.
  * @param metaTxRequestType
  * @param contractName
- * @param functionName
+ * @param functionSignature
  */
-const buildMetaTxRequest = (
-  metaTxRequestType: MetaTxRequestType,
-  contractName: DestinationContract,
-  functionName: string,
-  adminCanCall = true
-): MetaTxRequest => {
+const buildMetaTxRequest = ({
+  metaTxRequestType,
+  contractName,
+  functionSignature,
+  adminCanCall = true,
+  destinationAddressProvided = false,
+}: {
+  metaTxRequestType: MetaTxRequestType
+  contractName: DestinationContract
+  functionSignature: string
+  adminCanCall?: boolean
+  destinationAddressProvided?: boolean
+}): MetaTxRequest => {
   const types = MessageTypesRegistry[metaTxRequestType + 'Types']
-  const contractFunctionSigHash = getFunctionSignatureHash(
-    contractName,
-    functionName
-  )
   return {
     eip712TypeHash: buildTypeHash(metaTxRequestType, types),
     eip712Types: types,
     destinationContract: contractName,
-    contractFunctionSigHash,
-    functionNameOrSig: functionName,
+    destinationAddressProvided,
+    functionSelector: getFunctionSelector(functionSignature),
+    functionSignature: functionSignature,
     suffixTypeString: buildSuffixTypeString(types),
     requiresDataField: types.some((t) => t.name === 'data'),
     adminCanCall,
   }
 }
+
+const buildMetaTxRequestEntriesFromKeyToFnSigRecord = (
+  // Contract type of the destination of the meta tx
+  contractName: DestinationContract,
+
+  // MetaTx key to function signature mapping
+  metaTxKeyToFunctionSignature: Readonly<Record<string, string>>,
+
+  // Usually the key prefix is the contract name.
+  // One exception is LicensedUserManager meta-txs have 'Wallet' prefix.
+  // This keyPrefixOverride enables us to handle each case.
+  keyPrefixOverride: DestinationContract | string = contractName
+) =>
+  Object.entries(metaTxKeyToFunctionSignature).reduce(
+    (metaTxTypes, [typeKey, typeFunctionSignature]) => {
+      const metaTxKey = `${keyPrefixOverride}${typeKey}`
+
+      // Destination contract address is provided in the request properties.
+      // Currently only for Collection contract destinations. This allows
+      // meta-tx's to be sent to different collection proxies.
+      const destinationAddressProvided =
+        contractName === 'CollectionProxyFeaturesAggregate'
+
+      metaTxTypes[metaTxKey] = buildMetaTxRequest({
+        metaTxRequestType: MetaTxRequestType[metaTxKey],
+        contractName,
+        functionSignature: typeFunctionSignature,
+        destinationAddressProvided,
+      })
+
+      return metaTxTypes
+    },
+    {}
+  )
+
+const STARTRAIL_REGISTRY_TYPE_KEY_TO_FUNCTION_SIGNATURE = Object.freeze({
+  CreateSRRWithLockExternalTransfer:
+    'createSRRFromLicensedUser(bool,address,bytes32,bool)',
+  CreateSRRFromLicensedUser:
+    'createSRRFromLicensedUser(bool,address,bytes32,bool,address)',
+  CreateSRRFromLicensedUserWithCid:
+    'createSRRFromLicensedUser(bool,address,bytes32,string,bool,address)',
+  CreateSRRFromLicensedUserWithRoyalty:
+    'createSRRFromLicensedUser(bool,address,bytes32,string,bool,address,address,uint16)',
+  UpdateSRR: 'updateSRR(uint256,bool,address)',
+  UpdateSRRMetadata: 'updateSRRMetadata(uint256,bytes32)',
+  UpdateSRRMetadataWithCid: 'updateSRRMetadata(uint256,string)',
+  UpdateSRRRoyalty: 'updateSRRRoyalty(uint256,address,uint16)',
+  ApproveSRRByCommitment: 'approveSRRByCommitment(uint256,bytes32,string)',
+  ApproveSRRByCommitmentV2: 'approveSRRByCommitment(uint256,bytes32,string)',
+  ApproveSRRByCommitmentWithCustomHistoryId:
+    'approveSRRByCommitment(uint256,bytes32,string,uint256)',
+  ApproveSRRByCommitmentWithCustomHistoryIdV2:
+    'approveSRRByCommitment(uint256,bytes32,string,uint256)',
+  CancelSRRCommitment: 'cancelSRRCommitment(uint256)',
+  AddHistory: 'addHistory(uint256[],uint256[])',
+  SetLockExternalTransfer: 'setLockExternalTransfer(uint256,bool)',
+  TransferFromWithProvenance:
+    'transferFromWithProvenance(address,uint256,string,uint256,bool)',
+  TransferFromWithProvenanceV2:
+    'transferFromWithProvenance(address,uint256,string,uint256,bool)',
+})
 
 /**
  * The full list of Startrail MetaTxRequest's.
@@ -103,124 +170,103 @@ const metaTxRequests: Record<MetaTxRequestType, MetaTxRequest> = {
   //
   // LicensedUserManager
   //
-  WalletAddOwner: buildMetaTxRequest(
-    MetaTxRequestType.WalletAddOwner,
-    'LicensedUserManager',
-    'addOwner'
-  ),
-  WalletRemoveOwner: buildMetaTxRequest(
-    MetaTxRequestType.WalletRemoveOwner,
-    'LicensedUserManager',
-    'removeOwner'
-  ),
-  WalletChangeThreshold: buildMetaTxRequest(
-    MetaTxRequestType.WalletChangeThreshold,
-    'LicensedUserManager',
-    'changeThreshold'
-  ),
-  WalletSwapOwner: buildMetaTxRequest(
-    MetaTxRequestType.WalletSwapOwner,
-    'LicensedUserManager',
-    'swapOwner'
-  ),
-  WalletSetEnglishName: buildMetaTxRequest(
-    MetaTxRequestType.WalletSetEnglishName,
-    'LicensedUserManager',
-    'setEnglishName'
-  ),
-  WalletSetOriginalName: buildMetaTxRequest(
-    MetaTxRequestType.WalletSetOriginalName,
-    'LicensedUserManager',
-    'setOriginalName'
+  ...buildMetaTxRequestEntriesFromKeyToFnSigRecord(
+    `LicensedUserManager`,
+    {
+      AddOwner: 'addOwner(address,address,uint8)',
+      RemoveOwner: 'removeOwner(address,address,address,uint8)',
+      ChangeThreshold: 'changeThreshold(address,uint8)',
+      SwapOwner: 'swapOwner(address,address,address,address)',
+      SetEnglishName: 'setEnglishName(address,string)',
+      SetOriginalName: 'setOriginalName(address,string)',
+    },
+    `Wallet`
   ),
 
   //
   // StartrailRegistry
   //
-  StartrailRegistryCreateSRR: buildMetaTxRequest(
-    MetaTxRequestType.StartrailRegistryCreateSRR,
-    'StartrailRegistry',
-    'createSRRFromLicensedUser(bool,address,bytes32)'
+  ...buildMetaTxRequestEntriesFromKeyToFnSigRecord(
+    `StartrailRegistry`,
+    STARTRAIL_REGISTRY_TYPE_KEY_TO_FUNCTION_SIGNATURE
   ),
-  StartrailRegistryCreateSRRWithLockExternalTransfer: buildMetaTxRequest(
-    MetaTxRequestType.StartrailRegistryCreateSRRWithLockExternalTransfer,
-    'StartrailRegistry',
-    'createSRRFromLicensedUser(bool,address,bytes32,bool)'
-  ),
-  StartrailRegistryCreateSRRFromLicensedUser: buildMetaTxRequest(
-    MetaTxRequestType.StartrailRegistryCreateSRRFromLicensedUser,
-    'StartrailRegistry',
-    'createSRRFromLicensedUser(bool,address,bytes32,bool,address)'
-  ),
-  StartrailRegistryUpdateSRR: buildMetaTxRequest(
-    MetaTxRequestType.StartrailRegistryUpdateSRR,
-    'StartrailRegistry',
-    'updateSRR'
-  ),
-  StartrailRegistryUpdateSRRMetadata: buildMetaTxRequest(
-    MetaTxRequestType.StartrailRegistryUpdateSRRMetadata,
-    'StartrailRegistry',
-    'updateSRRMetadata(uint256,bytes32)'
-  ),
-  StartrailRegistryApproveSRRByCommitment: buildMetaTxRequest(
-    MetaTxRequestType.StartrailRegistryApproveSRRByCommitment,
-    'StartrailRegistry',
-    'approveSRRByCommitment(uint256,bytes32,string)'
-  ),
-  StartrailRegistryApproveSRRByCommitmentWithCustomHistoryId: buildMetaTxRequest(
-    MetaTxRequestType.StartrailRegistryApproveSRRByCommitmentWithCustomHistoryId,
-    'StartrailRegistry',
-    'approveSRRByCommitment(uint256,bytes32,string,uint256)'
-  ),
-  StartrailRegistryCancelSRRCommitment: buildMetaTxRequest(
-    MetaTxRequestType.StartrailRegistryCancelSRRCommitment,
-    'StartrailRegistry',
-    'cancelSRRCommitment(uint256)'
-  ),
-  StartrailRegistryAddHistory: buildMetaTxRequest(
-    MetaTxRequestType.StartrailRegistryAddHistory,
-    'StartrailRegistry',
-    'addHistory(uint256[],uint256[])'
-  ),
-  StartrailRegistrySetLockExternalTransfer: buildMetaTxRequest(
-    MetaTxRequestType.StartrailRegistrySetLockExternalTransfer,
-    'StartrailRegistry',
-    'setLockExternalTransfer(uint256,bool)'
-  ),
-  StartrailRegistryTransferFromWithProvenance: buildMetaTxRequest(
-    MetaTxRequestType.StartrailRegistryTransferFromWithProvenance,
-    'StartrailRegistry',
-    'transferFromWithProvenance(address,uint256,string,uint256,bool)'
-  ),
+
   //
   // BulkIssue
   //
-  BulkIssueSendBatch: buildMetaTxRequest(
-    MetaTxRequestType.BulkIssueSendBatch,
-    'BulkIssue',
-    'prepareBatchFromLicensedUser',
-    false
-  ),
+  BulkIssueSendBatch: buildMetaTxRequest({
+    metaTxRequestType: MetaTxRequestType.BulkIssueSendBatch,
+    contractName: 'BulkIssue',
+    functionSignature: 'prepareBatchFromLicensedUser(bytes32)',
+    adminCanCall: false,
+  }),
 
   //
   // BulkTransfer
   //
-  BulkTransferSendBatch: buildMetaTxRequest(
-    MetaTxRequestType.BulkTransferSendBatch,
-    'BulkTransfer',
-    'prepareBatchFromLicensedUser',
-    false
-  ),
+  BulkTransferSendBatch: buildMetaTxRequest({
+    metaTxRequestType: MetaTxRequestType.BulkTransferSendBatch,
+    contractName: 'BulkTransfer',
+    functionSignature: 'prepareBatchFromLicensedUser(bytes32)',
+    adminCanCall: false,
+  }),
 
   //
   // Generalized Bulk
   //
-  BulkSendBatch: buildMetaTxRequest(
-    MetaTxRequestType.BulkSendBatch,
-    'Bulk',
-    'prepareBatchFromLicensedUser',
-    false
+  BulkSendBatch: buildMetaTxRequest({
+    metaTxRequestType: MetaTxRequestType.BulkSendBatch,
+    contractName: 'Bulk',
+    functionSignature: 'prepareBatchFromLicensedUser(bytes32)',
+    adminCanCall: false,
+  }),
+
+  //
+  // CollectionFactory
+  //
+  CollectionFactoryCreateCollection: buildMetaTxRequest({
+    metaTxRequestType: MetaTxRequestType.CollectionFactoryCreateCollection,
+    contractName: 'CollectionFactory',
+    functionSignature: 'createCollectionContract(string,string,string,bytes32)',
+    adminCanCall: false,
+  }),
+
+  //
+  // Collections (proxies)
+  //
+  ...buildMetaTxRequestEntriesFromKeyToFnSigRecord(
+    `CollectionProxyFeaturesAggregate`,
+    // Create meta-tx's from the StartrailRegistry defined meta-tx's as most
+    // are also executable with collection contracts. Some are not and they
+    // are omitted on the next line.
+    _.omitBy(STARTRAIL_REGISTRY_TYPE_KEY_TO_FUNCTION_SIGNATURE, (val) =>
+      // For now in Collections we implement just one `createSRR` defined
+      // below and not the legacy forms.
+      // See also outstanding STARTRAIL-1946 that may change this.
+      val.startsWith(`createSRRFrom`)
+    ),
+    `Collection`
   ),
-}
+
+  CollectionCreateSRR: buildMetaTxRequest({
+    metaTxRequestType: MetaTxRequestType.CollectionCreateSRR,
+    contractName: 'CollectionProxyFeaturesAggregate',
+    functionSignature:
+      'createSRR(bool,address,string,bool,address,address,uint16)',
+    adminCanCall: false,
+    destinationAddressProvided: true,
+  }),
+
+  //
+  // Collection (FOR STUB ONLY - TO BE REMOVED)
+  //
+
+  CreateCollection: buildMetaTxRequest({
+    metaTxRequestType: MetaTxRequestType.CreateCollection,
+    contractName: 'CollectionProxyFeaturesAggregate',
+    functionSignature: 'createCollection()',
+    destinationAddressProvided: true,
+  }),
+} as Record<MetaTxRequestType, MetaTxRequest>
 
 export { MetaTxRequestType, metaTxRequests, buildSuffixTypeString }

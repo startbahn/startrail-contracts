@@ -10,5 +10,6 @@
   "bulkIssueProxyAddress": "0x2F237bf031F539D87F4F19C369e123DFd28f4974",
   "bulkTransferProxyAddress": "0x6632884A42E11Fc574Addd68680B5ff26EF6DB08",
   "openSeaMetaTransactionLibraryAddress": "0x666651A49c11ca8961C8d554823F0C5B3E7865a1",
-  "bulkProxyAddress": "0x5f4370405EeC91b671bbf199922Ca8971E191Ba1"
+  "bulkProxyAddress": "0x5f4370405EeC91b671bbf199922Ca8971E191Ba1",
+  "collectionFactoryAddress": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
 }

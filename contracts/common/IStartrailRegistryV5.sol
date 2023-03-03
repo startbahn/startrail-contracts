@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.6.11;
-pragma experimental ABIEncoderV2;
+pragma solidity 0.8.13;
 
 interface IStartrailRegistryV5 {
   /*
@@ -110,7 +109,7 @@ interface IStartrailRegistryV5 {
     bool isPrimaryIssuer,
     address artistAddress,
     bytes32 metadataDigest
-  ) external returns (uint256);
+  ) external;
 
   function createSRRFromLicensedUser(
     bool isPrimaryIssuer,

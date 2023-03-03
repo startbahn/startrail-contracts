@@ -2,6 +2,7 @@ const hre = require("hardhat");
 
 const { expect, use } = require("chai");
 const chaiAsPromised = require("chai-as-promised");
+const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 
 const { ContractKeys } = require("../startrail-common-js/contracts/types");
 const {
@@ -38,6 +39,7 @@ let metadataDigest = "";
 let startrailRegistry;
 let newStartrailRegistry;
 let startrailProxyAdmin;
+let nameRegistry;
 
 const randomText = () =>
   Math.random()
@@ -96,7 +98,7 @@ const createSRRFromLicensedUser = async () => {
  * StartrailRegistry.
  */
 const fixtureDefaultWithEOAForwarderAndAdmin = async () => {
-  ({ startrailProxyAdmin, startrailRegistry, nameRegistry } = await hre.waffle.loadFixture(
+  ({ startrailProxyAdmin, startrailRegistry, nameRegistry } = await loadFixture(
     fixtureDefault
   ));
   await nameRegistrySet(
@@ -114,7 +116,7 @@ describe("StartrailRegistry", () => {
   beforeEach(async () => {
     // Setup Test Data
     metadataDigest = randomSha256();
-    historyMetadataDigest = randomSha256();
+    historyMetadataHash = randomSha256();
     customHistoryname = randomText();
     customHistoryTypeName = randomText();
     target = randomText() + "@gmail.com";
@@ -142,7 +144,7 @@ describe("StartrailRegistry", () => {
       expect(
         await startrailProxyAdmin.getProxyImplementation(startrailRegistry.address)
       ).to.equal(newStartrailRegistry.address);
-
+      
       const srrDataAfterUpgraded = await startrailRegistry.getSRR(tokenId);
       expect(srrDataAfterUpgraded[0][1]).to.equal(srrData[0][1]);
 

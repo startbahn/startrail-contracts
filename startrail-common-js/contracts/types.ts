@@ -4,23 +4,10 @@ enum ContractKeys {
   StartrailProxyAdmin = 2,
   LicensedUserManager = 3,
   StartrailRegistry = 4,
-  BulkIssue = 5,
+  BulkIssue = 5, // backward compatibility for deployment
   MetaTxForwarder = 6,
-  BulkTransfer = 7,
+  BulkTransfer = 7, // backward compatibility for deployment
   Bulk = 8,
-}
-
-// Startrail Contracts.sol legacy
-enum ContractKeysLegacy {
-  RootLogic = 1,
-  BulkIssue = 2,
-  StartrailRegistry = 3,
-  StartrailProxyAdmin = 4,
-  LicensedUserLogic = 5,
-  LicensedUserWalletFactory = 6,
-  LicensedUserEvent = 7,
-  LicensedUserManager = 8,
-  Administrator = 9,
 }
 
 // Array of the number/id values (used as NameRegistry keys)
@@ -31,7 +18,6 @@ const keysToIds = (keysType) =>
     .filter((v) => !Number.isNaN(v))
 
 const ContractKeyIds = keysToIds(ContractKeys)
-const ContractKeyIdsLegacy = keysToIds(ContractKeysLegacy)
 
 // @gnosis.pm/safe-contracts/contracts/common/Enum.sol
 enum Operation {
@@ -45,11 +31,4 @@ enum UserType {
   ARTIST = 1,
 }
 
-export {
-  ContractKeys,
-  ContractKeysLegacy,
-  ContractKeyIds,
-  ContractKeyIdsLegacy,
-  Operation,
-  UserType,
-}
+export { ContractKeys, ContractKeyIds, Operation, UserType }

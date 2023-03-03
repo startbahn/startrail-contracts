@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import "../../proxyAdmin/BaseAdminUpgradeabilityProxy.sol";
 
@@ -23,7 +23,7 @@ contract AdminUpgradeabilityProxyLUM is BaseAdminUpgradeabilityProxy {
     constructor(
         address _logic,
         bytes memory _data
-    ) public payable UpgradeabilityProxy(_logic, _data) {}
+    ) payable UpgradeabilityProxy(_logic, _data) {}
 
     /**
      * @param _proxyAdmin Address of the proxy administrator.

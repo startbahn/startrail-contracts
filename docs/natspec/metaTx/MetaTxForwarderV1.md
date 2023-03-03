@@ -319,6 +319,22 @@ event ExecutionSuccess(bytes32 txHash)
 |---|---|---|
 | txHash  | bytes32 | undefined |
 
+### Initialized
+
+```solidity
+event Initialized(uint8 version)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| version  | uint8 | undefined |
+
 ### RequestTypeRegistered
 
 ```solidity

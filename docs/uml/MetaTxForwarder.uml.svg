@@ -91,9 +91,9 @@
 <path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M1466.0818,-158.9796C1445.7455,-170.9431 1425.1853,-183.3243 1405.9057,-195.4 1350.8239,-229.9003 1291.0465,-270.1388 1241.0868,-304.5911"/>
 <polygon fill="none" stroke="#000000" points="1234.9853,-296.0445 1216.3048,-321.7601 1246.9445,-313.3065 1234.9853,-296.0445"/>
 </g>
-<!-- 7 -->
+<!-- 9 -->
 <g id="node6" class="node">
-<title>7</title>
+<title>9</title>
 <polygon fill="#f2f2f2" stroke="#000000" points="137.5984,-195.9 137.5984,-572.7 840.213,-572.7 840.213,-195.9 137.5984,-195.9"/>
 <text text-anchor="middle" x="488.9057" y="-556.1" font-family="Times,serif" font-size="14.00" fill="#000000">MetaTxRequestManager</text>
 <polyline fill="none" stroke="#000000" points="137.5984,-547.9 840.213,-547.9 "/>
@@ -119,36 +119,35 @@
 <text text-anchor="start" x="145.5984" y="-220.9" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;&#160;&lt;&lt;modifier&gt;&gt; onlyAdministrator()</text>
 <text text-anchor="start" x="145.5984" y="-204.1" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;&#160;encodeRequest(_request: ExecutionRequest): bytes</text>
 </g>
-<!-- 6&#45;&gt;7 -->
+<!-- 6&#45;&gt;9 -->
 <g id="edge7" class="edge">
-<title>6&#45;&gt;7</title>
+<title>6&#45;&gt;9</title>
 <path fill="none" stroke="#000000" d="M1339.1531,-98.9034C1200.3376,-113.9158 1028.5647,-140.3948 868.9255,-189.5218"/>
 <polygon fill="none" stroke="#000000" points="865.7207,-179.5227 840.3116,-198.6181 872.0828,-199.5358 865.7207,-179.5227"/>
 </g>
-<!-- 8 -->
+<!-- 10 -->
 <g id="node8" class="node">
-<title>8</title>
-<polygon fill="#f2f2f2" stroke="#000000" points="1415.0052,-305.1 1415.0052,-463.5 1798.8062,-463.5 1798.8062,-305.1 1415.0052,-305.1"/>
-<text text-anchor="middle" x="1606.9057" y="-446.9" font-family="Times,serif" font-size="14.00" fill="#000000">TransactionExecutor</text>
-<polyline fill="none" stroke="#000000" points="1415.0052,-438.7 1798.8062,-438.7 "/>
-<text text-anchor="start" x="1423.0052" y="-422.1" font-family="Times,serif" font-size="14.00" fill="#000000">Internal:</text>
-<text text-anchor="start" x="1423.0052" y="-405.3" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;EXECUTE_FAILED_WITHOUT_REASON: string</text>
-<polyline fill="none" stroke="#000000" points="1415.0052,-397.1 1798.8062,-397.1 "/>
-<text text-anchor="start" x="1423.0052" y="-380.5" font-family="Times,serif" font-size="14.00" fill="#000000">Internal:</text>
-<text text-anchor="start" x="1423.0052" y="-363.7" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;&#160;executeCall(_to: address, _data: bytes, _txHash: bytes32): bool</text>
-<text text-anchor="start" x="1423.0052" y="-346.9" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;&#160;extractErrorMessage(_returnData: bytes): (message: string)</text>
-<text text-anchor="start" x="1423.0052" y="-330.1" font-family="Times,serif" font-size="14.00" fill="#000000">Public:</text>
-<text text-anchor="start" x="1423.0052" y="-313.3" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ExecutionSuccess(txHash: bytes32)</text>
+<title>10</title>
+<polygon fill="#f2f2f2" stroke="#000000" points="1415.0052,-313.5 1415.0052,-455.1 1798.8062,-455.1 1798.8062,-313.5 1415.0052,-313.5"/>
+<text text-anchor="middle" x="1606.9057" y="-438.5" font-family="Times,serif" font-size="14.00" fill="#000000">TransactionExecutor</text>
+<polyline fill="none" stroke="#000000" points="1415.0052,-430.3 1798.8062,-430.3 "/>
+<text text-anchor="start" x="1423.0052" y="-413.7" font-family="Times,serif" font-size="14.00" fill="#000000">Internal:</text>
+<text text-anchor="start" x="1423.0052" y="-396.9" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;EXECUTE_FAILED_WITHOUT_REASON: string</text>
+<polyline fill="none" stroke="#000000" points="1415.0052,-388.7 1798.8062,-388.7 "/>
+<text text-anchor="start" x="1423.0052" y="-372.1" font-family="Times,serif" font-size="14.00" fill="#000000">Internal:</text>
+<text text-anchor="start" x="1423.0052" y="-355.3" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;&#160;executeCall(_to: address, _data: bytes, _txHash: bytes32): bool</text>
+<text text-anchor="start" x="1423.0052" y="-338.5" font-family="Times,serif" font-size="14.00" fill="#000000">Public:</text>
+<text text-anchor="start" x="1423.0052" y="-321.7" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ExecutionSuccess(txHash: bytes32)</text>
 </g>
-<!-- 6&#45;&gt;8 -->
+<!-- 6&#45;&gt;10 -->
 <g id="edge5" class="edge">
-<title>6&#45;&gt;8</title>
-<path fill="none" stroke="#000000" d="M1606.9057,-158.9349C1606.9057,-194.3151 1606.9057,-236.5896 1606.9057,-274.9158"/>
-<polygon fill="none" stroke="#000000" points="1596.4058,-274.9332 1606.9057,-304.9332 1617.4058,-274.9333 1596.4058,-274.9332"/>
+<title>6&#45;&gt;10</title>
+<path fill="none" stroke="#000000" d="M1606.9057,-158.9349C1606.9057,-196.8149 1606.9057,-242.5979 1606.9057,-282.9768"/>
+<polygon fill="none" stroke="#000000" points="1596.4058,-283.2617 1606.9057,-313.2618 1617.4058,-283.2618 1596.4058,-283.2617"/>
 </g>
-<!-- 12 -->
+<!-- 14 -->
 <g id="node10" class="node">
-<title>12</title>
+<title>14</title>
 <polygon fill="#f2f2f2" stroke="#000000" points="1817.2394,-296.7 1817.2394,-471.9 2258.572,-471.9 2258.572,-296.7 1817.2394,-296.7"/>
 <text text-anchor="middle" x="2037.9057" y="-455.3" font-family="Times,serif" font-size="14.00" fill="#000000">ReplayProtection</text>
 <polyline fill="none" stroke="#000000" points="1817.2394,-447.1 2258.572,-447.1 "/>
@@ -162,21 +161,21 @@
 <text text-anchor="start" x="1825.2394" y="-321.7" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;&#160;getNonce(_wallet: address, _channel: uint128): uint128</text>
 <text text-anchor="start" x="1825.2394" y="-304.9" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;&#160;packNonce(_channel: uint128, _nonce: uint128): (noncePacked: uint256)</text>
 </g>
-<!-- 6&#45;&gt;12 -->
+<!-- 6&#45;&gt;14 -->
 <g id="edge6" class="edge">
-<title>6&#45;&gt;12</title>
+<title>6&#45;&gt;14</title>
 <path fill="none" stroke="#000000" d="M1751.4437,-159.0308C1770.7391,-170.7377 1790.0217,-183.0345 1807.9057,-195.4 1843.9047,-220.2907 1881.2601,-249.3893 1915.1337,-277.1866"/>
 <polygon fill="none" stroke="#000000" points="1908.7549,-285.538 1938.5394,-296.6349 1922.1758,-269.3862 1908.7549,-285.538"/>
 </g>
-<!-- 7&#45;&gt;2 -->
+<!-- 9&#45;&gt;2 -->
 <g id="edge8" class="edge">
-<title>7&#45;&gt;2</title>
+<title>9&#45;&gt;2</title>
 <path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M488.9057,-573.0556C488.9057,-580.9754 488.9057,-588.6938 488.9057,-596.1009"/>
 <polygon fill="none" stroke="#000000" points="478.4058,-596.2387 488.9057,-626.2387 499.4058,-596.2388 478.4058,-596.2387"/>
 </g>
-<!-- 7struct0 -->
+<!-- 9struct0 -->
 <g id="node7" class="node">
-<title>7struct0</title>
+<title>9struct0</title>
 <polygon fill="#f2f2f2" stroke="#000000" points="408.7805,-38.1 408.7805,-121.3 569.0309,-121.3 569.0309,-38.1 408.7805,-38.1"/>
 <text text-anchor="middle" x="488.9057" y="-104.7" font-family="Times,serif" font-size="14.00" fill="#000000">&lt;&lt;struct&gt;&gt;</text>
 <text text-anchor="middle" x="488.9057" y="-87.9" font-family="Times,serif" font-size="14.00" fill="#000000">MetaTxRequestType</text>
@@ -184,15 +183,15 @@
 <text text-anchor="start" x="416.7805" y="-63.1" font-family="Times,serif" font-size="14.00" fill="#000000">destination: address</text>
 <text text-anchor="start" x="416.7805" y="-46.3" font-family="Times,serif" font-size="14.00" fill="#000000">functionSignature: bytes4</text>
 </g>
-<!-- 7struct0&#45;&gt;7 -->
+<!-- 9struct0&#45;&gt;9 -->
 <g id="edge2" class="edge">
-<title>7struct0&#45;&gt;7</title>
+<title>9struct0&#45;&gt;9</title>
 <path fill="none" stroke="#000000" d="M488.9057,-121.4147C488.9057,-138.7582 488.9057,-160.253 488.9057,-183.4231"/>
 <polygon fill="#000000" stroke="#000000" points="488.9058,-183.6793 492.9057,-189.6793 488.9057,-195.6793 484.9057,-189.6792 488.9058,-183.6793"/>
 </g>
-<!-- 11 -->
+<!-- 13 -->
 <g id="node9" class="node">
-<title>11</title>
+<title>13</title>
 <polygon fill="#f2f2f2" stroke="#000000" points="1815.4894,-609.7 1815.4894,-734.5 2260.322,-734.5 2260.322,-609.7 1815.4894,-609.7"/>
 <text text-anchor="middle" x="2037.9057" y="-717.9" font-family="Times,serif" font-size="14.00" fill="#000000">&lt;&lt;Interface&gt;&gt;</text>
 <text text-anchor="middle" x="2037.9057" y="-701.1" font-family="Times,serif" font-size="14.00" fill="#000000">IReplayProtection</text>
@@ -203,9 +202,9 @@
 <text text-anchor="start" x="1823.4894" y="-634.7" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;&#160;&#160;getNonce(_signer: address, _channel: uint128): uint128</text>
 <text text-anchor="start" x="1823.4894" y="-617.9" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;&#160;&#160;packNonce(_channel: uint128, _nonce: uint128): (noncePacked: uint256)</text>
 </g>
-<!-- 12&#45;&gt;11 -->
+<!-- 14&#45;&gt;13 -->
 <g id="edge9" class="edge">
-<title>12&#45;&gt;11</title>
+<title>14&#45;&gt;13</title>
 <path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M2037.9057,-472.2133C2037.9057,-506.132 2037.9057,-544.9675 2037.9057,-579.3312"/>
 <polygon fill="none" stroke="#000000" points="2027.4058,-579.3633 2037.9057,-609.3633 2048.4058,-579.3633 2027.4058,-579.3633"/>
 </g>

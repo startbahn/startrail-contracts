@@ -73,7 +73,7 @@ class MetaTxForwarder {
    * @param signer Transaction signer (not signer of metatx but signer of
    *               the Ethereum tx broadcast to network)
    * @param ethersProvider Instance of an ethers provider
-   * @param metaTxForwarderAddress Address of the contracvt
+   * @param metaTxForwarderAddress Address of the contract
    */
   constructor(
     chainId: number,
@@ -152,8 +152,8 @@ class MetaTxForwarder {
   }: {
     request: MetaTxRequest
     signatures: string[]
-    gasLimit: number
-    gasPrice: number
+    gasLimit?: number
+    gasPrice?: number
   }): Promise<TransactionResponse> {
     const callProperties = await this.encodeExecuteTransactionProps({
       request,
@@ -185,8 +185,8 @@ class MetaTxForwarder {
   }: {
     request: MetaTxRequest
     signature: string
-    gasLimit: number
-    gasPrice: number
+    gasLimit?: number
+    gasPrice?: number
   }): Promise<TransactionResponse> {
     const callProperties = await this.encodeExecuteTransactionProps({
       request,
@@ -224,7 +224,7 @@ class MetaTxForwarder {
       metaTxRequest.requiresDataField === true
         ? encodeContractFunctionCalldata(
             metaTxRequest.destinationContract,
-            metaTxRequest.functionNameOrSig,
+            metaTxRequest.functionSignature,
             requestData
           )
         : '0x'

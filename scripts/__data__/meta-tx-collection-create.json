@@ -1,0 +1,9 @@
+{
+  "requestTypeKey": "CollectionFactoryCreateCollection",
+  "requestData": {
+    "name": "NoMoreApes",
+    "symbol": "NOAPE",
+    "metadataCID": "bafkreia7ozdu3sjrcrstad6s3pja33hfyehtprtgv4jcyvry7gnyzethie",
+    "salt": "0x01c7d41fda1b3c732c146c8e82771a44d0b7d1b09e0399d0e17fd6e1886069c6"
+  }
+}

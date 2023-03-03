@@ -219,7 +219,7 @@ function cancelSRRCommitment(uint256 tokenId) external nonpayable
 ### createSRR
 
 ```solidity
-function createSRR(bool isPrimaryIssuer, address artistAddress, bytes32 metadataDigest) external nonpayable returns (uint256)
+function createSRR(bool isPrimaryIssuer, address artistAddress, bytes32 metadataDigest) external nonpayable
 ```
 
 
@@ -233,12 +233,6 @@ function createSRR(bool isPrimaryIssuer, address artistAddress, bytes32 metadata
 | isPrimaryIssuer | bool | boolean whether the user is a primary issuer |
 | artistAddress | address | address of the artist contract |
 | metadataDigest | bytes32 | bytes32 of metadata hash |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | uint256 tokenId |
 
 ### createSRRFromBulk
 
@@ -747,18 +741,18 @@ function setTrustedForwarder(address forwarder) external nonpayable
 ### supportsInterface
 
 ```solidity
-function supportsInterface(bytes4 interfaceID) external view returns (bool)
+function supportsInterface(bytes4 interfaceId) external view returns (bool)
 ```
 
 
 
-
+*See {IERC165-supportsInterface}.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| interfaceID | bytes4 | undefined |
+| interfaceId | bytes4 | undefined |
 
 #### Returns
 
@@ -1145,6 +1139,22 @@ event History(uint256[] tokenIds, uint256[] customHistoryIds)
 |---|---|---|
 | tokenIds  | uint256[] | undefined |
 | customHistoryIds  | uint256[] | undefined |
+
+### Initialized
+
+```solidity
+event Initialized(uint8 version)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| version  | uint8 | undefined |
 
 ### MigrateSRR
 

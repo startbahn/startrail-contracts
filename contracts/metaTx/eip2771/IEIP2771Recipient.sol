@@ -1,5 +1,5 @@
 // SPDX-License-Identifier:MIT
-pragma solidity ^0.6.2;
+pragma solidity 0.8.13;
 
 /**
  * @title A contract must implement this interface in order to support relayed
@@ -33,5 +33,5 @@ abstract contract IEIP2771Recipient {
    * otherwise, return `msg.sender`
    * should be used in the contract anywhere instead of msg.sender
    */
-  function msgSender() internal virtual view returns (address payable);
+  function msgSender() internal virtual view returns (address);
 }

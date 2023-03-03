@@ -3,7 +3,8 @@ import _ from 'lodash'
 import { ethers, BigNumber } from 'ethers'
 import { assert, expect, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { solidity } from 'ethereum-waffle'
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers'
+
 import {
   TransactionReceipt,
   TransactionResponse,
@@ -20,6 +21,7 @@ import defaults from 'lodash/defaults'
 import { assertEqualBigNumberArrays, assertRevert } from './helpers/assertions'
 import { fixtureDefault } from './helpers/fixtures'
 import {
+  randomCID,
   randomSha256,
   randomText,
   sendWithEIP2771,
@@ -39,7 +41,6 @@ import { signMetaTx } from '../utils/opensea-helpers'
 import { Administrator } from '../startrail-common-js/contracts/administrator'
 
 use(chaiAsPromised)
-use(solidity)
 
 suppressLoggerWarnings(ethers)
 suppressLoggerWarnings(hre.ethers)
@@ -67,7 +68,8 @@ const isPrimaryIssuer = true
 const recipient = randomAddress()
 
 let metadataDigest = ''
-let historyMetadataDigest = ''
+let metadataCID = ''
+let historyMetadataHash = ''
 let customHistoryName = ''
 let customHistoryTypeName = ''
 
@@ -165,10 +167,13 @@ const addCustomHistoryType = (historyTypeName): Promise<number> =>
 const writeCustomHistory = (
   historyName,
   historyTypeId,
-  metadataDigestArg = historyMetadataDigest
+  metadataDigestArg = historyMetadataHash
 ): Promise<number> =>
-  startrailRegistry
-    .writeCustomHistory(historyName, historyTypeId, metadataDigestArg)
+  startrailRegistry[`writeCustomHistory(string,uint256,bytes32)`](
+    historyName,
+    historyTypeId,
+    metadataDigestArg
+  )
     .then((txRsp) => txRsp.wait(0))
     .then(
       (txReceipt) =>
@@ -177,10 +182,14 @@ const writeCustomHistory = (
 
 const updateCustomHistory = (
   historyId,
-  metadataDigestArg = historyMetadataDigest
+  name,
+  metadataDigestArg = historyMetadataHash
 ): Promise<number> =>
-  startrailRegistry
-    .updateCustomHistory(historyId, metadataDigestArg)
+  startrailRegistry[`updateCustomHistory(uint256,string,bytes32)`](
+    historyId,
+    name,
+    metadataDigestArg
+  )
     .then((txRsp) => txRsp.wait(0))
     .then(
       (txReceipt) =>
@@ -354,7 +363,7 @@ const assertTransferByReveal = async (
   expect(provLog.args.tokenId.toNumber()).to.equal(tokenId)
   expect(provLog.args.to).to.equal(toAddress)
   expect(provLog.args.from).to.equal(luwAddress)
-  expect(provLog.args.historyMetadataDigest).to.equal(metadataDigest)
+  expect(provLog.args.historyMetadataHash).to.equal(metadataDigest)
   expect(provLog.args.historyMetadataURI).to.equal(
     SCHEMA_URI_PREFIX + metadataDigest + '.json'
   )
@@ -422,7 +431,7 @@ const assertLogProvenanceFromTxReceipt = (
   const parsedLog0 = startrailRegistry.interface.parseLog(txReceipt.logs[0])
   expect(parsedLog0.name).to.equal(`Provenance`)
   expect(parsedLog0.args.customHistoryId).to.equal(expectedCustomHistoryId)
-  expect(parsedLog0.args.historyMetadataDigest).to.equal(historyDigest)
+  expect(parsedLog0.args.historyMetadataHash).to.equal(historyDigest)
   expect(parsedLog0.args.isIntermediary).to.equal(isIntermediary)
 }
 
@@ -434,24 +443,19 @@ describe('StartrailRegistry', () => {
    * This makes unit tests simpler and allows for direct calls to the
    * StartrailRegistry.
    */
-  const fixtureDefaultWithEOAForwarderAndAdmin = async (): Promise<
-    TransactionResponse
-  > => {
-    ;({
-      startrailRegistry,
-      metaTxForwarder,
-      nameRegistry,
-      administrator,
-    } = await hre.waffle.loadFixture(fixtureDefault))
-    await nameRegistrySet(
-      hre,
-      ContractKeys.Administrator,
-      administratorWallet.address
-    )
-    return await startrailRegistry.setTrustedForwarder(
-      trustedForwarderWallet.address
-    )
-  }
+  const fixtureDefaultWithEOAForwarderAndAdmin =
+    async (): Promise<TransactionResponse> => {
+      ;({ startrailRegistry, metaTxForwarder, nameRegistry, administrator } =
+        await loadFixture(fixtureDefault))
+      await nameRegistrySet(
+        hre,
+        ContractKeys.Administrator,
+        administratorWallet.address
+      )
+      return await startrailRegistry.setTrustedForwarder(
+        trustedForwarderWallet.address
+      )
+    }
 
   before(async () => {
     await fixtureDefaultWithEOAForwarderAndAdmin()
@@ -501,7 +505,8 @@ describe('StartrailRegistry', () => {
   beforeEach(async () => {
     // Setup Test Data
     metadataDigest = randomSha256()
-    historyMetadataDigest = randomSha256()
+    metadataCID = await randomCID()
+    historyMetadataHash = randomSha256()
     customHistoryName = randomText()
     customHistoryTypeName = randomText()
   })
@@ -533,9 +538,8 @@ describe('StartrailRegistry', () => {
 
     it('rejects if msg.sender is not the trusted forwarder', async () => {
       // send from wallet other than the trusted forwarder
-      const startrailRegistryNotTrusted = startrailRegistry.connect(
-        noAuthWallet
-      )
+      const startrailRegistryNotTrusted =
+        startrailRegistry.connect(noAuthWallet)
       await assertRevert(
         startrailRegistryNotTrusted[
           `createSRRFromLicensedUser(bool,address,bytes32,bool)`
@@ -584,9 +588,8 @@ describe('StartrailRegistry', () => {
 
     it('rejects if msg.sender is not the trusted forwarder', async () => {
       // send from wallet other than the trusted forwarder
-      const startrailRegistryNotTrusted = startrailRegistry.connect(
-        noAuthWallet
-      )
+      const startrailRegistryNotTrusted =
+        startrailRegistry.connect(noAuthWallet)
       await assertRevert(
         startrailRegistryNotTrusted[
           `createSRRFromLicensedUser(bool,address,bytes32,bool,address)`
@@ -594,26 +597,259 @@ describe('StartrailRegistry', () => {
         `Function can only be called through the trusted Forwarder`
       )
     })
+
+    it('rejects if issue twice with same metadata and same artist address', async () => {
+      await sendFromTrustedForwarder(
+        'createSRRFromLicensedUser(bool,address,bytes32,bool,address)',
+        [isPrimaryIssuer, artistAddress, metadataDigest, false, recipient]
+      )
+      await assertRevert(
+        sendFromTrustedForwarder(
+          'createSRRFromLicensedUser(bool,address,bytes32,bool,address)',
+          [isPrimaryIssuer, artistAddress, metadataDigest, false, recipient]
+        ),
+        `SRR already exists on chain for artist/metadata combination`
+      )
+    })
+  })
+
+  describe('createSRRFromLicensedUserWithCid (with recipient address)', () => {
+    it('issues with EIP2771 forwarded sender', async () => {
+      const txReceipt = await sendFromTrustedForwarder(
+        'createSRRFromLicensedUser(bool,address,bytes32,string,bool,address,address,uint16)',
+        [
+          isPrimaryIssuer,
+          artistAddress,
+          metadataDigest,
+          metadataCID,
+          false,
+          recipient,
+          ZERO_ADDRESS,
+          0,
+        ]
+      )
+
+      const eventArgs = decodeEventLog(
+        startrailRegistry,
+        'CreateSRR(uint256,(bool,address,address),string,bool)',
+        txReceipt.logs[1]
+      )
+
+      const tokenId = eventArgs[0].toNumber()
+
+      const transferArgs = decodeEventLog(
+        startrailRegistry,
+        'Transfer(address, address, uint256)',
+        txReceipt.logs[3]
+      )
+
+      expect(Number.isInteger(tokenId)).to.be.true
+      expect(tokenId > 0).to.be.true
+
+      const srr = eventArgs[1]
+      expect(srr[0]).to.equal(isPrimaryIssuer)
+      expect(srr[1]).to.equal(artistAddress)
+      expect(srr[2]).to.equal(luwAddress)
+
+      expect(transferArgs[1]).to.equal(recipient)
+      expect(transferArgs[2]).to.equal(tokenId)
+
+      expect(await startrailRegistry.ownerOf(tokenId)).to.equal(recipient)
+
+      expect(eventArgs[2]).to.equal(metadataCID)
+    })
+
+    it('issues with EIP2771 forwarded sender - with royalty', async () => {
+      const royaltyReceiver = randomAddress()
+      const royaltyPercentage = 500 // 5%
+      const txReceipt = await sendFromTrustedForwarder(
+        'createSRRFromLicensedUser(bool,address,bytes32,string,bool,address,address,uint16)',
+        [
+          isPrimaryIssuer,
+          artistAddress,
+          metadataDigest,
+          metadataCID,
+          false,
+          recipient,
+          royaltyReceiver,
+          royaltyPercentage,
+        ]
+      )
+
+      const eventArgs = decodeEventLog(
+        startrailRegistry,
+        'CreateSRR(uint256,(bool,address,address),string,bool)',
+        txReceipt.logs[1]
+      )
+
+      const royaltyEvent = decodeEventLog(
+        startrailRegistry,
+        'RoyaltiesSet(uint256,(address,uint16))',
+        txReceipt.logs[2]
+      )[1]
+
+      expect(royaltyEvent[0]).to.equal(royaltyReceiver)
+      expect(royaltyEvent[1]).to.equal(royaltyPercentage)
+
+      const tokenId = eventArgs[0].toNumber()
+
+      const transferArgs = decodeEventLog(
+        startrailRegistry,
+        'Transfer(address, address, uint256)',
+        txReceipt.logs[4]
+      )
+
+      expect(Number.isInteger(tokenId)).to.be.true
+      expect(tokenId > 0).to.be.true
+
+      const srr = eventArgs[1]
+      expect(srr[0]).to.equal(isPrimaryIssuer)
+      expect(srr[1]).to.equal(artistAddress)
+      expect(srr[2]).to.equal(luwAddress)
+
+      expect(transferArgs[1]).to.equal(recipient)
+      expect(transferArgs[2]).to.equal(tokenId)
+
+      expect(await startrailRegistry.ownerOf(tokenId)).to.equal(recipient)
+
+      expect(eventArgs[2]).to.equal(metadataCID)
+    })
+
+    it('issues with EIP2771 forwarded sender with zero address', async () => {
+      const txReceipt = await sendFromTrustedForwarder(
+        'createSRRFromLicensedUser(bool,address,bytes32,string,bool,address,address,uint16)',
+        [
+          isPrimaryIssuer,
+          artistAddress,
+          metadataDigest,
+          metadataCID,
+          false,
+          ZERO_ADDRESS,
+          ZERO_ADDRESS,
+          0,
+        ]
+      )
+
+      const eventArgs = decodeEventLog(
+        startrailRegistry,
+        'CreateSRR(uint256,(bool,address,address),string,bool)',
+        txReceipt.logs[1]
+      )
+
+      const tokenId = eventArgs[0].toNumber()
+
+      const transferArgs = decodeEventLog(
+        startrailRegistry,
+        'Transfer(address, address, uint256)',
+        txReceipt.logs[2]
+      )
+
+      expect(Number.isInteger(tokenId)).to.be.true
+      expect(tokenId > 0).to.be.true
+
+      const srr = eventArgs[1]
+      expect(srr[0]).to.equal(isPrimaryIssuer)
+      expect(srr[1]).to.equal(artistAddress)
+      expect(srr[2]).to.equal(luwAddress)
+
+      expect(transferArgs).to.equal(undefined)
+      expect(await startrailRegistry.ownerOf(tokenId)).to.equal(luwAddress)
+
+      expect(eventArgs[2]).to.equal(metadataCID)
+    })
+
+    it('rejects if msg.sender is not the trusted forwarder', async () => {
+      // send from wallet other than the trusted forwarder
+      const startrailRegistryNotTrusted =
+        startrailRegistry.connect(noAuthWallet)
+      await assertRevert(
+        startrailRegistryNotTrusted[
+          `createSRRFromLicensedUser(bool,address,bytes32,string,bool,address,address,uint16)`
+        ](
+          isPrimaryIssuer,
+          artistAddress,
+          metadataDigest,
+          metadataCID,
+          false,
+          recipient,
+          ZERO_ADDRESS,
+          0
+        ),
+        `Function can only be called through the trusted Forwarder`
+      )
+    })
+
+    it('rejects if issue twice with same metadata and same artist address', async () => {
+      await sendFromTrustedForwarder(
+        'createSRRFromLicensedUser(bool,address,bytes32,string,bool,address,address,uint16)',
+        [
+          isPrimaryIssuer,
+          artistAddress,
+          metadataDigest,
+          metadataCID,
+          false,
+          recipient,
+          ZERO_ADDRESS,
+          0,
+        ]
+      )
+      await assertRevert(
+        sendFromTrustedForwarder(
+          'createSRRFromLicensedUser(bool,address,bytes32,string,bool,address,address,uint16)',
+          [
+            isPrimaryIssuer,
+            artistAddress,
+            metadataDigest,
+            metadataCID,
+            false,
+            recipient,
+            ZERO_ADDRESS,
+            0,
+          ]
+        ),
+        `SRR already exists on chain for artist/metadata combination`
+      )
+    })
+
+    it('rejects if royalty percentage is greater than 10000 (100%)', async () => {
+      await assertRevert(
+        sendFromTrustedForwarder(
+          'createSRRFromLicensedUser(bool,address,bytes32,string,bool,address,address,uint16)',
+          [
+            isPrimaryIssuer,
+            artistAddress,
+            metadataDigest,
+            metadataCID,
+            false,
+            recipient,
+            randomAddress(),
+            11000,
+          ]
+        ),
+        'ERC2981: royalty fee will exceed salePrice'
+      )
+    })
   })
 
   describe('createSRRFromBulk', () => {
     before(async () => {
       // Set BulkIssue to an EOA wallet to enable direct sending
-      await nameRegistry.set(ContractKeys.BulkIssue, bulkIssueWallet.address)
+      await nameRegistry.set(ContractKeys.Bulk, bulkIssueWallet.address)
     })
 
     it('issues when sent from BulkIssue', async () => {
       const issuerAddress = randomAddress()
       const bulkIssueMetadata = randomSha256()
-      const {
-        data: bulkIssueData,
-      } = await startrailRegistry.populateTransaction.createSRRFromBulk(
-        isPrimaryIssuer,
-        artistAddress,
-        bulkIssueMetadata,
-        issuerAddress,
-        false
-      )
+      const { data: bulkIssueData } =
+        await startrailRegistry.populateTransaction[
+          `createSRRFromBulk(bool,address,bytes32,address,bool)`
+        ](
+          isPrimaryIssuer,
+          artistAddress,
+          bulkIssueMetadata,
+          issuerAddress,
+          false
+        )
 
       await bulkIssueWallet
         .sendTransaction({
@@ -625,11 +861,12 @@ describe('StartrailRegistry', () => {
 
     it('rejects if NOT sent from BulkIssue', async () => {
       // send from wallet other than the trusted forwarder
-      const startrailRegistryNotTrusted = startrailRegistry.connect(
-        noAuthWallet
-      )
+      const startrailRegistryNotTrusted =
+        startrailRegistry.connect(noAuthWallet)
       await assertRevert(
-        startrailRegistryNotTrusted.createSRRFromBulk(
+        startrailRegistryNotTrusted[
+          `createSRRFromBulk(bool,address,bytes32,address,bool)`
+        ](
           isPrimaryIssuer,
           artistAddress,
           metadataDigest,
@@ -657,14 +894,13 @@ describe('StartrailRegistry', () => {
       commitment = randomSha256()
       historyDigest = randomSha256()
 
-      const {
-        data: bulkTransferData,
-      } = await startrailRegistry.populateTransaction.approveSRRByCommitmentFromBulk(
-        tokenId,
-        commitment,
-        historyDigest,
-        0
-      )
+      const { data: bulkTransferData } =
+        await startrailRegistry.populateTransaction.approveSRRByCommitmentFromBulk(
+          tokenId,
+          commitment,
+          historyDigest,
+          0
+        )
 
       await bulkTransferWallet
         .sendTransaction({
@@ -676,9 +912,8 @@ describe('StartrailRegistry', () => {
 
     it('rejects if NOT sent from BulkTransfer', async () => {
       // send from wallet other than the trusted forwarder
-      const startrailRegistryNotTrusted = startrailRegistry.connect(
-        noAuthWallet
-      )
+      const startrailRegistryNotTrusted =
+        startrailRegistry.connect(noAuthWallet)
       await assertRevert(
         startrailRegistryNotTrusted.approveSRRByCommitmentFromBulk(
           tokenId,
@@ -724,19 +959,17 @@ describe('StartrailRegistry', () => {
         customHistoryTypeName
       )
 
-      const txReceipt = await startrailRegistry
-        .writeCustomHistory(
-          customHistoryTypeName,
-          customHistoryTypeId,
-          historyMetadataDigest
-        )
-        .then((txRsp) => txRsp.wait(0))
+      const txReceipt = await startrailRegistry[
+        `writeCustomHistory(string,uint256,bytes32)`
+      ](customHistoryTypeName, customHistoryTypeId, historyMetadataHash).then(
+        (txRsp) => txRsp.wait(0)
+      )
 
       const parsedLog = startrailRegistry.interface.parseLog(txReceipt.logs[0])
       expect(parsedLog.args.id).to.be.above(0)
       expect(parsedLog.args.name).to.equal(customHistoryTypeName)
       expect(parsedLog.args.customHistoryTypeId).to.equal(customHistoryTypeId)
-      expect(parsedLog.args.metadataDigest).to.equal(historyMetadataDigest)
+      expect(parsedLog.args.metadataDigest).to.equal(historyMetadataHash)
     })
 
     it("failed to create customHistory if customHistoryTypeId doesn't exist", async () => {
@@ -755,7 +988,7 @@ describe('StartrailRegistry', () => {
         sendFromTrustedForwarder('writeCustomHistory(string,uint256,bytes32)', [
           customHistoryName,
           customHistoryTypeId,
-          historyMetadataDigest,
+          historyMetadataHash,
         ]),
         `Caller is not the Startrail Administrator`
       )
@@ -776,13 +1009,17 @@ describe('StartrailRegistry', () => {
         customHistoryTypeId
       )
 
-      const txReceipt = await startrailRegistry
-        .updateCustomHistory(customHistoryId, updatedDigest)
-        .then((txRsp) => txRsp.wait(0))
+      const newCustomHistoryName = randomText()
+      const txReceipt = await startrailRegistry[
+        `updateCustomHistory(uint256,string,bytes32)`
+      ](customHistoryId, newCustomHistoryName, updatedDigest).then((txRsp) =>
+        txRsp.wait(0)
+      )
 
       const parsedLog = startrailRegistry.interface.parseLog(txReceipt.logs[0])
       expect(parsedLog.args.id).to.be.equal(customHistoryId)
       expect(parsedLog.args.metadataDigest).to.equal(updatedDigest)
+      expect(parsedLog.args.name).to.equal(newCustomHistoryName)
     })
 
     it("failed to create customHistory if customHistoryTypeId doesn't exist", async () => {
@@ -790,9 +1027,38 @@ describe('StartrailRegistry', () => {
       const updatedDigest =
         '0x001c7d6fdb9885b02689d0d76b34fe73e7706b3e9e841c16a8f8264077d197cd'
 
+      const newCustomHistoryName = randomText()
       await assertRevert(
-        updateCustomHistory(customHistoryId, updatedDigest),
+        updateCustomHistory(
+          customHistoryId,
+          newCustomHistoryName,
+          updatedDigest
+        ),
         `The custom history id does not exist`
+      )
+    })
+
+    it('failed to update customHistory if name is empty', async () => {
+      const updatedDigest =
+        '0x001c7d6fdb9885b02689d0d76b34fe73e7706b3e9e841c16a8f8264077d197cd'
+
+      const customHistoryTypeId = await addCustomHistoryType(
+        customHistoryTypeName
+      )
+
+      const customHistoryId = await writeCustomHistory(
+        customHistoryName,
+        customHistoryTypeId
+      )
+
+      const newCustomHistoryName = ''
+      await assertRevert(
+        updateCustomHistory(
+          customHistoryId,
+          newCustomHistoryName,
+          updatedDigest
+        ),
+        `The custom history name is required`
       )
     })
 
@@ -809,11 +1075,13 @@ describe('StartrailRegistry', () => {
         customHistoryTypeId
       )
 
+      const newCustomHistoryName = randomText()
+
       await assertRevert(
-        sendFromTrustedForwarder('updateCustomHistory(uint256,bytes32)', [
-          customHistoryId,
-          updatedDigest,
-        ]),
+        sendFromTrustedForwarder(
+          'updateCustomHistory(uint256,string,bytes32)',
+          [customHistoryId, newCustomHistoryName, updatedDigest]
+        ),
         `Caller is not the Startrail Administrator`
       )
     })
@@ -867,7 +1135,7 @@ describe('StartrailRegistry', () => {
       const reveal = randomSha256()
       const commitment = ethers.utils.keccak256(reveal)
 
-      const customHistoryId = 5
+      const customHistoryId = 2000
 
       await assertRevert(
         sendFromTrustedForwarder(
@@ -1994,7 +2262,8 @@ describe('StartrailRegistry', () => {
       const domainName = `new name`
 
       it('administrator can set', async () => {
-        const domainSeperatorBefore = await startrailRegistry.getDomainSeperator()
+        const domainSeperatorBefore =
+          await startrailRegistry.getDomainSeperator()
 
         await startrailRegistry
           .setOpenSeaMetaTxIntegration(proxyAddress, domainName)
@@ -2015,9 +2284,8 @@ describe('StartrailRegistry', () => {
       })
 
       it('rejects if msg.sender is not the administrator', async () => {
-        const startrailRegistryNotAdmin = startrailRegistry.connect(
-          noAuthWallet
-        )
+        const startrailRegistryNotAdmin =
+          startrailRegistry.connect(noAuthWallet)
         await assertRevert(
           startrailRegistryNotAdmin.setOpenSeaMetaTxIntegration(
             proxyAddress,
@@ -2047,13 +2315,12 @@ describe('StartrailRegistry', () => {
       })
 
       it('success when details are correct', async () => {
-        const {
-          data: transferFromCalldata,
-        } = await startrailRegistry.populateTransaction.transferFrom(
-          sellerAddress,
-          buyerAddress,
-          srrId
-        )
+        const { data: transferFromCalldata } =
+          await startrailRegistry.populateTransaction.transferFrom(
+            sellerAddress,
+            buyerAddress,
+            srrId
+          )
 
         const signatureSplit = await signMetaTx(
           startrailRegistry,
@@ -2077,13 +2344,12 @@ describe('StartrailRegistry', () => {
           nonce,
           signerWallet = sellerWallet
         ) => {
-          const {
-            data: transferFromCalldata,
-          } = await startrailRegistry.populateTransaction.transferFrom(
-            sellerAddress,
-            buyerAddress,
-            srrId
-          )
+          const { data: transferFromCalldata } =
+            await startrailRegistry.populateTransaction.transferFrom(
+              sellerAddress,
+              buyerAddress,
+              srrId
+            )
           const signatureSplit = await signMetaTx(
             startrailRegistry,
             signerWallet,
@@ -2131,9 +2397,8 @@ describe('StartrailRegistry', () => {
         const srrOwnerAddress = await startrailRegistry.ownerOf(srrId)
         const buyerAddress = randomAddress()
 
-        const startrailRegistryOpenSeaProxy = startrailRegistry.connect(
-          openSeaProxyWallet
-        )
+        const startrailRegistryOpenSeaProxy =
+          startrailRegistry.connect(openSeaProxyWallet)
         await startrailRegistryOpenSeaProxy.transferFrom(
           srrOwnerAddress,
           buyerAddress,
@@ -2155,9 +2420,8 @@ describe('StartrailRegistry', () => {
         })
 
         it(`rejects if msg.sender is not the administrator`, async () => {
-          const startrailRegistryNotAdmin = startrailRegistry.connect(
-            noAuthWallet
-          )
+          const startrailRegistryNotAdmin =
+            startrailRegistry.connect(noAuthWallet)
           await assertRevert(
             startrailRegistryNotAdmin.setOpenSeaApproveAllKillSwitch(true),
             `Caller is not the Startrail Administrator`
@@ -2184,7 +2448,7 @@ describe('StartrailRegistry', () => {
       try {
         await startrailRegistry.setTrustedForwarder(ZERO_ADDRESS)
         // should fail if it does not throw
-        assert.fail("should have thrown error")
+        assert.fail('should have thrown error')
       } catch (error) {
         // TODO: Update the error msg after compiler upgrade and use assertRevert
         expect(error.message).to.equal(
@@ -2196,7 +2460,7 @@ describe('StartrailRegistry', () => {
 
   describe('setNameRegistryAddress', () => {
     it('throws if nameRegistry is 0 address', async () => {
-      const { startrailRegistry } = await hre.waffle.loadFixture(fixtureDefault)
+      const { startrailRegistry } = await loadFixture(fixtureDefault)
 
       await assertRevert(
         startrailRegistry.setNameRegistryAddress(ZERO_ADDRESS),
