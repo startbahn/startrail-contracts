@@ -13,7 +13,7 @@ Library to support Meta Transactions from OpenSea. see https://docs.opensea.io/d
 ### getChainId
 
 ```solidity
-function getChainId() external pure returns (uint256)
+function getChainId() external view returns (uint256)
 ```
 
 
@@ -30,7 +30,7 @@ function getChainId() external pure returns (uint256)
 ### msgSenderFromEIP2771MsgData
 
 ```solidity
-function msgSenderFromEIP2771MsgData(bytes msgData) external view returns (address payable sender)
+function msgSenderFromEIP2771MsgData(bytes msgData) external view returns (address sender)
 ```
 
 
@@ -47,7 +47,7 @@ function msgSenderFromEIP2771MsgData(bytes msgData) external view returns (addre
 
 | Name | Type | Description |
 |---|---|---|
-| sender | address payable | undefined |
+| sender | address | undefined |
 
 
 

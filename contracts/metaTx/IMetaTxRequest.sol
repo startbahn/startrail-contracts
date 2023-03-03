@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity ^0.6.11;
+pragma solidity 0.8.13;
 
 /**
  * @title Meta transaction ExecutionRequest structure.
@@ -12,10 +12,10 @@ interface IMetaTxRequest {
 
     // EOA address if executeTransactionEOA called
     // Licensed User wallet (LUW) address if executeTransactionLUW called
-    address from; 
+    address from;
     
     // 2d nonce packed - see ReplayProtection.sol
-    uint256 nonce; 
+    uint256 nonce;
 
     // EIP712 encodeStruct of the MetaTx specific arguments
     // This is used when encoding the full EIP712 message to

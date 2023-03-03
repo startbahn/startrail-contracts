@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.6.11;
-pragma experimental ABIEncoderV2;
+pragma solidity 0.8.13;
 
 import "../common/IStartrailRegistryV1.sol";
 

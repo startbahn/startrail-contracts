@@ -19,7 +19,7 @@ generalized-bulk-approve-by-commitment.json example (see scripts/__data__ for fi
   "leafHash": "0x5dff4266f45820d2517539dba44061a3be1d8598165bb5fdbd79a9ba8774bb8d",
   "tokenId": 725195465807,
   "commitment": "0x10ca3eff73ebec87d2394fc58560afeab86dac7a21f5e402ea0a55e5c8a6758f",
-  "historyMetadataDigest": "0xe515947139053d36f28e833667f77df096b1dd3ecdd0146bce6cc5fa38700615",
+  "historyMetadataHash": "0xe515947139053d36f28e833667f77df096b1dd3ecdd0146bce6cc5fa38700615",
   "customHistoryId": 0
 }
 `);

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 /**
  * @title Ownable
@@ -24,7 +24,7 @@ contract OpenZeppelinUpgradesOwnable {
      * @dev The Ownable constructor sets the original `owner` of the contract to the sender
      * account.
      */
-    constructor() internal {
+    constructor() {
         _owner = msg.sender;
         emit OwnershipTransferred(address(0), _owner);
     }

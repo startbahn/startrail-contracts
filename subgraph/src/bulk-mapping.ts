@@ -16,7 +16,7 @@ import {
 export function handleBatchPrepared(event: BatchPreparedEvent): void {
   logInvocation('handleBatchPrepared', event)
 
-  let merkleRoot = event.params.merkleRoot.toHexString()
+  let merkleRoot = event.params.merkleRoot.toHex()
   let batch = BulkIssue.load(merkleRoot)
   if (batch) {
     log.info('already received this event for merkleRoot: {}', [
@@ -38,7 +38,7 @@ export function handleBatchPrepared(event: BatchPreparedEvent): void {
 export function handleCreateSRRWithProof(event: CreateSRRWithProofEvent): void {
   logInvocation('handleCreateSRRWithProof', event)
 
-  let merkleRoot = event.params.merkleRoot.toHexString()
+  let merkleRoot = event.params.merkleRoot.toHex()
   let batch = BulkIssue.load(merkleRoot)
   if (!batch) {
     log.error(
@@ -74,7 +74,7 @@ export function handleCreateSRRWithProof(event: CreateSRRWithProofEvent): void {
 export function handleMigrateBatch(event: MigrateBatchEvent): void {
   logInvocation('handleMigrateBatch', event)
 
-  let merkleRoot = event.params.merkleRoot.toHexString()
+  let merkleRoot = event.params.merkleRoot.toHex()
   let timestampUpdated = secondsToMillis(event.params.originTimestampUpdated)
 
   let batch = new BulkIssue(merkleRoot)

@@ -2,9 +2,11 @@
   "requestTypeKey": "StartrailRegistryCreateSRRFromLicensedUser",
   "requestData": {
     "isPrimaryIssuer": true,
-    "artistAddress": "0x864D38B2989553080dBe893f7366B2dc675Cac1F",
+    "artistAddress": "0x35902f4f4c94DCba48a71202b795E3Ad2f75c56F",
     "metadataDigest": "0x5dfdd11afc70980aa3f2bc222563acfba856d0a9e4225b62c7948ded7495ca1a",
     "lockExternalTransfer": false,
-    "to": "0xBb1010F86fCfD7223F5E95dCB7899Af069493B80"
+    "to": "0xBb1010F86fCfD7223F5E95dCB7899Af069493B80",
+    "royaltyReceiver": "0x0000000000000000000000000000000000000000",
+    "royaltyPercentage": 0
   }
 }

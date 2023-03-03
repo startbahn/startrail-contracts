@@ -2,7 +2,7 @@ version: "3"
 services:
   graph-node:
     container_name: subgraph-node
-    image: graphprotocol/graph-node:v0.26.0
+    image: graphprotocol/graph-node:v0.27.0
     ports:
       - "8000:8000"
       - "8001:8001"

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity >=0.5.0 <0.7.0;
+pragma solidity 0.8.13;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 // Imports signatureSplit:
 import "../common/SignatureDecoder.sol";

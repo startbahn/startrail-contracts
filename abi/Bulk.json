@@ -72,6 +72,19 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "version",
+        "type": "uint8"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "bytes32",
         "name": "merkleRoot",
@@ -122,7 +135,7 @@
       },
       {
         "internalType": "string",
-        "name": "historyMetadataDigest",
+        "name": "historyMetadataHash",
         "type": "string"
       },
       {
@@ -168,9 +181,9 @@
   {
     "inputs": [
       {
-        "internalType": "bytes32[]",
-        "name": "merkleProof",
-        "type": "bytes32[]"
+        "internalType": "bytes32[][]",
+        "name": "merkleProofs",
+        "type": "bytes32[][]"
       },
       {
         "internalType": "bytes32",
@@ -178,81 +191,52 @@
         "type": "bytes32"
       },
       {
-        "internalType": "bytes32",
-        "name": "leafHash",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "bool",
-        "name": "isPrimaryIssuer",
-        "type": "bool"
-      },
-      {
-        "internalType": "address",
-        "name": "artistAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "metadataDigest",
-        "type": "bytes32"
-      }
-    ],
-    "name": "createSRRWithProof",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "bytes32[]",
-        "name": "merkleProof",
+        "name": "leafHashes",
         "type": "bytes32[]"
       },
       {
-        "internalType": "bytes32",
-        "name": "merkleRoot",
-        "type": "bytes32"
+        "internalType": "bool[]",
+        "name": "isPrimaryIssuers",
+        "type": "bool[]"
       },
       {
-        "internalType": "bytes32",
-        "name": "leafHash",
-        "type": "bytes32"
+        "internalType": "address[]",
+        "name": "artistAddresses",
+        "type": "address[]"
       },
       {
-        "internalType": "bool",
-        "name": "isPrimaryIssuer",
-        "type": "bool"
+        "internalType": "bytes32[]",
+        "name": "metadataDigests",
+        "type": "bytes32[]"
       },
       {
-        "internalType": "address",
-        "name": "artistAddress",
-        "type": "address"
+        "internalType": "string[]",
+        "name": "metadataCIDs",
+        "type": "string[]"
       },
       {
-        "internalType": "bytes32",
-        "name": "metadataDigest",
-        "type": "bytes32"
+        "internalType": "bool[]",
+        "name": "lockExternalTransfers",
+        "type": "bool[]"
       },
       {
-        "internalType": "bool",
-        "name": "lockExternalTransfer",
-        "type": "bool"
+        "internalType": "address[]",
+        "name": "royaltyReceivers",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint16[]",
+        "name": "royaltyPercentages",
+        "type": "uint16[]"
       }
     ],
-    "name": "createSRRWithProof",
+    "name": "createSRRWithProofMulti",
     "outputs": [
       {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
+        "internalType": "uint256[]",
+        "name": "tokenIds",
+        "type": "uint256[]"
       }
     ],
     "stateMutability": "nonpayable",
@@ -425,7 +409,7 @@
       },
       {
         "internalType": "string",
-        "name": "historyMetadataDigest",
+        "name": "historyMetadataHash",
         "type": "string"
       },
       {
@@ -463,7 +447,7 @@
       },
       {
         "internalType": "string",
-        "name": "historyMetadataDigest",
+        "name": "historyMetadataHash",
         "type": "string"
       },
       {
@@ -504,40 +488,11 @@
         "internalType": "bytes32",
         "name": "metadataDigest",
         "type": "bytes32"
-      }
-    ],
-    "name": "verifyLeafHash",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "hashMatches",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "leafHash",
-        "type": "bytes32"
       },
       {
-        "internalType": "bool",
-        "name": "isPrimaryIssuer",
-        "type": "bool"
-      },
-      {
-        "internalType": "address",
-        "name": "artistAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "metadataDigest",
-        "type": "bytes32"
+        "internalType": "string",
+        "name": "metadataCID",
+        "type": "string"
       },
       {
         "internalType": "bool",
@@ -575,7 +530,7 @@
       },
       {
         "internalType": "string",
-        "name": "historyMetadataDigest",
+        "name": "metadataCID",
         "type": "string"
       },
       {

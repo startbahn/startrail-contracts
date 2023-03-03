@@ -1,10 +1,12 @@
-import { memoize } from 'lodash'
+import { memoize, omit } from 'lodash'
 
 import { FunctionFragment, Interface } from '@ethersproject/abi'
+import { id } from '@ethersproject/hash'
 
 import BulkABI from './abi/Bulk.json'
-import BulkIssueABI from './abi/BulkIssue.json'
 import BulkTransferABI from './abi/BulkTransfer.json'
+import CollectionProxyFeaturesAggregateABI from './abi/CollectionProxyFeaturesAggregate.json'
+import CollectionFactoryABI from './abi/CollectionFactory.json'
 import LicensedUserManagerABI from './abi/LicensedUserManager.json'
 import MetaTxForwarderABI from './abi/MetaTxForwarder.json'
 import NameRegistryABI from './abi/NameRegistry.json'
@@ -12,9 +14,10 @@ import StartrailProxyABI from './abi/StartrailProxy.json'
 import StartrailRegistryABI from './abi/StartrailRegistry.json'
 
 const contractABI = Object.freeze({
-  BulkIssue: BulkIssueABI,
   Bulk: BulkABI,
   BulkTransfer: BulkTransferABI,
+  CollectionProxyFeaturesAggregate: CollectionProxyFeaturesAggregateABI,
+  CollectionFactory: CollectionFactoryABI,
   LicensedUserManager: LicensedUserManagerABI,
   MetaTxForwarder: MetaTxForwarderABI,
   NameRegistry: NameRegistryABI,
@@ -30,13 +33,11 @@ const getContractInterface = memoize(
 )
 
 /**
- * Get function signature hash for a Startrail contract function.
+ * Get function selector for a function signature.
+ * see https://docs.soliditylang.org/en/v0.8.17/abi-spec.html?highlight=function%20signature#function-selector
  */
-const getFunctionSignatureHash = (
-  contractName: string,
-  functionNameOrDefinition: string
-): string =>
-  getContractInterface(contractName).getSighash(functionNameOrDefinition)
+const getFunctionSelector = (functionSignature: string): string =>
+  id(functionSignature).slice(0, 10)
 
 /**
  * Encode calldata for a call to a contract function.
@@ -57,12 +58,20 @@ const encodeContractFunctionCalldata = (
 
   return contractInterface.encodeFunctionData(
     fnFragment,
-    Object.values(requestObject)
+    Object.values(
+      omit(
+        requestObject,
+        // strip out 'destination' as it's not passed through to the destination
+        // function. it is a special property used to indicate which destination
+        // contract in cases where there could be more than 1 (eg. collections)
+        [`destination`]
+      )
+    )
   )
 }
 
 export {
   encodeContractFunctionCalldata,
   getContractInterface,
-  getFunctionSignatureHash,
+  getFunctionSelector,
 }

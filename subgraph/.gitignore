@@ -13,3 +13,5 @@ package-lock.json
 .env
 .env.setup*
 .env.qa
+
+modifyBuild/abi/*.json

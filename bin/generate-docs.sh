@@ -48,8 +48,8 @@ npx hardhat dodoc 2> /dev/null
 
 # dodoc generate docs for openzeppelin contracts under node_modules
 #  couldn't see a way to filter these out so remove the directory here
-echo "Removing natspec generated for contracts under node_modules/ ($NATSPEC_DIR/elin) ...\n"
-rm -rf $NATSPEC_DIR/elin
+echo "Removing natspec generated for contracts under node_modules/ ($NATSPEC_DIR/elin,$NATSPEC_DIR/te) ...\n"
+rm -rf $NATSPEC_DIR/elin $NATSPEC_DIR/te
 
 #
 # Storage Layouts - DISABLED because solc output JSON does not contain storageLayout information

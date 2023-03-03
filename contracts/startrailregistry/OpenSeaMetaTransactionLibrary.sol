@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 /**
  * Library to support Meta Transactions from OpenSea.
@@ -69,7 +69,7 @@ library OpenSeaMetaTransactionLibrary {
         return self.domainSeperator;
     }
 
-    function getChainId() public pure returns (uint256) {
+    function getChainId() public view returns (uint256) {
         uint256 id;
         assembly {
             id := chainid()
@@ -180,7 +180,7 @@ library OpenSeaMetaTransactionLibrary {
     function msgSenderFromEIP2771MsgData(bytes calldata msgData)
         public
         view
-        returns (address payable sender)
+        returns (address sender)
     {
         if (msg.sender == address(this)) {
             bytes memory array = msgData;

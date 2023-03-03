@@ -261,6 +261,22 @@ event ChangedThreshold(address indexed wallet, uint8 threshold)
 | wallet `indexed` | address | undefined |
 | threshold  | uint8 | undefined |
 
+### Initialized
+
+```solidity
+event Initialized(uint8 version)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| version  | uint8 | undefined |
+
 ### RemovedOwner
 
 ```solidity

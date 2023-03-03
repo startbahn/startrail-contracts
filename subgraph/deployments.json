@@ -17,6 +17,12 @@
     },
     "Bulk": {
       "startBlock": 13142583
+    },
+    "CollectionFactory": {
+      "startBlock": 30000000
+    },
+    "Collection": {
+      "startBlock": 30000000
     }
   },
   "mumbai-release": {
@@ -37,6 +43,12 @@
     },
     "Bulk": {
       "startBlock": 12378987
+    },
+    "CollectionFactory": {
+      "startBlock": 30000000
+    },
+    "Collection": {
+      "startBlock": 30000000
     }
   },
   "mumbai-staging": {
@@ -57,6 +69,12 @@
     },
     "Bulk": {
       "startBlock": 15984927
+    },
+    "CollectionFactory": {
+      "startBlock": 30000000
+    },
+    "Collection": {
+      "startBlock": 30000000
     }
   },
   "polygon": {
@@ -77,6 +95,12 @@
     },
     "Bulk": {
       "startBlock": 13286271
+    },
+    "CollectionFactory": {
+      "startBlock": 40000000
+    },
+    "Collection": {
+      "startBlock": 40000000
     }
   },
   "local": {
@@ -96,6 +120,12 @@
       "startBlock": 1
     },
     "Bulk": {
+      "startBlock": 1
+    },
+    "CollectionFactory": {
+      "startBlock": 1
+    },
+    "Collection": {
       "startBlock": 1
     }
   }

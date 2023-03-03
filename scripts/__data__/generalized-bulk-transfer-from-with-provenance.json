@@ -1,12 +1,12 @@
 {
   "merkleProof": [
-    "0x5dff4266f45820d2517539dba44061a3be1d8598165bb5fdbd79a9ba8774bb8d"
+    "0x572a5e293b80d0d03ebb52a89a00d93a37cd8e2ce8ccd4399de652e8c4c9f21a"
   ],
-  "merkleRoot": "0xb3dbc1f0288b569840937cab66645f22b0cac106920c3b9272a968fae9472ac7",
-  "leafHash": "0x1ba60a60bfd7e56f4dbd085904da7fded34aa806f31f927e83c2dbc8bdc0257f",
-  "to": "0x88f7c48e2A696276D13004c7bd32EAE05E4f2bE1",
-  "tokenId": 333561554987,
-  "historyMetadataDigest": "0xe515947139053d36f28e833667f77df096b1dd3ecdd0146bce6cc5fa38700615",
-  "customHistoryId": 0,
+  "merkleRoot": "0x8e0b8272d369820938c65d682daf10215dd344804776231be35ceb0aecc92f31",
+  "leafHash": "0x60f10423380e31fac91fd1aa7eb830ed74d920a4b3e48d15c65012ab55b5593e",
+  "to": "0xdfb64492cdD303e86788Af19123CF9F1Bc65b084",
+  "tokenId": 129020582412,
+  "historyMetadataHash": "0x565aa707ce293c9e815871d6d0913f449283bf55f72c28a4222ef62698d246e1",
+  "customHistoryId": 1,
   "isIntermediary": false
 }

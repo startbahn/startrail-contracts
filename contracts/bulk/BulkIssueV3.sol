@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.6.11;
-pragma experimental ABIEncoderV2;
+pragma solidity 0.8.13;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
-import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
-import "@openzeppelin/contracts/cryptography/ECDSA.sol";
+import "../proxy/utils/InitializableWithGap.sol";
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import "../common/INameRegistry.sol";
 import "../metaTx/eip2771/EIP2771BaseRecipient.sol";
@@ -23,7 +22,7 @@ interface IStartrailRegistry {
 
 contract BulkIssueV3 is 
     Contracts,
-    Initializable,
+    InitializableWithGap,
     EIP2771BaseRecipient
 {
     using ECDSA for bytes32;
@@ -333,12 +332,11 @@ contract BulkIssueV3 is
      */
 
     function _prepareBatch(bytes32 merkleRoot) private {
-        batches[merkleRoot] = Batch({
-            prepared: true,
-            issuer: msgSender(),
-            processedCount: 0
-        });
-        emit BatchPrepared(merkleRoot, msgSender());
+        Batch storage batch = batches[merkleRoot]; 
+        batch.issuer = msgSender();
+        batch.prepared = true;
+        batch.processedCount = 0;
+        emit BatchPrepared(merkleRoot, batch.issuer);
     }
 
     function _startrailRegistry() private view returns (IStartrailRegistry sr) {

@@ -3,10 +3,53 @@ version: 2.1
 orbs:
   node: circleci/node@4.9.0
 
+qa-branch-only: &qa_branch_only
+  filters:
+    branches:
+      only:
+        - qa
+
+qa-tag-only:  &qa_tag_only
+  filters:
+    branches:
+      ignore: /.*/
+    tags:
+      only:
+        - '/^subgraph-v\d+(\.\d+){3}-qa$/'
+
+master-branch-only:  &master_branch_only
+  filters:
+    branches:
+      only: master
+
+
+stg-tag-only: &stg_tag_only
+  filters:
+    branches:
+      ignore: /.*/
+    tags:
+      only:
+        - '/^subgraph-v\d+(\.\d+){3}-stg$/'
+
+
+prod-tag-only: &prod_tag_only
+  filters:
+    branches:
+      ignore: /.*/
+    tags:
+      only:
+        - '/^subgraph-v\d+(\.\d+){2}$/'
+
 executors:
   default:
     docker:
       - image: cimg/node:16.13
+
+  foundry:
+    docker:
+      # foundry doesn't have a stable tag so lock at a specific commit here.
+      # periodically upgrade this:
+      - image: ghcr.io/foundry-rs/foundry:nightly-6d94a105de767911c630f15c39cb9f2e82dfe078
 
 commands:
   #
@@ -41,10 +84,21 @@ commands:
             - node_modules
             - subgraph/node_modules
             - ~/.cache/yarn
+  install_forge_dependencies:
+    steps:
+      - run:
+          name: Install Forge dependencies
+          command: forge install
 
   #
   # Startrail Commands
   #
+  install_dependencies_on_foundry_image:
+    steps:
+      - run:
+          name: Install Dependencies for NodeJs install on foundry image
+          command: |
+            apk add --update bash curl git nodejs openssh-client sudo yarn
   run_hardhat_compile:
     steps:
       - run:
@@ -53,8 +107,13 @@ commands:
   run_hardhat_unit_test:
     steps:
       - run:
-          name: Startrail Unit tests
+          name: Hardhat Unit tests
           command: REPORT_GAS=true npx hardhat test
+  run_forge_unit_test:
+    steps:
+      - run:
+          name: Forge Unit tests
+          command: forge test
   run_solidity_coverage:
     steps:
       - run:
@@ -120,13 +179,25 @@ commands:
     steps:
       - run:
           name: deploy mumbai release subgraph into public node
-          command: cd subgraph && yarn run deploy-release
+          command: cd subgraph && yarn run deploy-release && yarn run deploy-release2
+  deploy_staging:
+    steps:
+      - run:
+          name: deploy mumbai staging subgraph into public node
+          command: cd subgraph && yarn run deploy-staging && yarn run deploy-staging2
 
-  deploy_master:
+  deploy_polygon:
     steps:
       - run:
           name: deploy mainnet master subgraph into public node
-          command: cd subgraph && yarn run deploy-master
+          command: cd subgraph && yarn run deploy-polygon && yarn run deploy-polygon2
+
+  install_nodejs:
+    steps:
+      - node/install:
+          install-npm: false # saves ~9seconds
+          install-yarn: true
+          node-version: 16.13.2
 
 jobs:
   #
@@ -151,24 +222,37 @@ jobs:
       - install_node_dependencies
       - save_node_dependencies
       - run_hardhat_compile
-  test_startrail:
+  test_startrail_hardhat:
     executor: default
     steps:
       - checkout
       - restore_node_dependencies
       - install_node_dependencies
       - save_node_dependencies
+      - run_hardhat_compile
       - run_hardhat_unit_test
+
+  test_startrail_forge:
+    executor: foundry
+    steps:
+      - install_dependencies_on_foundry_image
+      # have problems with the install_nodejs command here so installed yarn and
+      # nodejs with the previous command. unfortunately the nodejs minor version
+      # is different. for now it works fine but would be better to resolve this.
+      # - install_nodejs
+      - checkout
+      - restore_node_dependencies
+      - install_node_dependencies
+      - save_node_dependencies
+      - install_forge_dependencies
+      - run_forge_unit_test
 
   test_subgraph:
     machine:
       image: ubuntu-2004:202111-01
     resource_class: medium
     steps:
-      - node/install:
-          install-npm: false # saves ~9seconds
-          install-yarn: true
-          node-version: 16.13.2
+      - install_nodejs
       - checkout
       - restore_node_dependencies
       - install_node_dependencies
@@ -192,15 +276,39 @@ jobs:
   mumbai_develop:
     executor: default
     steps:
+      - checkout
+      - restore_node_dependencies
+      - install_node_dependencies
+      - save_node_dependencies
+      - build_subgraph_source
       - deploy_develop
   mumbai_release:
     executor: default
     steps:
+      - checkout
+      - restore_node_dependencies
+      - install_node_dependencies
+      - save_node_dependencies
+      - build_subgraph_source
       - deploy_release
-  mainnet_master:
+  mumbai_staging:
     executor: default
     steps:
-      - deploy_master
+      - checkout
+      - restore_node_dependencies
+      - install_node_dependencies
+      - save_node_dependencies
+      - build_subgraph_source
+      - deploy_staging
+  polygon_mainnet:
+    executor: default
+    steps:
+      - checkout
+      - restore_node_dependencies
+      - install_node_dependencies
+      - save_node_dependencies
+      - build_subgraph_source
+      - deploy_polygon
 
 workflows:
   version: 2
@@ -213,9 +321,10 @@ workflows:
       - build_subgraph:
           requires:
             - install_dependencies
-      - test_startrail:
+      - test_startrail_hardhat:
           requires:
             - build_startrail
+      - test_startrail_forge
       - test_subgraph:
           requires:
             - build_subgraph

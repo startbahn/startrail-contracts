@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 /**
  * Library to move logic off the main contract because it became too large to

@@ -10,7 +10,7 @@ import { eventUTCMillis, logInvocation, toUTCString } from './utils'
 export function handleBatchPrepared(event: BatchPreparedEvent): void {
   logInvocation('handleBatchPrepared', event)
 
-  let merkleRoot = event.params.merkleRoot.toHexString()
+  let merkleRoot = event.params.merkleRoot.toHex()
   let batch = BulkTransfer.load(merkleRoot)
   if (batch) {
     log.info('already received this event for merkleRoot: {}', [
@@ -35,7 +35,7 @@ export function handleApproveSRRByCommitmentWithProof(
 ): void {
   logInvocation('handleApproveSRRByCommitmentWithProof', event)
 
-  let merkleRoot = event.params.merkleRoot.toHexString()
+  let merkleRoot = event.params.merkleRoot.toHex()
   let batch = BulkTransfer.load(merkleRoot)
   if (!batch) {
     log.error(

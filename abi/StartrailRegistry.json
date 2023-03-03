@@ -72,6 +72,37 @@
       },
       {
         "indexed": false,
+        "internalType": "string",
+        "name": "metadataCID",
+        "type": "string"
+      }
+    ],
+    "name": "CreateCustomHistory",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "customHistoryTypeId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
         "internalType": "bytes32",
         "name": "metadataDigest",
         "type": "bytes32"
@@ -176,15 +207,15 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct IStartrailRegistryV16.SRR",
+        "internalType": "struct IStartrailRegistryV21.SRR",
         "name": "registryRecord",
         "type": "tuple"
       },
       {
         "indexed": false,
-        "internalType": "bytes32",
-        "name": "metadataDigest",
-        "type": "bytes32"
+        "internalType": "string",
+        "name": "metadataCID",
+        "type": "string"
       },
       {
         "indexed": false,
@@ -224,7 +255,7 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct IStartrailRegistryV16.SRR",
+        "internalType": "struct IStartrailRegistryV21.SRR",
         "name": "registryRecord",
         "type": "tuple"
       },
@@ -233,6 +264,54 @@
         "internalType": "bytes32",
         "name": "metadataDigest",
         "type": "bytes32"
+      }
+    ],
+    "name": "CreateSRR",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "bool",
+            "name": "isPrimaryIssuer",
+            "type": "bool"
+          },
+          {
+            "internalType": "address",
+            "name": "artistAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "issuer",
+            "type": "address"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct IStartrailRegistryV21.SRR",
+        "name": "registryRecord",
+        "type": "tuple"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "metadataDigest",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "lockExternalTransfer",
+        "type": "bool"
       }
     ],
     "name": "CreateSRR",
@@ -309,6 +388,19 @@
       }
     ],
     "name": "History",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "version",
+        "type": "uint8"
+      }
+    ],
+    "name": "Initialized",
     "type": "event"
   },
   {
@@ -392,7 +484,7 @@
       {
         "indexed": false,
         "internalType": "string",
-        "name": "historyMetadataDigest",
+        "name": "historyMetadataHash",
         "type": "string"
       },
       {
@@ -441,7 +533,7 @@
       {
         "indexed": false,
         "internalType": "string",
-        "name": "historyMetadataDigest",
+        "name": "historyMetadataHash",
         "type": "string"
       },
       {
@@ -484,7 +576,7 @@
       {
         "indexed": false,
         "internalType": "string",
-        "name": "historyMetadataDigest",
+        "name": "historyMetadataHash",
         "type": "string"
       },
       {
@@ -527,7 +619,7 @@
       {
         "indexed": false,
         "internalType": "string",
-        "name": "historyMetadataDigest",
+        "name": "historyMetadataHash",
         "type": "string"
       },
       {
@@ -673,6 +765,37 @@
       }
     ],
     "name": "ProvenanceFromMigration",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint16",
+            "name": "percentage",
+            "type": "uint16"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct IStartrailRegistryV21.RoyaltyInfo",
+        "name": "royalty",
+        "type": "tuple"
+      }
+    ],
+    "name": "RoyaltiesSet",
     "type": "event"
   },
   {
@@ -922,6 +1045,37 @@
       },
       {
         "indexed": false,
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "metadataCID",
+        "type": "string"
+      }
+    ],
+    "name": "UpdateCustomHistory",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "indexed": false,
         "internalType": "bytes32",
         "name": "metadataDigest",
         "type": "bytes32"
@@ -989,7 +1143,7 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct IStartrailRegistryV16.SRR",
+        "internalType": "struct IStartrailRegistryV21.SRR",
         "name": "registryRecord",
         "type": "tuple"
       }
@@ -1043,6 +1197,25 @@
       }
     ],
     "name": "UpdateSRRFromMigration",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "metadataCID",
+        "type": "string"
+      }
+    ],
+    "name": "UpdateSRRMetadataDigest",
     "type": "event"
   },
   {
@@ -1177,7 +1350,7 @@
       },
       {
         "internalType": "string",
-        "name": "historyMetadataDigest",
+        "name": "historyMetadataHash",
         "type": "string"
       }
     ],
@@ -1200,7 +1373,7 @@
       },
       {
         "internalType": "string",
-        "name": "historyMetadataDigest",
+        "name": "historyMetadataHash",
         "type": "string"
       },
       {
@@ -1228,7 +1401,7 @@
       },
       {
         "internalType": "string",
-        "name": "historyMetadataDigest",
+        "name": "historyMetadataHash",
         "type": "string"
       },
       {
@@ -1324,7 +1497,7 @@
       },
       {
         "internalType": "bool",
-        "name": "lockExternalTransfer",
+        "name": "lockExternalTransfer_",
         "type": "bool"
       }
     ],
@@ -1357,8 +1530,62 @@
         "type": "bytes32"
       },
       {
+        "internalType": "string",
+        "name": "metadataCID",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "issuerAddress",
+        "type": "address"
+      },
+      {
         "internalType": "bool",
-        "name": "lockExternalTransfer",
+        "name": "lockExternalTransfer_",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "royaltyReceiver",
+        "type": "address"
+      },
+      {
+        "internalType": "uint16",
+        "name": "royaltyPercentage",
+        "type": "uint16"
+      }
+    ],
+    "name": "createSRRFromBulk",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "isPrimaryIssuer",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "artistAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "metadataDigest",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bool",
+        "name": "lockExternalTransfer_",
         "type": "bool"
       }
     ],
@@ -1386,13 +1613,61 @@
       },
       {
         "internalType": "bool",
-        "name": "lockExternalTransfer",
+        "name": "lockExternalTransfer_",
         "type": "bool"
       },
       {
         "internalType": "address",
         "name": "to",
         "type": "address"
+      }
+    ],
+    "name": "createSRRFromLicensedUser",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "isPrimaryIssuer",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "artistAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "metadataDigest",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "string",
+        "name": "metadataCID",
+        "type": "string"
+      },
+      {
+        "internalType": "bool",
+        "name": "lockExternalTransfer_",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "royaltyReceiver",
+        "type": "address"
+      },
+      {
+        "internalType": "uint16",
+        "name": "royaltyPercentage",
+        "type": "uint16"
       }
     ],
     "name": "createSRRFromLicensedUser",
@@ -1506,7 +1781,7 @@
         "type": "uint256"
       }
     ],
-    "stateMutability": "pure",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1601,7 +1876,7 @@
             "type": "address"
           }
         ],
-        "internalType": "struct IStartrailRegistryV16.SRR",
+        "internalType": "struct IStartrailRegistryV21.SRR",
         "name": "registryRecord",
         "type": "tuple"
       },
@@ -1631,7 +1906,7 @@
       },
       {
         "internalType": "string",
-        "name": "historyMetadataDigest",
+        "name": "historyMetadataHash",
         "type": "string"
       },
       {
@@ -1784,6 +2059,59 @@
         "internalType": "address",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "royalties",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "uint16",
+        "name": "percentage",
+        "type": "uint16"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_salePrice",
+        "type": "uint256"
+      }
+    ],
+    "name": "royaltyInfo",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -1981,7 +2309,7 @@
     "inputs": [
       {
         "internalType": "bytes4",
-        "name": "interfaceID",
+        "name": "interfaceId",
         "type": "bytes4"
       }
     ],
@@ -2084,7 +2412,7 @@
       },
       {
         "internalType": "string",
-        "name": "historyMetadataDigest",
+        "name": "historyMetadataHash",
         "type": "string"
       },
       {
@@ -2117,7 +2445,7 @@
       },
       {
         "internalType": "string",
-        "name": "historyMetadataDigest",
+        "name": "historyMetadataHash",
         "type": "string"
       },
       {
@@ -2185,9 +2513,37 @@
         "type": "uint256"
       },
       {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
         "internalType": "bytes32",
         "name": "metadataDigest",
         "type": "bytes32"
+      }
+    ],
+    "name": "updateCustomHistory",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "customHistoryId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "metadataCID",
+        "type": "string"
       }
     ],
     "name": "updateCustomHistory",
@@ -2226,12 +2582,71 @@
         "type": "uint256"
       },
       {
+        "internalType": "string",
+        "name": "metadataCID",
+        "type": "string"
+      }
+    ],
+    "name": "updateSRRMetadata",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
         "internalType": "bytes32",
         "name": "metadataDigest",
         "type": "bytes32"
       }
     ],
     "name": "updateSRRMetadata",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "royaltyReceiver",
+        "type": "address"
+      },
+      {
+        "internalType": "uint16",
+        "name": "royaltyPercentage",
+        "type": "uint16"
+      }
+    ],
+    "name": "updateSRRRoyalty",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "tokenIds",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "address",
+        "name": "royaltyReceiver",
+        "type": "address"
+      }
+    ],
+    "name": "updateSRRRoyaltyReceiverMulti",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -2252,6 +2667,29 @@
         "internalType": "bytes32",
         "name": "metadataDigest",
         "type": "bytes32"
+      }
+    ],
+    "name": "writeCustomHistory",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "customHistoryTypeId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "metadataCID",
+        "type": "string"
       }
     ],
     "name": "writeCustomHistory",

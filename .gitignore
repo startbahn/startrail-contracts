@@ -5,6 +5,11 @@ cache/
 **/deployments/localhost/
 **/deployments/local-legacy/
 **/deployments/mainnet-fork/
+typechain-types/
+
+# Foundry
+forge-cache/
+forge-out/
 
 # Logs
 logs
@@ -79,9 +84,6 @@ coverage.json
 
 # circleci
 process.yml
-
-#GCS ABI upload folder ingored from git
-v*
 
 # version
 .node-version

@@ -1,8 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.6.11;
-
-// Using ABIEncoderV2 to support using ExecutionRequest struct as calldata
-pragma experimental ABIEncoderV2;
+pragma solidity 0.8.13;
 
 import "../common/SignatureDecoder.sol";
 import "../name/Contracts.sol";

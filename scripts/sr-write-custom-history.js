@@ -24,8 +24,7 @@ Usage: HARDHAT_NETWORK=<network> npx ts-node scripts/sr-write-custom-history.js 
   const srContract = await getContract(hre, "StartrailRegistry");
 
 
-  const { data: writeHistoryCalldata } = await srContract.populateTransaction
-    .writeCustomHistory(historyName, historyTypeId, metadataDigest)
+  const { data: writeHistoryCalldata } = await srContract.populateTransaction[`writeCustomHistory(string,uint256,bytes32)`](historyName, historyTypeId, metadataDigest)
   console.log(
     `\nSending StartrailRegistry.writeCustomHistory transaction for ` +
     `[${historyName}]`

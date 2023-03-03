@@ -3,19 +3,19 @@
   "contractFunction": "updateSRR",
   "inputs": [
     {
-      "tokenId": "628560438356",
+      "tokenId": "761762342424",
       "isPrimaryIssuer": false,
       "artistAddress": "0x41862D0fa30f56e282FFEf0f99C57c32E0e26d4d"
     },
     {
-      "tokenId": "628560438356",
+      "tokenId": "761762342424",
       "isPrimaryIssuer": true,
       "artistAddress": "0x1D65AE4E5db4E95C1dCd21E2C4D1F30ed399146E"
     },
     {
-      "tokenId": "628560438356",
+      "tokenId": "761762342424",
       "isPrimaryIssuer": true,
-      "artistAddress": "0x864D38B2989553080dBe893f7366B2dc675Cac1F"
+      "artistAddress": "0x35902f4f4c94DCba48a71202b795E3Ad2f75c56F"
     }
   ]
 }

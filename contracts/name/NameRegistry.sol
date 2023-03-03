@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
+import "../proxy/utils/InitializableWithGap.sol";
 import "../common/INameRegistry.sol";
 import "./Contracts.sol";
 
-contract NameRegistry is Initializable, INameRegistry, Contracts {
+contract NameRegistry is InitializableWithGap, INameRegistry, Contracts {
     /*
      * Modifiers
      */

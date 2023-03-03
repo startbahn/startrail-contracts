@@ -1,6 +1,6 @@
 {
   "name": "startrail-subgraph",
-  "version": "1.13.0",
+  "version": "1.14.5",
   "scripts": {
     "test": "jest",
     "build": "yarn run generate-local && graph build subgraph.local.yaml",
@@ -11,17 +11,17 @@
     "create-local-develop": "graph create --node http://127.0.0.1:8020 startbahn/startrail-mumbai-develop",
     "create-local-release": "graph create --node http://127.0.0.1:8020 startbahn/startrail-mumbai-release",
     "create-local-staging": "graph create --node http://127.0.0.1:8020 startbahn/startrail-mumbai-staging",
-    "deploy-local": "yarn run codegen && graph deploy --ipfs http://localhost:5001 --node http://127.0.0.1:8020 startbahn/startrail-local subgraph.local.yaml -l v1.12.0",
-    "deploy-local-release": "yarn run generate-release && graph deploy --ipfs http://localhost:5001 --node http://127.0.0.1:8020 startbahn/startrail-mumbai-release subgraph.release.yaml -l v1.12.0",
-    "deploy-local-staging": "yarn run generate-staging && graph deploy --ipfs http://localhost:5001 --node http://127.0.0.1:8020 startbahn/startrail-mumbai-staging subgraph.staging.yaml -l v1.12.0",
-    "deploy-local-develop": "yarn run generate-develop && graph deploy --ipfs http://localhost:5001 --node http://127.0.0.1:8020 startbahn/startrail-mumbai-develop subgraph.develop.yaml -l v1.12.0",
-    "deploy-develop": "yarn run generate-develop && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-mumbai-develop --access-token \"$TOKEN\" subgraph.mumbai-develop.yaml -l v1.12.0",
-    "deploy-release": "yarn run generate-release && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-mumbai-release --access-token \"$TOKEN\" subgraph.mumbai-release.yaml -l v1.12.0",
-    "deploy-release2": "yarn run generate-release && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-mumbai-release2 --access-token \"$TOKEN\" subgraph.mumbai-release.yaml -l v1.12.0",
-    "deploy-staging": "yarn run generate-staging && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-mumbai-staging --access-token \"$TOKEN\" subgraph.mumbai-staging.yaml -l v1.12.0",
-    "deploy-staging2": "yarn run generate-staging && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-mumbai-staging2 --access-token \"$TOKEN\" subgraph.mumbai-staging.yaml -l v1.12.0",
-    "deploy-polygon": "yarn run generate-polygon && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-polygon --access-token \"$TOKEN\" subgraph.polygon.yaml -l v1.12.0",
-    "deploy-polygon2": "yarn run generate-polygon && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn-bot-user/startrail-polygon2 --access-token \"$TOKEN\" subgraph.polygon.yaml -l v1.12.0",
+    "deploy-local": "yarn run codegen && graph deploy --ipfs http://localhost:5001 --node http://127.0.0.1:8020 startbahn/startrail-local subgraph.local.yaml -l `jq '.version' package.json`",
+    "deploy-local-release": "yarn run generate-release && graph deploy --ipfs http://localhost:5001 --node http://127.0.0.1:8020 startbahn/startrail-mumbai-release subgraph.release.yaml ",
+    "deploy-local-staging": "yarn run generate-staging && graph deploy --ipfs http://localhost:5001 --node http://127.0.0.1:8020 startbahn/startrail-mumbai-staging subgraph.staging.yaml ",
+    "deploy-local-develop": "yarn run generate-develop && graph deploy --ipfs http://localhost:5001 --node http://127.0.0.1:8020 startbahn/startrail-mumbai-develop subgraph.develop.yaml ",
+    "deploy-develop": "yarn run generate-develop && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-mumbai-develop --access-token \"$TOKEN\" subgraph.mumbai-develop.yaml ",
+    "deploy-release": "yarn run generate-release && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-mumbai-release --access-token \"$TOKEN\" subgraph.mumbai-release.yaml ",
+    "deploy-release2": "yarn run generate-release && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-mumbai-release2 --access-token \"$TOKEN\" subgraph.mumbai-release.yaml ",
+    "deploy-staging": "yarn run generate-staging && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-mumbai-staging --access-token \"$TOKEN\" subgraph.mumbai-staging.yaml ",
+    "deploy-staging2": "yarn run generate-staging && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-mumbai-staging2 --access-token \"$TOKEN\" subgraph.mumbai-staging.yaml ",
+    "deploy-polygon": "yarn run generate-polygon && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-polygon --access-token \"$TOKEN\" subgraph.polygon.yaml ",
+    "deploy-polygon2": "yarn run generate-polygon && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn-bot-user/startrail-polygon2 --access-token \"$TOKEN\" subgraph.polygon.yaml ",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "generate-local": "node bin/generate-subgraph-yaml local ../deployments/localhost/deploy.json ../abi 1",
     "generate-develop": "node bin/generate-subgraph-yaml mumbai-develop",
@@ -39,8 +39,8 @@
     "remove-local-develop": "graph remove --ipfs http://localhost:5001 --node http://127.0.0.1:8020 startbahn/startrail-mumbai-develop"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "0.29.2",
-    "@graphprotocol/graph-ts": "0.26.0",
+    "@graphprotocol/graph-cli": "0.33.1",
+    "@graphprotocol/graph-ts": "0.29.0",
     "@types/jest": "^26.0.24",
     "@typescript-eslint/eslint-plugin": "^4.29.1",
     "@typescript-eslint/parser": "^4.29.1",
@@ -60,5 +60,9 @@
     "babel-register": "^6.26.0",
     "lokka": "^1.7.0",
     "lokka-transport-http": "^1.6.1"
+  },
+  "resolutions": {
+    "json-schema": "^0.4.0",
+    "ejs": "^3.1.7"
   }
 }

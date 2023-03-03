@@ -250,6 +250,22 @@ event CreateSRRWithProof(bytes32 indexed merkleRoot, uint256 indexed tokenId, by
 | tokenId `indexed` | uint256 | undefined |
 | srrHash  | bytes32 | undefined |
 
+### Initialized
+
+```solidity
+event Initialized(uint8 version)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| version  | uint8 | undefined |
+
 ### MigrateBatch
 
 ```solidity

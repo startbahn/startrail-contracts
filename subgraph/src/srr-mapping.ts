@@ -20,11 +20,13 @@ import {
   SRRTransferCommit,
 } from '../generated/schema'
 import {
-  CreateCustomHistory as CustomHistoryCreatedEvent,
+  CreateCustomHistory as CustomHistoryCreatedWithCIDEvent,
+  CreateCustomHistory1 as CustomHistoryCreatedEvent,
   CreateCustomHistoryFromMigration as CustomHistoryCreatedFromMigrationEvent,
   CreateCustomHistoryType as CustomHistoryTypeCreatedEvent,
-  CreateSRR as CreateSRRWithLockExternalTransferEvent,
+  CreateSRR as CreateSRRWithCIDEvent,
   CreateSRR1 as CreateSRREventLegacy,
+  CreateSRR2 as CreateSRRWithLockExternalTransferEvent,
   CreateSRRFromMigration as CreateSRRFromMigrationEvent,
   History as SRRHistoryEvent,
   LockExternalTransfer as LockExternalTransferEvent,
@@ -46,10 +48,13 @@ import {
   TransferFromMigration as TransferFromMigrationEvent,
   UpdateSRR as UpdateSRRWithSenderEvent,
   UpdateSRR1 as UpdateSRREvent,
-  UpdateCustomHistory as CustomHistoryUpdatedEvent,
+  UpdateCustomHistory as CustomHistoryUpdatedWithCIDEvent,
+  UpdateCustomHistory1 as CustomHistoryUpdatedEvent,
   UpdateSRRFromMigration as UpdateSRRFromMigrationEvent,
-  UpdateSRRMetadataDigest as UpdateSRRMetadataDigestEvent,
+  UpdateSRRMetadataDigest as UpdateSRRMetadataWithCIDEvent,
+  UpdateSRRMetadataDigest1 as UpdateSRRMetadataDigestEvent,
   UpdateSRRMetadataDigestFromMigration as UpdateSRRMetadataDigestFromMigrationEvent,
+  RoyaltiesSet as RoyaltiesSetEvent,
 } from '../generated/StartrailRegistry/StartrailRegistry'
 import {
   currentChainId,
@@ -67,7 +72,7 @@ export function handleTransfer(event: TransferEvent): void {
   let srrId = event.params.tokenId.toString()
   let srrIdBigInt = event.params.tokenId
 
-  let isMint = event.params.from.toHexString() == ZERO_ADDRESS.toHexString()
+  let isMint = event.params.from.toHex() == ZERO_ADDRESS.toHex()
 
   let srr = SRR.load(srrId)
   if (!srr) {
@@ -125,7 +130,7 @@ export function handleTransferFromMigration(
     srr.originTxHash = event.params.originTxHash
   }
 
-  if (event.params.from.toHexString() != ZERO_ADDRESS.toHexString()) {
+  if (event.params.from.toHex() != ZERO_ADDRESS.toHex()) {
     checkAndClearCommitOnTransfer(srr as SRR, originTimestampMillis)
   }
 
@@ -161,7 +166,7 @@ export function handleCreateSRR(event: CreateSRREventLegacy): void {
     event.params.registryRecord.isPrimaryIssuer,
     event.params.registryRecord.artistAddress,
     event.params.registryRecord.issuer,
-    event.params.metadataDigest,
+    event.params.metadataDigest.toHex(),
     false,
     timestampMillis,
     event
@@ -182,7 +187,26 @@ export function handleCreateSRRWithLockExternalTransfer(
     event.params.registryRecord.isPrimaryIssuer,
     event.params.registryRecord.artistAddress,
     event.params.registryRecord.issuer,
-    event.params.metadataDigest,
+    event.params.metadataDigest.toHex(),
+    event.params.lockExternalTransfer,
+    timestampMillis,
+    event
+  )
+}
+
+export function handleCreateSRRWithCID(event: CreateSRRWithCIDEvent): void {
+  logInvocation('handleCreateSRRWithCID', event)
+
+  let timestampMillis = eventUTCMillis(event)
+  let srrId = event.params.tokenId.toString()
+  let srr = SRR.load(srrId)
+
+  saveCreateSRRInternal(
+    srr as SRR,
+    event.params.registryRecord.isPrimaryIssuer,
+    event.params.registryRecord.artistAddress,
+    event.params.registryRecord.issuer,
+    event.params.metadataCID,
     event.params.lockExternalTransfer,
     timestampMillis,
     event
@@ -214,7 +238,7 @@ export function handleCreateSRRFromMigration(
     event.params.registryRecord.isPrimaryIssuer,
     event.params.registryRecord.artistAddress,
     event.params.registryRecord.issuer,
-    event.params.metadataDigest,
+    event.params.metadataDigest.toHex(),
     false,
     timestampMillis,
     event
@@ -226,7 +250,7 @@ function saveCreateSRRInternal(
   isPrimaryIssuer: boolean,
   artist: Address,
   issuer: Address,
-  metadataDigest: Bytes,
+  metadataDigest: string,
   lockExternalTransfer: boolean,
   updateTimestamp: BigInt,
   event: ethereum.Event
@@ -247,7 +271,7 @@ function saveCreateSRRInternal(
 }
 
 function getLicensedUserIdFromAddress(address: Address): string | null {
-  let id = address.toHexString()
+  let id = address.toHex()
   let luw = LicensedUserWallet.load(id)
   return !luw ? null : luw.id
 }
@@ -261,7 +285,7 @@ export function handleSRRProvenance(event: SRRProvenanceEventLegacy): void {
     params.from,
     params.to,
     null,
-    params.historyMetadataDigest,
+    params.historyMetadataHash,
     params.historyMetadataURI,
     false
   )
@@ -278,7 +302,7 @@ export function handleSRRProvenanceWithCustomHistory(
     params.from,
     params.to,
     params.customHistoryId,
-    params.historyMetadataDigest,
+    params.historyMetadataHash,
     params.historyMetadataURI,
     false
   )
@@ -295,7 +319,7 @@ export function handleSRRProvenanceWithIntermediary(
     params.from,
     params.to,
     null,
-    params.historyMetadataDigest,
+    params.historyMetadataHash,
     params.historyMetadataURI,
     params.isIntermediary
   )
@@ -312,7 +336,7 @@ export function handleSRRProvenanceWithCustomHistoryAndIntermediary(
     params.from,
     params.to,
     params.customHistoryId,
-    params.historyMetadataDigest,
+    params.historyMetadataHash,
     params.historyMetadataURI,
     params.isIntermediary
   )
@@ -330,7 +354,7 @@ function handleSRRProvenanceInternal(
   from: Address,
   to: Address,
   customHistoryId: BigInt | null,
-  historyMetadataDigest: string | null,
+  historyMetadataHash: string | null,
   historyMetadataURI: string | null,
   isIntermediary: boolean
 ): void {
@@ -353,7 +377,7 @@ function handleSRRProvenanceInternal(
     .keccak256(
       ByteArray.fromUTF8(tokenId.toString() + eventTimestampMillis.toString())
     )
-    .toHexString()
+    .toHex()
   let provenance = SRRProvenance.load(provenanceId)
   if (!provenance) {
     provenance = new SRRProvenance(provenanceId)
@@ -362,12 +386,16 @@ function handleSRRProvenanceInternal(
     provenance.from = from
     provenance.to = to
 
-    if (historyMetadataDigest) {
-      provenance.metadataDigest = Bytes.fromHexString(
-        historyMetadataDigest
-      ) as Bytes
+    if (historyMetadataHash) {
+      // isHexString
+      if (historyMetadataHash.length == 64) {
+        provenance.metadataDigest =
+          Bytes.fromHexString(historyMetadataHash).toHex()
+      } else {
+        provenance.metadataDigest = historyMetadataHash
+      }
     } else {
-      provenance.metadataDigest = new Bytes(0)
+      provenance.metadataDigest = ''
     }
 
     if (historyMetadataURI) {
@@ -444,28 +472,52 @@ export function handleUpdateCustomHistory(
 ): void {
   logInvocation('handleUpdateCustomHistory', event)
   let now = eventUTCMillis(event)
+  handleUpdateCustomHistoryInternal(
+    event.params.id.toString(),
+    now,
+    event.params.metadataDigest.toHex(),
+    event.params.name
+  )
+}
 
-  let customHistoryId = event.params.id.toString()
+export function handleUpdateCustomHistoryWithCID(
+  event: CustomHistoryUpdatedWithCIDEvent
+): void {
+  logInvocation('handleUpdateCustomHistoryWithCID', event)
+  let now = eventUTCMillis(event)
+  handleUpdateCustomHistoryInternal(
+    event.params.id.toString(),
+    now,
+    event.params.metadataCID,
+    event.params.name
+  )
+}
+
+function handleUpdateCustomHistoryInternal(
+  customHistoryId: string,
+  now: BigInt,
+  metadataDigest: string,
+  name: string
+): void {
   let ch = CustomHistory.load(customHistoryId)
-
   if (!ch) {
     log.error('received event for unknown CustomHistory: {}', [customHistoryId])
     return
   }
 
   let id = crypto
-    .keccak256(
-      ByteArray.fromUTF8(ch.metadataDigest.toString() + now.toString())
-    )
-    .toHexString()
+    .keccak256(ByteArray.fromUTF8(ch.metadataDigest + now.toString()))
+    .toHex()
 
   let chMh = new CustomHistoryMetadataHistory(id)
   chMh.metadataDigest = ch.metadataDigest
+  chMh.name = ch.name
   chMh.customHistory = customHistoryId
   chMh.createdAt = now
   chMh.createdAtStr = toUTCString(chMh.createdAt)
 
-  ch.metadataDigest = event.params.metadataDigest
+  ch.metadataDigest = metadataDigest
+  ch.name = name
   ch.updatedAt = now
   ch.updatedAtStr = toUTCString(ch.updatedAt)
 
@@ -482,7 +534,22 @@ export function handleCreateCustomHistory(
     event.params.id,
     event.params.name,
     event.params.customHistoryTypeId,
-    event.params.metadataDigest,
+    event.params.metadataDigest.toHex(),
+    currentChainId(),
+    event.transaction.hash
+  )
+}
+
+export function handleCreateCustomHistoryWithCid(
+  event: CustomHistoryCreatedWithCIDEvent
+): void {
+  logInvocation('handleCreateCustomHistory', event)
+  handleCreateCustomHistoryInternal(
+    eventUTCMillis(event),
+    event.params.id,
+    event.params.name,
+    event.params.customHistoryTypeId,
+    event.params.metadataCID,
     currentChainId(),
     event.transaction.hash
   )
@@ -497,7 +564,7 @@ export function handleCreateCustomHistoryFromMigration(
     event.params.id,
     event.params.name,
     event.params.customHistoryTypeId,
-    event.params.metadataDigest,
+    event.params.metadataDigest.toHex(),
     event.params.originChain,
     event.params.originTxHash
   )
@@ -508,7 +575,7 @@ function handleCreateCustomHistoryInternal(
   id: BigInt,
   name: string,
   customHistoryTypeId: BigInt,
-  metadataDigest: Bytes,
+  metadataDigest: string,
   originChain: string,
   originTxHash: Bytes
 ): void {
@@ -541,7 +608,7 @@ export function handleSRRHistory(event: SRRHistoryEvent): void {
       let customHistoryId = customHistoryIds[customHistoryIdsIdx].toString()
       let historyId = crypto
         .keccak256(ByteArray.fromUTF8(tokenId + customHistoryId))
-        .toHexString()
+        .toHex()
 
       let history = new SRRHistory(historyId)
       history.srr = tokenId
@@ -590,7 +657,7 @@ function handleSRRCommitmentInternal(
     return
   }
 
-  log.info('SRRCommitment commitment = {}', [commitment.toHexString()])
+  log.info('SRRCommitment commitment = {}', [commitment.toHex()])
 
   srr.transferCommitment = commitment
   srr.updatedAt = eventTimestampMillis
@@ -744,7 +811,7 @@ function handleUpdateSRRInternal(
   const artist = getLicensedUserIdFromAddress(artistAddress)
   if (!artist) {
     log.error('received event for unknown SRR artist address: {}', [
-      artistAddress.toHexString(),
+      artistAddress.toHex(),
     ])
     return
   }
@@ -765,7 +832,19 @@ export function handleUpdateSRRMetadataDigest(
   handleUpdateSRRMetadataDigestInternal(
     eventUTCMillis(event),
     event.params.tokenId,
-    event.params.metadataDigest,
+    event.params.metadataDigest.toHex(),
+    event
+  )
+}
+
+export function handleUpdateSRRMetadataWithCid(
+  event: UpdateSRRMetadataWithCIDEvent
+): void {
+  logInvocation('handleUpdateSRRMetadataDigest', event)
+  handleUpdateSRRMetadataDigestInternal(
+    eventUTCMillis(event),
+    event.params.tokenId,
+    event.params.metadataCID,
     event
   )
 }
@@ -777,7 +856,7 @@ export function handleUpdateSRRMetadataDigestFromMigration(
   handleUpdateSRRMetadataDigestInternal(
     secondsToMillis(event.params.originTimestamp),
     event.params.tokenId,
-    event.params.metadataDigest,
+    event.params.metadataDigest.toHex(),
     event
   )
 }
@@ -785,7 +864,7 @@ export function handleUpdateSRRMetadataDigestFromMigration(
 function handleUpdateSRRMetadataDigestInternal(
   eventTimestampMillis: BigInt,
   tokenId: BigInt,
-  metadataDigest: Bytes,
+  metadataDigest: string,
   event: ethereum.Event
 ): void {
   let srrId = tokenId.toString()
@@ -811,20 +890,18 @@ function saveSRRMetadataHistory(
   let metadataHistoryId = crypto
     .keccak256(
       ByteArray.fromUTF8(
-        event.transaction.hash.toHexString() +
-          event.logIndex.toHexString() +
-          (srr.metadataDigest as Bytes).toHexString()
+        event.transaction.hash.toHex() +
+          event.logIndex.toHex() +
+          (srr.metadataDigest as string)
       )
     )
-    .toHexString()
+    .toHex()
 
   let srrMetadataHistory = new SRRMetadataHistory(metadataHistoryId) // metadataHistoryId)
   srrMetadataHistory.srr = srr.id
   srrMetadataHistory.createdAt = eventTimestampMillis
   srrMetadataHistory.createdAtStr = toUTCString(srrMetadataHistory.createdAt)
-  srrMetadataHistory.metadataDigest = Bytes.fromHexString(
-    (srr.metadataDigest as Bytes).toHexString()
-  ) as Bytes
+  srrMetadataHistory.metadataDigest = srr.metadataDigest as string
   srrMetadataHistory.save()
 }
 
@@ -844,7 +921,7 @@ export function handleProvenanceDateMigrationFix(
   logInvocation('handleProvenanceDateMigrationFix', event)
   let provenanceId = crypto
     .keccak256(ByteArray.fromUTF8(event.params.tokenId.toString() + '66000'))
-    .toHexString()
+    .toHex()
   let prov = SRRProvenance.load(provenanceId)
   if (!prov) {
     log.error('received fix event but provenance not found: {}', [provenanceId])
@@ -869,5 +946,26 @@ export function handleLockExternalTransfer(
     return
   }
   srr.lockExternalTransfer = event.params.flag
+  srr.save()
+}
+
+export function handleRoyaltiesSet(event: RoyaltiesSetEvent): void {
+  logInvocation('handleRoyaltiesSet', event)
+  const srrId = event.params.tokenId.toString()
+  const srr = SRR.load(srrId)
+  if (!srr) {
+    log.error('received royalties set event but srr not found: {}', [srrId])
+    return
+  }
+
+  const timestampMillis = eventUTCMillis(event)
+
+  srr.updatedAt = timestampMillis
+  srr.updatedAtStr = toUTCString(srr.updatedAt)
+
+  const royalty = event.params.royalty
+  srr.royaltyPercentage = royalty.percentage
+  srr.royaltyReceiver = royalty.receiver
+
   srr.save()
 }

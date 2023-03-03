@@ -1,5 +1,5 @@
 // SPDX-License-Identifier:MIT
-pragma solidity ^0.6.2;
+pragma solidity 0.8.13;
 
 import "./IEIP2771Recipient.sol";
 
@@ -76,7 +76,7 @@ abstract contract EIP2771BaseRecipient is IEIP2771Recipient {
     internal
     override
     view
-    returns (address payable ret)
+    returns (address ret)
   {
     if (msg.data.length >= 24 && isTrustedForwarder(msg.sender)) {
       // At this point we know that the sender is a trusted forwarder,

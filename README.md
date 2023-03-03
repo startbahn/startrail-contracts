@@ -79,9 +79,9 @@ Remember to use `--network <network>` with the hardhat cli. See the hardhat docs
 
 ## :bulb: Tests
 
-All tests are run using hardhat. See the hardhat docs for more information.
+Tests are run using hardhat or foundry. See their docs for more information.
 
-To run the tests use `yarn test` or `npx hardhat test`
+To run the tests use `yarn test` or `npx hardhat test` for hardhat ones, `yarn forge-test` for foundry ones.
 
 CircleCI is configured to run all the tests also. See `.circleci/config.yml` for details.
 

@@ -12,7 +12,7 @@ import { eventUTCMillis, logInvocation, toUTCString } from './utils'
 export function handleBatchPrepared(event: BatchPreparedEvent): void {
   logInvocation('handleBatchPrepared', event)
 
-  const merkleRoot = event.params.merkleRoot.toHexString()
+  const merkleRoot = event.params.merkleRoot.toHex()
   let batch = Bulk.load(merkleRoot)
   if (batch) {
     log.info('already received this event for merkleRoot: {}', [
@@ -34,7 +34,7 @@ export function handleBatchPrepared(event: BatchPreparedEvent): void {
 export function handleCreateSRRWithProof(event: CreateSRRWithProofEvent): void {
   logInvocation('handleCreateSRRWithProof', event)
 
-  const merkleRoot = event.params.merkleRoot.toHexString()
+  const merkleRoot = event.params.merkleRoot.toHex()
   const batch = Bulk.load(merkleRoot)
   if (!batch) {
     log.error(
@@ -71,7 +71,7 @@ export function handleApproveSRRByCommitmentWithProof(
 ): void {
   logInvocation('handleApproveSRRByCommitmentWithProof', event)
 
-  const merkleRoot = event.params.merkleRoot.toHexString()
+  const merkleRoot = event.params.merkleRoot.toHex()
   const batch = Bulk.load(merkleRoot)
   if (!batch) {
     log.error(
@@ -109,7 +109,7 @@ export function handleTransferFromWithProvenanceWithProof(
 ): void {
   logInvocation('handleTransferFromWithProvenanceWithProof', event)
 
-  const merkleRoot = event.params.merkleRoot.toHexString()
+  const merkleRoot = event.params.merkleRoot.toHex()
   const batch = Bulk.load(merkleRoot)
   if (!batch) {
     log.error(

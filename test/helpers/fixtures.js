@@ -21,7 +21,13 @@ const { deployRenameRecipient } = require("../../utils/deployment/013-deploy-ren
 const { deployBytecodeReduction } = require("../../utils/deployment/014-deploy-bytecode-reduction");
 const { deployCustomHistoryUpdate } = require("../../utils/deployment/015-deploy-custom-history-update");
 const { deployUpdateSRRAddHistoryPermission } = require("../../utils/deployment/016-deploy-update-srr-add-history-permission");
+
 const { deployAuditFixes } = require("../../utils/deployment/017-deploy-audit-fixes")
+const { deployCustomHistoryNameUpdate } = require("../../utils/deployment/018-deploy-custom-history-name-update")
+const { deployEnableIPFS } = require("../../utils/deployment/019-deploy-enable-ipfs");
+const { deployRoyaltyERC2981 } = require("../../utils/deployment/020-deploy-royalty-erc2981");
+const { deployFixIPFSUrl } = require("../../utils/deployment/021-deploy-change-ipfs-url.ts");
+const { deployRoyaltyReceiverMultiUpdate } = require('../../utils/deployment/022-deploy-royalty-receiver-multi-update');
 
 /**
  * Deploys latest version of Startrail contracts plus some test data
@@ -43,9 +49,14 @@ async function fixtureDefault() {
   await deployRenameRecipient(hre);
   await deployBytecodeReduction(hre)
   await deployCustomHistoryUpdate(hre);
-  await deployUpdateSRRAddHistoryPermission(hre);
+  await deployUpdateSRRAddHistoryPermission(hre)
   await deployAuditFixes(hre);
-  
+  await deployCustomHistoryNameUpdate(hre);
+  await deployEnableIPFS(hre)
+  await deployRoyaltyERC2981(hre)
+  await deployFixIPFSUrl(hre)
+  await deployRoyaltyReceiverMultiUpdate(hre)
+
   const lum = await getContract(hre, "LicensedUserManager");
   const metaTxForwarder = await getContract(hre, "MetaTxForwarder");
   const nameRegistry = await getContract(hre, "NameRegistry");

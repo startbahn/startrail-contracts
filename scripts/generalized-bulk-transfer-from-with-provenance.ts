@@ -19,7 +19,7 @@ generalized-bulk-transfer-from-with-provenance.json example (see scripts/__data_
   "leafHash": "0x1ba60a60bfd7e56f4dbd085904da7fded34aa806f31f927e83c2dbc8bdc0257f",
   "to": "0x88f7c48e2A696276D13004c7bd32EAE05E4f2bE1",
   "tokenId": 333561554987,
-  "historyMetadataDigest": "0xe515947139053d36f28e833667f77df096b1dd3ecdd0146bce6cc5fa38700615",
+  "historyMetadataHash": "0xe515947139053d36f28e833667f77df096b1dd3ecdd0146bce6cc5fa38700615",
   "customHistoryId": 0,
   "isIntermediary": false
 }

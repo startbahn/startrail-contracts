@@ -2,7 +2,7 @@
   "requestTypeKey": "StartrailRegistryCreateSRRWithLockExternalTransfer",
   "requestData": {
     "isPrimaryIssuer": false,
-    "artistAddress": "0x864D38B2989553080dBe893f7366B2dc675Cac1F",
+    "artistAddress": "0x35902f4f4c94DCba48a71202b795E3Ad2f75c56F",
     "metadataDigest": "0x0c01cc79da2f4087d0c1cc9a01cff151b2656a3734d394e20f3e590da2cf2e8b",
     "lockExternalTransfer": false
   }
