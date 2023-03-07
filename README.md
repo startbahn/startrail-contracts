@@ -1,5 +1,6 @@
 # Startrail
 [![npm version](https://img.shields.io/npm/v/@startbahn/startrail/master.svg)](https://www.npmjs.com/package/@startbahn/startrail/v/master)
+[![Hacken Badge](https://hacken.io/wp-content/uploads/2023/02/ColorFullColorTypeSmartContractAuditBackFilled.png)](./audits/Hacken_Aug2022.pdf)
 
 ## :memo: Overview
 
