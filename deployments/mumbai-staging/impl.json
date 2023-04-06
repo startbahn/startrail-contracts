@@ -2,8 +2,8 @@
   "nameRegistryImplementationAddress": "0xbeaf0454452fa453c106406041baBffb912Ed1Aa",
   "metaTxForwarderImplementationAddress": "0xA5efc5c814Dae23e603FFB3B3833C8F9813d9BE1",
   "licensedUserManagerImplementationAddress": "0x043Bb00f094e81b092cd2Dfe79c61920Dd52518f",
-  "startrailRegistryImplementationAddress": "0xa2B4779d0a72e8eA3A1329a24cA86071d57298fc",
+  "startrailRegistryImplementationAddress": "0x3A98F5B5259d3fA3c7a08e47320c02AF446644b0",
   "bulkIssueImplementationAddress": "0x766D758654ac2f9B36A3aa87B3Ae35B10BEf35a8",
   "bulkTransferImplementationAddress": "0x3eD92cCa405875Ee2706E3101d3c31eE72a6D724",
-  "bulkImplementationAddress": "0xE29582618dDc258511A1faF568812A14b8370238"
+  "bulkImplementationAddress": "0x4fD2B335Eef4eF8Ca3CbeC79a00acB9dCbf66e98"
 }

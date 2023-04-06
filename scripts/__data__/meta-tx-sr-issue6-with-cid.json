@@ -8,6 +8,6 @@
     "lockExternalTransfer": false,
     "to": "0x0000000000000000000000000000000000000000",
     "royaltyReceiver": "0x0000000000000000000000000000000000000000",
-    "royaltyPercentage": 0
+    "royaltyBasisPoints": 0
   }
 }

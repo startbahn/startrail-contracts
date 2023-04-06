@@ -156,8 +156,15 @@ const getContractNameLatest = (contractName) => {
  * Helper that gets a list of all collection feature contract names.
  * @return Names of all Feature contracts
  */
- const getCollectionFeatureContractNames = (): ReadonlyArray<string> => {
-  return glob.sync(`contracts/collection/features/*.sol`)
+const getCollectionFeatureContractNames = (): ReadonlyArray<string> => {
+  return [
+    ...glob.sync(`contracts/collection/features/*.sol`),
+    `contracts/collection/features/shared/LibERC2981RoyaltyEvents.sol`,
+    `contracts/collection/features/erc721/LibERC721Events.sol`,
+    `contracts/collection/features/shared/LibSRRApproveTransferFeatureEvents.sol`,
+    `contracts/collection/features/shared/LibSRRMetadataEvents.sol`,
+    `contracts/collection/features/shared/LibSRRProvenanceEvents.sol`,
+  ]
 }
 
 const sortByNumber = (filenames: string[]) => filenames.sort((a, b) => {
@@ -196,7 +203,6 @@ const getContract = (
     case `StartrailProxyAdmin`:
       deployJSONKey = `proxyAdminAddress`;
       break;
-    case `CollectionFactory`:
     case `StartrailCollectionFeatureRegistry`:
       deployJSONKey = `${lowerFirst(contractName)}Address`;
       break;

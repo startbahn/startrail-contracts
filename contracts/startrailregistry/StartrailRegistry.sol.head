@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import "../proxy/utils/InitializableWithGap.sol";
 import "../common/INameRegistry.sol";
-import "../common/IStartrailRegistryV21.sol";
+import "../common/IStartrailRegistryV22.sol";
 import "../lib/IDGeneratorV3.sol";
 import "../metaTx/eip2771/EIP2771BaseRecipient.sol";
 import "../name/Contracts.sol";
@@ -22,7 +22,7 @@ interface ILicensedUserManager {
 
 contract StartrailRegistryV21 is
     Contracts,
-    IStartrailRegistryV21,
+    IStartrailRegistryV22,
     IStartrailRegistryMigrationV2,
     InitializableWithGap,
     Storage,
@@ -96,7 +96,7 @@ contract StartrailRegistryV21 is
 
     /**
      * Royalties
-     * marked `public` to provide direct read access to the percentages.
+     * marked `public` to provide direct read access to the basis points.
      * required for proposed SBINFT implementation AND
      * it's handy to have this lookup as royaltyInfo doesn't show this.
      * although it could be derived: `royaltyInfo(tokenId, 1 ether);
@@ -282,7 +282,7 @@ contract StartrailRegistryV21 is
         address artistAddress,
         bytes32 metadataDigest,
         bool lockExternalTransfer_
-    ) public override(IStartrailRegistryV21) trustedForwarderOnly {
+    ) public override(IStartrailRegistryV22) trustedForwarderOnly {
         _createSRR(
             isPrimaryIssuer,
             artistAddress,
@@ -310,7 +310,7 @@ contract StartrailRegistryV21 is
         bytes32 metadataDigest,
         bool lockExternalTransfer_,
         address to
-    ) public override(IStartrailRegistryV21) trustedForwarderOnly {
+    ) public override(IStartrailRegistryV22) trustedForwarderOnly {
         uint256 tokenId = _createSRR(
             isPrimaryIssuer,
             artistAddress,
@@ -335,7 +335,7 @@ contract StartrailRegistryV21 is
      * @param lockExternalTransfer_ bool of the flag to disable standard ERC721 transfer methods
      * @param to the address this token will be transferred to after the creation
      * @param royaltyReceiver royalty receiver
-     * @param royaltyPercentage royalty percentage
+     * @param royaltyBasisPoints royalty basis points
      */
     function createSRRFromLicensedUser(
         bool isPrimaryIssuer,
@@ -345,8 +345,8 @@ contract StartrailRegistryV21 is
         bool lockExternalTransfer_,
         address to,
         address royaltyReceiver,
-        uint16 royaltyPercentage
-    ) public override(IStartrailRegistryV21) trustedForwarderOnly {
+        uint16 royaltyBasisPoints
+    ) public override(IStartrailRegistryV22) trustedForwarderOnly {
         uint256 tokenId = _createSRR(
             isPrimaryIssuer,
             artistAddress,
@@ -355,7 +355,7 @@ contract StartrailRegistryV21 is
             msgSender(),
             lockExternalTransfer_,
             royaltyReceiver,
-            royaltyPercentage
+            royaltyBasisPoints
         );
         if (to != address(0)) {
             ERC721UpgradeSafe._transfer(msgSender(), to, tokenId);
@@ -369,7 +369,7 @@ contract StartrailRegistryV21 is
         bytes32 metadataDigest,
         address issuerAddress,
         bool lockExternalTransfer_
-    ) public override(IStartrailRegistryV21) returns (uint256) {
+    ) public override(IStartrailRegistryV22) returns (uint256) {
         onlyBulk();
         return
             _createSRR(
@@ -392,8 +392,8 @@ contract StartrailRegistryV21 is
         address issuerAddress,
         bool lockExternalTransfer_,
         address royaltyReceiver,
-        uint16 royaltyPercentage
-    ) public override(IStartrailRegistryV21) returns (uint256) {
+        uint16 royaltyBasisPoints
+    ) public override(IStartrailRegistryV22) returns (uint256) {
         onlyBulk();
         return
             _createSRR(
@@ -404,7 +404,7 @@ contract StartrailRegistryV21 is
                 issuerAddress,
                 lockExternalTransfer_,
                 royaltyReceiver,
-                royaltyPercentage
+                royaltyBasisPoints
             );
     }
 
@@ -421,7 +421,7 @@ contract StartrailRegistryV21 is
         bytes32 commitment,
         string memory historyMetadataHash,
         uint256 customHistoryId
-    ) public override(IStartrailRegistryV21) {
+    ) public override(IStartrailRegistryV22) {
         onlyBulk();
         _approveSRRByCommitment(
             tokenId,
@@ -437,7 +437,7 @@ contract StartrailRegistryV21 is
         string memory historyMetadataHash,
         uint256 customHistoryId,
         bool isIntermediary
-    ) external override(IStartrailRegistryV21) {
+    ) external override(IStartrailRegistryV22) {
         onlyBulk();
         _transferFromWithProvenance(
             to,
@@ -458,7 +458,7 @@ contract StartrailRegistryV21 is
         uint256 tokenId,
         bool isPrimaryIssuer,
         address artistAddress
-    ) external override(IStartrailRegistryV21) {
+    ) external override(IStartrailRegistryV22) {
         tokenExists(tokenId);
         onlyIssuerOrArtistOrAdministrator(tokenId);
         _saveSRR(tokenId, isPrimaryIssuer, artistAddress);
@@ -473,7 +473,7 @@ contract StartrailRegistryV21 is
      */
     function updateSRRMetadata(uint256 tokenId, bytes32 metadataDigest)
         external
-        override(IStartrailRegistryV21)
+        override(IStartrailRegistryV22)
     {
         tokenExists(tokenId);
         onlyIssuerOrArtistOrAdministrator(tokenId);
@@ -488,7 +488,7 @@ contract StartrailRegistryV21 is
      */
     function updateSRRMetadata(uint256 tokenId, string memory metadataCID)
         external
-        override(IStartrailRegistryV21)
+        override(IStartrailRegistryV22)
     {
         tokenExists(tokenId);
         onlyIssuerOrArtistOrAdministrator(tokenId);
@@ -501,22 +501,22 @@ contract StartrailRegistryV21 is
      * Only apply to srrs created with royalty info
      * @param tokenId uint256 of StartrailRegistryRecordID
      * @param royaltyReceiver royalty receiver
-     * @param royaltyPercentage royalty percentage
+     * @param royaltyBasisPoints royalty basis points
      */
     function updateSRRRoyalty(
         uint256 tokenId,
         address royaltyReceiver,
-        uint16 royaltyPercentage
-    ) external override(IStartrailRegistryV21) {
+        uint16 royaltyBasisPoints
+    ) external override(IStartrailRegistryV22) {
         tokenExists(tokenId);
         onlyIssuerOrArtistOrAdministrator(tokenId);
 
         RoyaltyInfo memory royalty = royalties[tokenId];
         if (royalty.receiver != address(0)) {
-            _saveRoyalties(tokenId, royaltyPercentage, royaltyReceiver);
+            _saveRoyalties(tokenId, royaltyBasisPoints, royaltyReceiver);
             emit RoyaltiesSet(tokenId, RoyaltyInfo(
                 royaltyReceiver,
-                royaltyPercentage
+                royaltyBasisPoints
             ));
         }
     }
@@ -530,7 +530,7 @@ contract StartrailRegistryV21 is
     function updateSRRRoyaltyReceiverMulti(
         uint256[] calldata tokenIds,
         address royaltyReceiver
-    ) external override(IStartrailRegistryV21) {
+    ) external override(IStartrailRegistryV22) {
         onlyAdministrator();
 
         for (uint256 i = 0; i < tokenIds.length; i++) {
@@ -540,13 +540,13 @@ contract StartrailRegistryV21 is
             if (royalty.receiver != address(0)) {
                 _saveRoyalties(
                     tokenIds[i],
-                    royalty.percentage,
+                    royalty.basisPoints,
                     royaltyReceiver
                 );
                 
                 emit RoyaltiesSet(tokenIds[i], RoyaltyInfo(
                     royaltyReceiver,
-                    royalty.percentage
+                    royalty.basisPoints
                 ));
             }
         }
@@ -562,7 +562,7 @@ contract StartrailRegistryV21 is
         uint256 tokenId,
         bytes32 commitment,
         string memory historyMetadataHash
-    ) external override(IStartrailRegistryV21) {
+    ) external override(IStartrailRegistryV22) {
         onlySRROwnerOrAdministrator(tokenId);
         _approveSRRByCommitment(
             tokenId,
@@ -584,7 +584,7 @@ contract StartrailRegistryV21 is
         bytes32 commitment,
         string memory historyMetadataHash,
         uint256 customHistoryId
-    ) external override(IStartrailRegistryV21) {
+    ) external override(IStartrailRegistryV22) {
         onlySRROwnerOrAdministrator(tokenId);
         customHistoryIdExists(customHistoryId);
         _approveSRRByCommitment(
@@ -601,7 +601,7 @@ contract StartrailRegistryV21 is
      */
     function cancelSRRCommitment(uint256 tokenId)
         external
-        override(IStartrailRegistryV21)
+        override(IStartrailRegistryV22)
     {
         onlySRROwnerOrAdministrator(tokenId);
         _clearSRRCommitment(tokenId);
@@ -620,7 +620,7 @@ contract StartrailRegistryV21 is
         bytes32 reveal,
         uint256 tokenId,
         bool isIntermediary
-    ) external override(IStartrailRegistryV21) {
+    ) external override(IStartrailRegistryV22) {
         tokenExists(tokenId);
 
         bytes32 commitment;
@@ -654,7 +654,7 @@ contract StartrailRegistryV21 is
     function addHistory(
         uint256[] calldata tokenIds,
         uint256[] calldata customHistoryIds
-    ) external override(IStartrailRegistryV21) {
+    ) external override(IStartrailRegistryV22) {
         onlyLicensedUserOrAdministrator();
         require(
             tokenIds.length * customHistoryIds.length <=
@@ -686,7 +686,7 @@ contract StartrailRegistryV21 is
      */
     function setNameRegistryAddress(address nameRegistry)
         external
-        override(IStartrailRegistryV21)
+        override(IStartrailRegistryV22)
     {
         require(nameRegistry != address(0), "nameRegistry cannot be 0 address");
         onlyAdministrator();
@@ -700,7 +700,7 @@ contract StartrailRegistryV21 is
      */
     function setTokenURIParts(string memory URIPrefix, string memory URIPostfix)
         external
-        override(IStartrailRegistryV21)
+        override(IStartrailRegistryV22)
     {
         onlyAdministrator();
         _stringStorage[SRR_GLOBAL_SLOT][_SRR][_URI_PREFIX] = URIPrefix;
@@ -715,7 +715,7 @@ contract StartrailRegistryV21 is
     function getSRR(uint256 tokenId)
         public
         view
-        override(IStartrailRegistryV21)
+        override(IStartrailRegistryV22)
         returns (SRR memory registryRecord, bytes32 metadataDigest)
     {
         tokenExists(tokenId);
@@ -737,7 +737,7 @@ contract StartrailRegistryV21 is
     function getSRRCommitment(uint256 tokenId)
         public
         view
-        override(IStartrailRegistryV21)
+        override(IStartrailRegistryV22)
         returns (
             bytes32 commitment,
             string memory historyMetadataHash,
@@ -789,7 +789,7 @@ contract StartrailRegistryV21 is
     function tokenURI(string memory metadataDigest)
         public
         view
-        override(IStartrailRegistryV21)
+        override(IStartrailRegistryV22)
         returns (string memory)
     {
         // length == 0x + 64, it's metadataDigest not ipfs cid
@@ -817,7 +817,7 @@ contract StartrailRegistryV21 is
      */
     function addCustomHistoryType(string memory historyTypeName)
         external
-        override(IStartrailRegistryV21)
+        override(IStartrailRegistryV22)
     {
         onlyAdministrator();
         require(
@@ -843,7 +843,7 @@ contract StartrailRegistryV21 is
         string memory name,
         uint256 customHistoryTypeId,
         bytes32 metadataDigest
-    ) public override(IStartrailRegistryV21) {
+    ) public override(IStartrailRegistryV22) {
         onlyAdministrator();
 
         require(
@@ -874,7 +874,7 @@ contract StartrailRegistryV21 is
         string memory name,
         uint256 customHistoryTypeId,
         string memory metadataCID
-    ) public override(IStartrailRegistryV21) {
+    ) public override(IStartrailRegistryV22) {
         onlyAdministrator();
 
         require(
@@ -905,7 +905,7 @@ contract StartrailRegistryV21 is
         uint256 customHistoryId,
         string memory name,
         bytes32 metadataDigest
-    ) public override(IStartrailRegistryV21) {
+    ) public override(IStartrailRegistryV22) {
         onlyAdministrator();
 
         // REVERTs inside this call if the id does not exist
@@ -935,7 +935,7 @@ contract StartrailRegistryV21 is
         uint256 customHistoryId,
         string memory name,
         string memory metadataCID
-    ) public override(IStartrailRegistryV21) {
+    ) public override(IStartrailRegistryV22) {
         onlyAdministrator();
 
         // REVERTs inside this call if the id does not exist
@@ -963,7 +963,7 @@ contract StartrailRegistryV21 is
     function getCustomHistoryNameById(uint256 id)
         public
         view
-        override(IStartrailRegistryV21)
+        override(IStartrailRegistryV22)
         returns (string memory)
     {
         return _stringStorage[id][_CUSTOM_HISTORY][_CUSTOM_HISTORY_NAME];
@@ -980,7 +980,7 @@ contract StartrailRegistryV21 is
         address sender,
         bool lockExternalTransfer_,
         address royaltyReceiver,
-        uint16 royaltyPercentage
+        uint16 royaltyBasisPoints
     ) private returns (uint256 tokenId) {
         bool isCID = isNotEmptyString(metadataCID);
 
@@ -1001,7 +1001,7 @@ contract StartrailRegistryV21 is
 
         if (royaltyReceiver != address(0)) {
             require(
-                royaltyPercentage <= 10000,
+                royaltyBasisPoints <= 10000,
                 "ERC2981: royalty fee will exceed salePrice"
             );
         }
@@ -1045,10 +1045,10 @@ contract StartrailRegistryV21 is
         }
 
         if (royaltyReceiver != address(0)) {
-            _saveRoyalties(tokenId, royaltyPercentage, royaltyReceiver);
+            _saveRoyalties(tokenId, royaltyBasisPoints, royaltyReceiver);
             emit RoyaltiesSet(tokenId, RoyaltyInfo(
                 royaltyReceiver,
-                royaltyPercentage
+                royaltyBasisPoints
             ));
         }
     }
@@ -1212,7 +1212,7 @@ contract StartrailRegistryV21 is
         string memory historyMetadataHash,
         uint256 customHistoryId,
         bool isIntermediary
-    ) external override(IStartrailRegistryV21) {
+    ) external override(IStartrailRegistryV22) {
         externalTransferNotLocked(tokenId);
         onlySRROwnerOrAdministrator(tokenId);
         _transferFromWithProvenance(
@@ -1275,7 +1275,7 @@ contract StartrailRegistryV21 is
      */
     function setLockExternalTransfer(uint256 tokenId, bool flag)
         external
-        override(IStartrailRegistryV21)
+        override(IStartrailRegistryV22)
     {
         onlyIssuerOrAdministrator(tokenId);
         tokenExists(tokenId);
@@ -1290,7 +1290,7 @@ contract StartrailRegistryV21 is
     function lockExternalTransfer(uint256 tokenId)
         public
         view
-        override(IStartrailRegistryV21)
+        override(IStartrailRegistryV22)
         returns (bool)
     {
         return _boolStorage[tokenId][_SRR][_LOCK_EXTERNAL_TRANSFER];
@@ -1316,7 +1316,7 @@ contract StartrailRegistryV21 is
     function contractURI()
         external
         view
-        override(IStartrailRegistryV21)
+        override(IStartrailRegistryV22)
         returns (string memory)
     {
         return _stringStorage[SRR_GLOBAL_SLOT][_SRR][_CONTRACT_URI];
@@ -1327,7 +1327,7 @@ contract StartrailRegistryV21 is
      */
     function setContractURI(string memory _contractURI)
         external
-        override(IStartrailRegistryV21)
+        override(IStartrailRegistryV22)
     {
         onlyAdministrator();
         _stringStorage[SRR_GLOBAL_SLOT][_SRR][_CONTRACT_URI] = _contractURI;
@@ -1348,7 +1348,7 @@ contract StartrailRegistryV21 is
      */
     function transferOwnership(address newOwner)
         public
-        override(IStartrailRegistryV21)
+        override(IStartrailRegistryV22)
     {
         onlyAdministrator();
         require(
@@ -1506,34 +1506,14 @@ contract StartrailRegistryV21 is
     }
 
     /**
-     * @dev get royalty information for the token id
-     */
-    function _getTokenRoyalty(uint256 tokenId)
-        private
-        view
-        returns (RoyaltyInfo memory)
-    {
-        RoyaltyInfo memory royalty = royalties[tokenId];
-        if (royalty.receiver == address(0)) {
-            // The default receiver address 0x75194F40c5337d218A6798B02BbB34500a653A16 is what we use for OpenSea
-            // for all environments like QA, STG and production. As we set the default royalty to 0, this shouldn’t matter.
-            royalty = RoyaltyInfo(
-                0x75194F40c5337d218A6798B02BbB34500a653A16,
-                0
-            );
-        }
-        return royalty;
-    }
-
-    /**
      * @dev Saves the Royalty
      * @param tokenId uint256 of StartrailRegistryRecordID
-     * @param percentage uint16
+     * @param basisPoints uint16
      * @param receiver address
      */
     function _saveRoyalties(
         uint256 tokenId,
-        uint16 percentage,
+        uint16 basisPoints,
         address receiver
     ) private {
         require(
@@ -1542,13 +1522,13 @@ contract StartrailRegistryV21 is
         );
 
         require(
-            percentage <= 10000,
+            basisPoints <= 10000,
             "ERC2981: royalty fee will exceed salePrice"
         );
 
         tokenExists(tokenId);
 
-        royalties[tokenId] = RoyaltyInfo(receiver, percentage);
+        royalties[tokenId] = RoyaltyInfo(receiver, basisPoints);
     }
 
     /**
@@ -1575,7 +1555,7 @@ contract StartrailRegistryV21 is
             );
         }
         
-        uint256 royaltyAmount = (_salePrice * royalty.percentage) / 10000;
+        uint256 royaltyAmount = (_salePrice * royalty.basisPoints) / 10000;
 
         return (royalty.receiver, royaltyAmount);
     }

@@ -4,6 +4,6 @@ pragma solidity 0.8.13;
 library LibERC2981RoyaltyTypes {
     struct RoyaltyInfo {
         address receiver;
-        uint16 percentage;
+        uint16 basisPoints;
     }
 }

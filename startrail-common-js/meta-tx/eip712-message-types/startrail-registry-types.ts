@@ -70,7 +70,7 @@ interface StartrailRegistryCreateSRRFromLicensedUserWithRoyaltyRecord {
   lockExternalTransfer: boolean
   to: string
   royaltyReceiver: string
-  royaltyPercentage: number
+  royaltyBasisPoints: number
 }
 
 const StartrailRegistryCreateSRRFromLicensedUserWithRoyaltyTypes: ReadonlyArray<TypedDataField> = buildTypeList(
@@ -82,7 +82,7 @@ const StartrailRegistryCreateSRRFromLicensedUserWithRoyaltyTypes: ReadonlyArray<
     lockExternalTransfer: 'bool',
     to: 'address',
     royaltyReceiver: 'address',
-    royaltyPercentage: 'uint16',
+    royaltyBasisPoints: 'uint16',
   }
 )
 
@@ -128,14 +128,14 @@ const StartrailRegistryUpdateSRRRoyaltyTypes: ReadonlyArray<TypedDataField> = bu
   {
     tokenId: 'uint256',
     royaltyReceiver: 'address',
-    royaltyPercentage: 'uint16',
+    royaltyBasisPoints: 'uint16',
   }
 )
 
 interface StartrailRegistryUpdateSRRRoyaltyRecord {
   tokenId: BigNumber | string
   royaltyReceiver: string
-  royaltyPercentage: number
+  royaltyBasisPoints: number
 }
 
 // v1: using historyMetadataDigest

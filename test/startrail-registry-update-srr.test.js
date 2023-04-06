@@ -29,7 +29,7 @@ const isPrimaryIssuer = true
 const artistAddress = randomAddress()
 
 const defaultRoyaltyReceiver = randomAddress()
-const defaultRoyaltyPercentage = 1_570 // 15.7%
+const defaultRoyaltyBasisPoints = 1_570 // 15.7%
 
 let startrailRegistry
 let luwHandler, luwArtist, anotherArtist
@@ -78,7 +78,7 @@ describe('StartrailRegistry SRR updates', () => {
     metadataDigest = randomSha256()
   })
 
-  const createSRRMetaTx = async (metadataHash = null, royaltyReceiver = ZERO_ADDRESS, royaltyPercentage = 0, recipient = ZERO_ADDRESS, metadataCID = '') => {
+  const createSRRMetaTx = async (metadataHash = null, royaltyReceiver = ZERO_ADDRESS, royaltyBasisPoints = 0, recipient = ZERO_ADDRESS, metadataCID = '') => {
     const createSRRTxReceipt = await metaTxSend({
       requestTypeKey:
         MetaTxRequestType.StartrailRegistryCreateSRRFromLicensedUserWithRoyalty,
@@ -90,7 +90,7 @@ describe('StartrailRegistry SRR updates', () => {
         lockExternalTransfer: false,
         to: recipient,
         royaltyReceiver,
-        royaltyPercentage
+        royaltyBasisPoints
       },
       fromAddress: luwHandler,
       signerWallet: ownerWallet,
@@ -532,17 +532,17 @@ describe('StartrailRegistry SRR updates', () => {
   describe('updateSRRRoyalty', () => {
     it('called by an Issuer', async () => {
       // Create SRR first
-      const tokenId = await createSRRMetaTx(metadataDigest, defaultRoyaltyReceiver, defaultRoyaltyPercentage)
+      const tokenId = await createSRRMetaTx(metadataDigest, defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
 
       // Update SRR royalty tx
       const royaltyReceiver = randomAddress()
-      const royaltyPercentage = 500 // 5%
+      const royaltyBasisPoints = 500 // 5%
       const updateSRRRoyaltyTxReceipt = await metaTxSend({
         requestTypeKey: MetaTxRequestType.StartrailRegistryUpdateSRRRoyalty,
         requestData: {
           tokenId,
           royaltyReceiver,
-          royaltyPercentage,
+          royaltyBasisPoints,
         },
         fromAddress: luwHandler,
         signerWallet: ownerWallet,
@@ -555,22 +555,22 @@ describe('StartrailRegistry SRR updates', () => {
       )[1]
 
       expect(royaltyEvent[0]).to.equal(royaltyReceiver)
-      expect(royaltyEvent[1]).to.equal(royaltyPercentage)
+      expect(royaltyEvent[1]).to.equal(royaltyBasisPoints)
     })
 
     it('called by an Artist', async () => {
       // Create SRR first
-      const tokenId = await createSRRMetaTx(metadataDigest, defaultRoyaltyReceiver, defaultRoyaltyPercentage)
+      const tokenId = await createSRRMetaTx(metadataDigest, defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
 
       // Update SRR royalty tx
       const royaltyReceiver = randomAddress()
-      const royaltyPercentage = 500 // 5%
+      const royaltyBasisPoints = 500 // 5%
       const updateSRRRoyaltyTxReceipt = await metaTxSend({
         requestTypeKey: MetaTxRequestType.StartrailRegistryUpdateSRRRoyalty,
         requestData: {
           tokenId,
           royaltyReceiver,
-          royaltyPercentage,
+          royaltyBasisPoints,
         },
         fromAddress: luwArtist,
         signerWallet: ownerWallet,
@@ -583,20 +583,20 @@ describe('StartrailRegistry SRR updates', () => {
       )[1]
 
       expect(royaltyEvent[0]).to.equal(royaltyReceiver)
-      expect(royaltyEvent[1]).to.equal(royaltyPercentage)
+      expect(royaltyEvent[1]).to.equal(royaltyBasisPoints)
     })
 
     it('called from the Administrator contract', async () => {
       // Create SRR first
-      const tokenId = await createSRRMetaTx(metadataDigest, defaultRoyaltyReceiver, defaultRoyaltyPercentage)
+      const tokenId = await createSRRMetaTx(metadataDigest, defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
 
       // Update SRR metadata tx
       const royaltyReceiver = randomAddress()
-      const royaltyPercentage = 500 // 5%
+      const royaltyBasisPoints = 500 // 5%
       const { data: updateEncoded } =
         await startrailRegistry.populateTransaction[
           `updateSRRRoyalty(uint256,address,uint16)`
-        ](tokenId, royaltyReceiver, royaltyPercentage)
+        ](tokenId, royaltyReceiver, royaltyBasisPoints)
 
       const admin = await getAdministratorInstance(hre)
       const updateSRRRoyaltyTxReceipt = await admin.execTransaction({
@@ -612,7 +612,7 @@ describe('StartrailRegistry SRR updates', () => {
       )[1]
 
       expect(royaltyEvent[0]).to.equal(royaltyReceiver)
-      expect(royaltyEvent[1]).to.equal(royaltyPercentage)
+      expect(royaltyEvent[1]).to.equal(royaltyBasisPoints)
     })
 
     it('rejects if tokenId does not exist', async () => {
@@ -622,7 +622,7 @@ describe('StartrailRegistry SRR updates', () => {
           requestData: {
             tokenId: 123456,
             royaltyReceiver: randomAddress(),
-            royaltyPercentage: 500, // 5%
+            royaltyBasisPoints: 500, // 5%
           },
           fromAddress: luwHandler,
           signerWallet: ownerWallet,
@@ -637,13 +637,13 @@ describe('StartrailRegistry SRR updates', () => {
         startrailRegistry.connect(noAuthWallet)
 
       const royaltyReceiver = randomAddress()
-      const royaltyPercentage = 500 // 5%
+      const royaltyBasisPoints = 500 // 5%
 
       return assertRevert(
         startrailRegistryNotTrusted[`updateSRRRoyalty(uint256,address,uint16)`](
           tokenId,
           royaltyReceiver,
-          royaltyPercentage
+          royaltyBasisPoints
         ),
         `Caller is not the Startrail Administrator or an Issuer or an Artist`
       )
@@ -651,16 +651,16 @@ describe('StartrailRegistry SRR updates', () => {
 
     it('rejects if the meta tx signer is not the Issuer or the Artist or the Startrail Administrator', async () => {
       // Create SRR first
-      const tokenId = await createSRRMetaTx(metadataDigest, defaultRoyaltyReceiver, defaultRoyaltyPercentage)
+      const tokenId = await createSRRMetaTx(metadataDigest, defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
       const royaltyReceiver = randomAddress()
-      const royaltyPercentage = 500 // 5%
+      const royaltyBasisPoints = 500 // 5%
       return assertRevert(
         metaTxSend({
           requestTypeKey: MetaTxRequestType.StartrailRegistryUpdateSRRRoyalty,
           requestData: {
             tokenId,
             royaltyReceiver,
-            royaltyPercentage,
+            royaltyBasisPoints,
           },
           fromAddress: anotherArtist,
           signerWallet: ownerWallet,
@@ -669,18 +669,18 @@ describe('StartrailRegistry SRR updates', () => {
       )
     })
 
-    it('rejects if royalty percentage is greater than 10000 (100%)', async () => {
+    it('rejects if royalty basis points is greater than 10000 (100%)', async () => {
       // Create SRR first
-      const tokenId = await createSRRMetaTx(metadataDigest, defaultRoyaltyReceiver, defaultRoyaltyPercentage)
+      const tokenId = await createSRRMetaTx(metadataDigest, defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
       const royaltyReceiver = randomAddress()
-      const royaltyPercentage = 11000 // 110%
+      const royaltyBasisPoints = 11000 // 110%
       await assertRevert(
         metaTxSend({
           requestTypeKey: MetaTxRequestType.StartrailRegistryUpdateSRRRoyalty,
           requestData: {
             tokenId,
             royaltyReceiver,
-            royaltyPercentage,
+            royaltyBasisPoints,
           },
           fromAddress: luwHandler,
           signerWallet: ownerWallet,
@@ -691,16 +691,16 @@ describe('StartrailRegistry SRR updates', () => {
 
     it('rejects if royalty receiver address is zero address', async () => {
       // Create SRR first
-      const tokenId = await createSRRMetaTx(metadataDigest, defaultRoyaltyReceiver, defaultRoyaltyPercentage)
+      const tokenId = await createSRRMetaTx(metadataDigest, defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
       const royaltyReceiver = ZERO_ADDRESS
-      const royaltyPercentage = 500 // 5%
+      const royaltyBasisPoints = 500 // 5%
       await assertRevert(
         metaTxSend({
           requestTypeKey: MetaTxRequestType.StartrailRegistryUpdateSRRRoyalty,
           requestData: {
             tokenId,
             royaltyReceiver,
-            royaltyPercentage,
+            royaltyBasisPoints,
           },
           fromAddress: luwHandler,
           signerWallet: ownerWallet,
@@ -713,8 +713,8 @@ describe('StartrailRegistry SRR updates', () => {
   describe('updateSRRRoyaltyReceiverMulti', () => {
     it('called from the Administrator contract', async () => {
       // Create SRR first
-      const tokenId1 = await createSRRMetaTx(randomSha256(), defaultRoyaltyReceiver, defaultRoyaltyPercentage)
-      const tokenId2 = await createSRRMetaTx(randomSha256(), defaultRoyaltyReceiver, defaultRoyaltyPercentage)
+      const tokenId1 = await createSRRMetaTx(randomSha256(), defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
+      const tokenId2 = await createSRRMetaTx(randomSha256(), defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
 
       const royaltyReceiver = randomAddress()
 
@@ -744,10 +744,10 @@ describe('StartrailRegistry SRR updates', () => {
       )[1]
 
       expect(royalty1Event[0]).to.equal(royaltyReceiver)
-      expect(royalty1Event[1]).to.equal(defaultRoyaltyPercentage)
+      expect(royalty1Event[1]).to.equal(defaultRoyaltyBasisPoints)
 
       expect(royalty2Event[0]).to.equal(royaltyReceiver)
-      expect(royalty2Event[1]).to.equal(defaultRoyaltyPercentage)
+      expect(royalty2Event[1]).to.equal(defaultRoyaltyBasisPoints)
     })
 
     it('rejects if msg.sender is not an Administrator', async () => {

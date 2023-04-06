@@ -69,7 +69,7 @@ const generateSRRsWithCid = async (n) => {
       metadataCID,
       lockExternalTransfer: randomBoolean(),
       royaltyReceiver: randomAddress(),
-      royaltyPercentage: 500, // 5%
+      royaltyBasisPoints: 500, // 5%
     };
   }));
   return srrs;
@@ -460,7 +460,7 @@ describe("BulkIssue", () => {
         srrDetailsList.map(srr => srr.metadataCID),
         srrDetailsList.map(srr => srr.lockExternalTransfer),
         srrDetailsList.map(srr => srr.royaltyReceiver),
-        srrDetailsList.map(srr => srr.royaltyPercentage),
+        srrDetailsList.map(srr => srr.royaltyBasisPoints),
         {
           // 20M gas
           gasLimit: 20000000

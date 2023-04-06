@@ -28,6 +28,7 @@ const { deployEnableIPFS } = require("../../utils/deployment/019-deploy-enable-i
 const { deployRoyaltyERC2981 } = require("../../utils/deployment/020-deploy-royalty-erc2981");
 const { deployFixIPFSUrl } = require("../../utils/deployment/021-deploy-change-ipfs-url.ts");
 const { deployRoyaltyReceiverMultiUpdate } = require('../../utils/deployment/022-deploy-royalty-receiver-multi-update');
+const { deployRoyaltyRefactor } = require("../../utils/deployment/023-deploy-royalty-refactor");
 
 /**
  * Deploys latest version of Startrail contracts plus some test data
@@ -56,6 +57,7 @@ async function fixtureDefault() {
   await deployRoyaltyERC2981(hre)
   await deployFixIPFSUrl(hre)
   await deployRoyaltyReceiverMultiUpdate(hre)
+  await deployRoyaltyRefactor(hre)
 
   const lum = await getContract(hre, "LicensedUserManager");
   const metaTxForwarder = await getContract(hre, "MetaTxForwarder");

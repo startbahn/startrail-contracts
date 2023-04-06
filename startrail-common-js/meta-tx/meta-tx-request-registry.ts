@@ -227,7 +227,7 @@ const metaTxRequests: Record<MetaTxRequestType, MetaTxRequest> = {
   CollectionFactoryCreateCollection: buildMetaTxRequest({
     metaTxRequestType: MetaTxRequestType.CollectionFactoryCreateCollection,
     contractName: 'CollectionFactory',
-    functionSignature: 'createCollectionContract(string,string,string,bytes32)',
+    functionSignature: 'createCollectionContract(string,string,bytes32)',
     adminCanCall: false,
   }),
 
@@ -239,11 +239,26 @@ const metaTxRequests: Record<MetaTxRequestType, MetaTxRequest> = {
     // Create meta-tx's from the StartrailRegistry defined meta-tx's as most
     // are also executable with collection contracts. Some are not and they
     // are omitted on the next line.
-    _.omitBy(STARTRAIL_REGISTRY_TYPE_KEY_TO_FUNCTION_SIGNATURE, (val) =>
-      // For now in Collections we implement just one `createSRR` defined
-      // below and not the legacy forms.
-      // See also outstanding STARTRAIL-1946 that may change this.
-      val.startsWith(`createSRRFrom`)
+    _.omitBy(
+      STARTRAIL_REGISTRY_TYPE_KEY_TO_FUNCTION_SIGNATURE,
+      (fnSig, typeKey) =>
+        // For now in Collections we implement just one `createSRR` defined
+        // below and not the legacy forms.
+        // See also outstanding STARTRAIL-1946 that may change this.
+        typeKey.startsWith(`CreateSRR`) ||
+        [
+          // The following 3 all have corresponding 'V2' versions so we skip
+          // these. Although V1 and V2 function signatures are identical, not
+          // sure how that came about. But for collections we only want to
+          // support one meta-tx from the originals.
+          'ApproveSRRByCommitment',
+          'ApproveSRRByCommitmentWithCustomHistoryId',
+          'TransferFromWithProvenance',
+
+          // Collections support CID hashes only so we use
+          // UpdateSRRMetadataWithCid instead of the following:
+          'UpdateSRRMetadata',
+        ].includes(typeKey)
     ),
     `Collection`
   ),
@@ -257,14 +272,11 @@ const metaTxRequests: Record<MetaTxRequestType, MetaTxRequest> = {
     destinationAddressProvided: true,
   }),
 
-  //
-  // Collection (FOR STUB ONLY - TO BE REMOVED)
-  //
-
-  CreateCollection: buildMetaTxRequest({
-    metaTxRequestType: MetaTxRequestType.CreateCollection,
+  CollectionTransferOwnership: buildMetaTxRequest({
+    metaTxRequestType: MetaTxRequestType.CollectionTransferOwnership,
     contractName: 'CollectionProxyFeaturesAggregate',
-    functionSignature: 'createCollection()',
+    functionSignature: 'transferOwnership(address)',
+    adminCanCall: false,
     destinationAddressProvided: true,
   }),
 } as Record<MetaTxRequestType, MetaTxRequest>

@@ -3,6 +3,8 @@
 pragma solidity 0.8.13;
 
 interface IOwnableFeature {
+    error ZeroAddress();
+
     /**
      * @dev Ownable initializer
      */

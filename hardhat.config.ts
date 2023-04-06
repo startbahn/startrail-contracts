@@ -9,18 +9,19 @@ import 'hardhat-log-remover'
 import '@primitivefi/hardhat-dodoc'
 import 'hardhat-contract-sizer'
 import 'hardhat-storage-layout'
+import '@openzeppelin/hardhat-upgrades'
+import "@nomiclabs/hardhat-etherscan"
 
 // STARTRAIL-1414 fix coverage:
 // import 'solidity-coverage'
-
 import dotenv from 'dotenv'
 import { ethers } from 'ethers'
 import fs from 'fs'
 import { TASK_COMPILE } from 'hardhat/builtin-tasks/task-names'
 import { task } from 'hardhat/config'
 import { HardhatNetworkConfig } from 'hardhat/types'
+import { isEqual, uniqWith } from 'lodash'
 import path from 'path'
-import { uniqWith, isEqual } from 'lodash'
 
 import chainIds from './utils/chain-ids'
 import {
@@ -61,7 +62,7 @@ const startrailAdministratorLocal: StartrailAdministratorConfig = {
 //
 // Known address in Live networks
 //
-const MUMBAI_DEPLOYER_ADDRESS = '0x17a4dC4aF1FAF9c3Db0515a170491c37eb0373Dc'
+const MUMBAI_DEPLOYER_ADDRESS = '0x2A02C20195CA2A9bCc8E043cf7acE2EEa8Ab71Db'
 const MUMBAI_API_ADDRESS = '0x2B5de787FaC8c91608254158d6b7184feDC783Aa'
 
 const MAINNET_DEPLOYER_ADDRESS = '0x4F59ae1E7b5708d5E153402351A3b72F5F493B50'
@@ -308,5 +309,9 @@ export default {
     exclude: featureContractNameList.map((name) => `I${name}`),
     // ignore duplicates - although most are avoided by the `exclude` above
     strict: false,
+  },
+
+  etherscan: {
+    apiKey: process.env.POLYGONSCAN_ACCOUNT,
   },
 }

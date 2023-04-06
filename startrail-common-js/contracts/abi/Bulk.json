@@ -192,7 +192,7 @@
       },
       {
         "internalType": "bytes32[]",
-        "name": "srrHashes",
+        "name": "leafHashes",
         "type": "bytes32[]"
       },
       {
@@ -227,7 +227,7 @@
       },
       {
         "internalType": "uint16[]",
-        "name": "royaltyPercentages",
+        "name": "royaltyBasisPoints",
         "type": "uint16[]"
       }
     ],
@@ -256,7 +256,7 @@
       },
       {
         "internalType": "bytes32[]",
-        "name": "srrHashes",
+        "name": "leafHashes",
         "type": "bytes32[]"
       },
       {
@@ -471,7 +471,7 @@
     "inputs": [
       {
         "internalType": "bytes32",
-        "name": "srrHash",
+        "name": "leafHash",
         "type": "bytes32"
       },
       {
@@ -500,7 +500,7 @@
         "type": "bool"
       }
     ],
-    "name": "verifySRRHash",
+    "name": "verifyLeafHash",
     "outputs": [
       {
         "internalType": "bool",
@@ -530,7 +530,7 @@
       },
       {
         "internalType": "string",
-        "name": "historyMetadataHash",
+        "name": "metadataCID",
         "type": "string"
       },
       {

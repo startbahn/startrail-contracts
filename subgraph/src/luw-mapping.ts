@@ -15,7 +15,7 @@ import {
   logInvocation,
   secondsToMillis,
   toUTCString,
-} from './utils'
+} from './lib/utils'
 
 function userType(n: i32): string {
   switch (n) {

@@ -1,0 +1,11 @@
+{
+  "requestTypeKey": "CollectionTransferFromWithProvenanceV2",
+  "requestData": {
+    "destination": "0x5979B6061f1caC61F70A06Cd968a6f67fe0B8284",
+    "to": "0xf1dbd215d72d99422693ca61f7bbecfcd0edb16f",
+    "tokenId": 20398948250,
+    "historyMetadataHash": "bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsq",
+    "customHistoryId": "1",
+    "isIntermediary": true
+  }
+}

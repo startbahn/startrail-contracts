@@ -5,7 +5,7 @@ import {
   BatchPrepared as BatchPreparedEvent,
 } from '../generated/BulkTransfer/BulkTransfer'
 import { BulkTransfer } from '../generated/schema'
-import { eventUTCMillis, logInvocation, toUTCString } from './utils'
+import { eventUTCMillis, logInvocation, toUTCString } from './lib/utils'
 
 export function handleBatchPrepared(event: BatchPreparedEvent): void {
   logInvocation('handleBatchPrepared', event)

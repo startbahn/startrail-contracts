@@ -227,7 +227,7 @@
       },
       {
         "internalType": "uint16[]",
-        "name": "royaltyPercentages",
+        "name": "royaltyBasisPoints",
         "type": "uint16[]"
       }
     ],

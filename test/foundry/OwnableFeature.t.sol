@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.13;
 
 import {OwnableFeature, OwnableFeatureAlreadyInitialized} from "../../contracts/collection/features/OwnableFeature.sol";
@@ -29,19 +30,63 @@ contract OwnableFeatureTest is StartrailTestBase {
     }
 
     function testTransferOwnership() public {
-        vm.prank(collectionOwnerLU);
-        ownableFeature.transferOwnership(newOwner);
+        vm.prank(trustedForwarder);
+        (bool success, ) = collectionAddress.call(
+            eip2771AppendSender(
+                abi.encodeWithSelector(
+                    ownableFeature.transferOwnership.selector,
+                    newOwner
+                ),
+                collectionOwnerLU
+            )
+        );
+        require(success);
         assertEq(ownableFeature.owner(), newOwner);
     }
 
     function testRevert_TransferOwnershipNotOwner() public {
-        vm.expectRevert(bytes("Ownable: sender must be owner"));
-        vm.prank(notOwner);
+        expectRevertTransferOwnership(
+            notOwner,
+            newOwner,
+            LibFeatureCommon.NotOwner.selector
+        );
+    }
+
+    function testRevert_TransferOwnershipZeroAddress() public {
+        expectRevertTransferOwnership(
+            collectionOwnerLU,
+            address(0x0),
+            IOwnableFeature.ZeroAddress.selector
+        );
+    }
+
+    function testRevert_TransferOwnershipNotTrustedForwarder() public {
+        vm.prank(collectionOwnerLU);
+        vm.expectRevert(LibEIP2771.NotTrustedForwarder.selector);
         ownableFeature.transferOwnership(newOwner);
     }
 
     function testRevert_AlreadyInitialized() public {
         vm.expectRevert(OwnableFeatureAlreadyInitialized.selector);
         ownableFeature.__OwnableFeature_initialize(collectionOwnerLU);
+    }
+
+    function expectRevertTransferOwnership(
+        address msgSender_,
+        address newOwner_,
+        bytes4 expectedError
+    ) private {
+        vm.prank(trustedForwarder);
+        vm.expectRevert(expectedError);
+        (bool success, ) = collectionAddress.call(
+            eip2771AppendSender(
+                abi.encodeWithSelector(
+                    ownableFeature.transferOwnership.selector,
+                    newOwner_
+                ),
+                msgSender_
+            )
+        );
+        success; // suppresses unused variable warning
     }
 }

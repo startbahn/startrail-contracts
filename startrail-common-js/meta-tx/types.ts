@@ -87,21 +87,15 @@ enum MetaTxRequestType {
   // Collections
   CollectionCreateSRR = 'CollectionCreateSRR',
   CollectionUpdateSRR = 'CollectionUpdateSRR',
-  CollectionUpdateSRRMetadata = 'CollectionUpdateSRRMetadata',
   CollectionUpdateSRRMetadataWithCid = 'CollectionUpdateSRRMetadataWithCid',
   CollectionUpdateSRRRoyalty = 'CollectionUpdateSRRRoyalty',
-  CollectionApproveSRRByCommitment = 'CollectionApproveSRRByCommitment',
   CollectionApproveSRRByCommitmentV2 = 'CollectionApproveSRRByCommitmentV2',
-  CollectionApproveSRRByCommitmentWithCustomHistoryId = 'CollectionApproveSRRByCommitmentWithCustomHistoryId',
   CollectionApproveSRRByCommitmentWithCustomHistoryIdV2 = 'CollectionApproveSRRByCommitmentWithCustomHistoryIdV2',
   CollectionCancelSRRCommitment = 'CollectionCancelSRRCommitment',
   CollectionAddHistory = 'CollectionAddHistory',
   CollectionSetLockExternalTransfer = 'CollectionSetLockExternalTransfer',
-  CollectionTransferFromWithProvenance = 'CollectionTransferFromWithProvenance',
   CollectionTransferFromWithProvenanceV2 = 'CollectionTransferFromWithProvenanceV2',
-
-  // Collections (FOR STUB ONLY - TO BE REMOVED)
-  CreateCollection = 'CreateCollection',
+  CollectionTransferOwnership = 'CollectionTransferOwnership',
 }
 
 export { DestinationContract, MetaTxRequest, MetaTxRequestType }

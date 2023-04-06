@@ -661,7 +661,7 @@ describe('StartrailRegistry', () => {
 
     it('issues with EIP2771 forwarded sender - with royalty', async () => {
       const royaltyReceiver = randomAddress()
-      const royaltyPercentage = 500 // 5%
+      const royaltyBasisPoints = 500 // 5%
       const txReceipt = await sendFromTrustedForwarder(
         'createSRRFromLicensedUser(bool,address,bytes32,string,bool,address,address,uint16)',
         [
@@ -672,7 +672,7 @@ describe('StartrailRegistry', () => {
           false,
           recipient,
           royaltyReceiver,
-          royaltyPercentage,
+          royaltyBasisPoints,
         ]
       )
 
@@ -689,7 +689,7 @@ describe('StartrailRegistry', () => {
       )[1]
 
       expect(royaltyEvent[0]).to.equal(royaltyReceiver)
-      expect(royaltyEvent[1]).to.equal(royaltyPercentage)
+      expect(royaltyEvent[1]).to.equal(royaltyBasisPoints)
 
       const tokenId = eventArgs[0].toNumber()
 
@@ -811,7 +811,7 @@ describe('StartrailRegistry', () => {
       )
     })
 
-    it('rejects if royalty percentage is greater than 10000 (100%)', async () => {
+    it('rejects if royalty basis points is greater than 10000 (100%)', async () => {
       await assertRevert(
         sendFromTrustedForwarder(
           'createSRRFromLicensedUser(bool,address,bytes32,string,bool,address,address,uint16)',

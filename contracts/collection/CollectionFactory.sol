@@ -2,47 +2,90 @@
 
 pragma solidity 0.8.13;
 
-import {Ownable, OwnableStorage} from "@solidstate/contracts/access/ownable/Ownable.sol";
-import {AddressUtils} from "@solidstate/contracts/utils/AddressUtils.sol";
-import {ReentrancyGuard} from "@solidstate/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 
-import "./features/ERC721Feature.sol";
-import "./features/OwnableFeature.sol";
+import {MinimalProxyFactory} from "@solidstate/contracts/factory/MinimalProxyFactory.sol";
+
+import "./features/interfaces/IERC721Feature.sol";
+import "./features/interfaces/IOwnableFeature.sol";
 import "./shared/LibEIP2771.sol";
+import "./CollectionFactoryStorage.sol";
 import "./CollectionProxy.sol";
 import "./CollectionRegistry.sol";
 
 /**
  * @title Factory for creating Startrail NFT Collection proxies
  * @author Chris Hatch - <chris.hatch@startbahn.jp>
+ * @dev see `collection-factory-upgradability.test.ts` for upgrade related
+ *          tests that use the hardhat oz upgrades plugin
+ *      see `CollectionFactory.t.sol` for general behavior tests
  */
-contract CollectionFactory is Ownable, ReentrancyGuard {
-    error DiamondIsNotAContract();
+contract CollectionFactory is
+    OwnableUpgradeable,
+    UUPSUpgradeable,
+    ReentrancyGuardUpgradeable,
+    MinimalProxyFactory
+{
+    error FeatureRegistryIsNotAContract();
+    error CollectionProxyImplementationIsNotAContract();
     error NotTrustedForwarder();
 
     event CollectionCreated(
         address indexed collectionAddress,
+        address indexed ownerAddress,
         string name,
         string symbol,
-        string metadataCID
+        bytes32 salt
     );
 
-    using OwnableStorage for OwnableStorage.Layout;
+    // Legacy event (qa only - not even in prod) so can be removed soon
+    // after gogh has integrated with the above new event
+    event CollectionCreated(
+        address indexed collectionAddress,
+        address indexed ownerAddress,
+        string name,
+        string symbol,
+        string metadataCID,
+        bytes32 salt
+    );
+
     using AddressUtils for address;
 
-    CollectionRegistry public immutable _collectionRegistry;
-
-    address public immutable _featureRegistry;
-
-    constructor(address featureRegistry) {
-        if (!featureRegistry.isContract()) {
-            revert DiamondIsNotAContract();
+    function initialize(
+        address featureRegistry_,
+        address collectionProxyImplementation
+    ) public initializer {
+        if (!featureRegistry_.isContract()) {
+            revert FeatureRegistryIsNotAContract();
         }
-        _featureRegistry = featureRegistry;
+        if (!collectionProxyImplementation.isContract()) {
+            revert CollectionProxyImplementationIsNotAContract();
+        }
 
-        _collectionRegistry = new CollectionRegistry();
+        CollectionFactoryStorage.Layout
+            storage layout = CollectionFactoryStorage.layout();
+        layout.featureRegistry = featureRegistry_;
+        layout.collectionProxyImplementation = collectionProxyImplementation;
+        layout.collectionRegistry = address(
+            new CollectionRegistry(address(this))
+        );
 
-        OwnableStorage.layout().setOwner(msg.sender);
+        __Ownable_init();
+    }
+
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal override onlyOwner {}
+
+    function collectionRegistry() external view returns (address) {
+        return CollectionFactoryStorage.layout().collectionRegistry;
+    }
+
+    function featureRegistry() external view returns (address) {
+        return CollectionFactoryStorage.layout().featureRegistry;
     }
 
     /**
@@ -54,7 +97,6 @@ contract CollectionFactory is Ownable, ReentrancyGuard {
     function createCollectionContract(
         string calldata name,
         string calldata symbol,
-        string calldata metadataCID,
         bytes32 salt
     )
         external
@@ -65,31 +107,45 @@ contract CollectionFactory is Ownable, ReentrancyGuard {
         //   ReentrancyGuardStorage.layout().status.
         nonReentrant
     {
-        LibEIP2771.onlyTrustedForwarder(_featureRegistry);
-        LibEIP2771.onlyLicensedUser(_featureRegistry);
+        CollectionFactoryStorage.Layout
+            storage layout = CollectionFactoryStorage.layout();
+        address featureRegistry_ = layout.featureRegistry;
 
-        address collectionCreatorLU = LibEIP2771.msgSender(_featureRegistry);
+        LibEIP2771.onlyTrustedForwarder(featureRegistry_);
+        LibEIP2771.onlyLicensedUser(featureRegistry_);
 
-        // TODO: is it cheaper with assembly?
-        // TODO: consider using Clones (oz) or Factory (solidstate)?
-        address collectionAddress = address(
-            new CollectionProxy{salt: salt}(_featureRegistry)
+        // Create the proxy contract with an EIP1167 minimal clone.
+        // This proxies to the CollectionProxy implementation contract.
+        // which in turn proxies to feature registry implementations. 🤯
+        address collectionAddress = _deployMinimalProxy(
+            layout.collectionProxyImplementation,
+            salt
         );
+        CollectionProxy(payable(collectionAddress))
+            .__CollectionProxy_initialize(featureRegistry_);
 
-        // TODO: making the owner the LU means we now need a meta-tx to invoke
-        //       transferOwnership. see STARTRAIL-1906.
+        // Initialize ownership
+        address collectionCreatorLU = LibEIP2771.msgSender(featureRegistry_);
         IOwnableFeature(collectionAddress).__OwnableFeature_initialize(
             collectionCreatorLU
         );
+
+        // Initialize ERC721 properties
         IERC721Feature(collectionAddress).__ERC721Feature_initialize(
             name,
             symbol
         );
 
-        _collectionRegistry.addCollection(collectionAddress);
+        CollectionRegistry(layout.collectionRegistry).addCollection(
+            collectionAddress
+        );
 
-        // TODO: store metadataCID - for now just emit it
-
-        emit CollectionCreated(collectionAddress, name, symbol, metadataCID);
+        emit CollectionCreated(
+            collectionAddress,
+            collectionCreatorLU,
+            name,
+            symbol,
+            salt
+        );
     }
 }

@@ -20,8 +20,6 @@ abstract contract ERC721UpgradeableBase {
         return LibERC721Storage.layout().symbol;
     }
 
-    function tokenURI(uint256 id) public view virtual returns (string memory);
-
     /*//////////////////////////////////////////////////////////////
                       ERC721 BALANCE/OWNER STORAGE
     //////////////////////////////////////////////////////////////*/
@@ -117,18 +115,7 @@ abstract contract ERC721UpgradeableBase {
         uint256 id
     ) public virtual {
         transferFrom(from, to, id);
-
-        require(
-            to.code.length == 0 ||
-                ERC721TokenReceiver(to).onERC721Received(
-                    msg.sender,
-                    from,
-                    id,
-                    ""
-                ) ==
-                ERC721TokenReceiver.onERC721Received.selector,
-            "UNSAFE_RECIPIENT"
-        );
+        safeTransferFromReceivedCheck(msg.sender, from, to, id, "");
     }
 
     function safeTransferFrom(
@@ -138,11 +125,20 @@ abstract contract ERC721UpgradeableBase {
         bytes calldata data
     ) public virtual {
         transferFrom(from, to, id);
+        safeTransferFromReceivedCheck(msg.sender, from, to, id, data);
+    }
 
+    function safeTransferFromReceivedCheck(
+        address operator,
+        address from,
+        address to,
+        uint256 id,
+        bytes memory data
+    ) internal {
         require(
             to.code.length == 0 ||
                 ERC721TokenReceiver(to).onERC721Received(
-                    msg.sender,
+                    operator,
                     from,
                     id,
                     data

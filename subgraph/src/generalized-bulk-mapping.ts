@@ -7,7 +7,7 @@ import {
   TransferFromWithProvenanceWithProof as TransferFromWithProvenanceWithProofEvent,
 } from '../generated/Bulk/Bulk'
 import { Bulk, BulkSRR } from '../generated/schema'
-import { eventUTCMillis, logInvocation, toUTCString } from './utils'
+import { eventUTCMillis, logInvocation, toUTCString } from './lib/utils'
 
 export function handleBatchPrepared(event: BatchPreparedEvent): void {
   logInvocation('handleBatchPrepared', event)

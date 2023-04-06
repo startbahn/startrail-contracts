@@ -16,6 +16,9 @@ bytes4 constant SELECTOR_GET_SUPPORTED_INTERFACE = bytes4(
     keccak256("getSupportedInterface(bytes4)")
 );
 
+error CollectionProxyAlreadyInitialized();
+error ImplementationAddressNotFound();
+
 /**
  * @title A Startrail NFT Collection proxy contract.
  * @author Chris Hatch - <chris.hatch@startbahn.jp>
@@ -28,14 +31,13 @@ contract CollectionProxy is Proxy {
     using AddressUtils for address;
     using CollectionProxyStorage for CollectionProxyStorage.Layout;
 
-    error FeatureRegistryIsNotAContract();
-    error ImplementationAddressNotFound();
-
-    constructor(address _featureRegistry) {
-        if (!_featureRegistry.isContract()) {
-            revert FeatureRegistryIsNotAContract();
+    function __CollectionProxy_initialize(address _featureRegistry) external {
+        CollectionProxyStorage.Layout storage layout = CollectionProxyStorage
+            .layout();
+        if (layout.featureRegistry != address(0)) {
+            revert CollectionProxyAlreadyInitialized();
         }
-        CollectionProxyStorage.layout().setFeatureRegistry(_featureRegistry);
+        layout.setFeatureRegistry(_featureRegistry);
     }
 
     /**
@@ -86,6 +88,8 @@ contract CollectionProxy is Proxy {
             super.handleFallback();
         }
     }
+
+    receive() external payable {}
 
     /**
      * @dev Query FeatureRegistry.facetAddress() to get the implementation

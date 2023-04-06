@@ -113,4 +113,22 @@ $NODE scripts/sr-update-custom-history-with-cid 1  "GOMA Japan" bafkreibue6ax5qb
 
 # create collection with an SRR
 sendMetaTx collection-create
-sendMetaTx collection-sr-issue
+sendMetaTx collection-issue-token
+
+sendMetaTx collection-approve-by-commit
+sendMetaTx collection-cancel-approve
+
+sendMetaTx collection-approve-by-commit
+$NODE scripts/srr-transfer-by-reveal scripts/__data__/collection-transfer-by-reveal.json || exit $?
+
+sendMetaTx collection-update-token
+sendMetaTx collection-update-token-metadata
+sendMetaTx collection-update-token-royalty
+
+sendMetaTx collection-lock-external-transfer
+
+sendMetaTx collection-issue-token2
+sendMetaTx collection-transfer-from-with-provenance
+
+sendMetaTx collection-transfer-ownership
+

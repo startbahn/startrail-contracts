@@ -38,4 +38,12 @@ contract CollectionFactoryTest is StartrailTestBase {
 
         assertFalse(cERC165.supportsInterface(0x1111ffff));
     }
+
+    function testRevert_AlreadyInitialized() public {
+        vm.expectRevert("Initializable: contract is already initialized");
+        collectionFactory.initialize(
+            address(featureRegistry),
+            collectionProxyImpl
+        );
+    }
 }

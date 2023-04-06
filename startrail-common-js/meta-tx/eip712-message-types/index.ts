@@ -15,12 +15,8 @@ import {
 import {
   CollectionAddHistoryRecord,
   CollectionAddHistoryTypes,
-  CollectionApproveSRRByCommitmentRecord,
-  CollectionApproveSRRByCommitmentTypes,
   CollectionApproveSRRByCommitmentV2Record,
   CollectionApproveSRRByCommitmentV2Types,
-  CollectionApproveSRRByCommitmentWithCustomHistoryIdRecord,
-  CollectionApproveSRRByCommitmentWithCustomHistoryIdTypes,
   CollectionApproveSRRByCommitmentWithCustomHistoryIdV2Record,
   CollectionApproveSRRByCommitmentWithCustomHistoryIdV2Types,
   CollectionCancelSRRCommitmentRecord,
@@ -29,20 +25,16 @@ import {
   CollectionCreateSRRTypes,
   CollectionSetLockExternalTransferRecord,
   CollectionSetLockExternalTransferTypes,
-  CollectionTransferFromWithProvenanceRecord,
-  CollectionTransferFromWithProvenanceTypes,
   CollectionTransferFromWithProvenanceV2Record,
   CollectionTransferFromWithProvenanceV2Types,
-  CollectionUpdateSRRMetadataRecord,
-  CollectionUpdateSRRMetadataTypes,
+  CollectionTransferOwnershipRecord,
+  CollectionTransferOwnershipTypes,
   CollectionUpdateSRRMetadataWithCidRecord,
   CollectionUpdateSRRMetadataWithCidTypes,
   CollectionUpdateSRRRecord,
   CollectionUpdateSRRRoyaltyRecord,
   CollectionUpdateSRRRoyaltyTypes,
   CollectionUpdateSRRTypes,
-  CreateCollection,
-  CreateCollectionTypes,
 } from './collection.types'
 import { EIP712DomainTypes, GenericParamTypes } from './core-types'
 import { isDynamicArrayType } from './helpers'
@@ -134,19 +126,15 @@ const MessageTypesRegistry: Record<string, ReadonlyArray<TypedDataField>> = {
 
   CollectionCreateSRRTypes,
   CollectionUpdateSRRTypes,
-  CollectionUpdateSRRMetadataTypes,
   CollectionUpdateSRRMetadataWithCidTypes,
   CollectionUpdateSRRRoyaltyTypes,
-  CollectionApproveSRRByCommitmentTypes,
-  CollectionApproveSRRByCommitmentWithCustomHistoryIdTypes,
   CollectionApproveSRRByCommitmentV2Types,
   CollectionApproveSRRByCommitmentWithCustomHistoryIdV2Types,
   CollectionCancelSRRCommitmentTypes,
   CollectionAddHistoryTypes,
   CollectionSetLockExternalTransferTypes,
-  CollectionTransferFromWithProvenanceTypes,
   CollectionTransferFromWithProvenanceV2Types,
-  CreateCollectionTypes,
+  CollectionTransferOwnershipTypes,
 }
 
 //
@@ -186,19 +174,15 @@ type MessageRecordType =
   // Collections contracts (proxies)
   | CollectionCreateSRRRecord
   | CollectionUpdateSRRRecord
-  | CollectionUpdateSRRMetadataRecord
   | CollectionUpdateSRRMetadataWithCidRecord
   | CollectionUpdateSRRRoyaltyRecord
-  | CollectionApproveSRRByCommitmentRecord
   | CollectionApproveSRRByCommitmentV2Record
-  | CollectionApproveSRRByCommitmentWithCustomHistoryIdRecord
   | CollectionApproveSRRByCommitmentWithCustomHistoryIdV2Record
   | CollectionCancelSRRCommitmentRecord
   | CollectionAddHistoryRecord
   | CollectionSetLockExternalTransferRecord
-  | CollectionTransferFromWithProvenanceRecord
   | CollectionTransferFromWithProvenanceV2Record
-  | CreateCollection
+  | CollectionTransferOwnershipRecord
 
   // Bulk contracts
   | BulkIssueSendBatchRecord
@@ -244,16 +228,12 @@ export {
   // Collections contracts
   CollectionCreateSRRRecord,
   CollectionUpdateSRRRecord,
-  CollectionUpdateSRRMetadataRecord,
   CollectionUpdateSRRMetadataWithCidRecord,
   CollectionUpdateSRRRoyaltyRecord,
-  CollectionApproveSRRByCommitmentRecord,
-  CollectionApproveSRRByCommitmentWithCustomHistoryIdRecord,
   CollectionCancelSRRCommitmentRecord,
   CollectionAddHistoryRecord,
   CollectionSetLockExternalTransferRecord,
-  CollectionTransferFromWithProvenanceRecord,
-  CreateCollection,
+  CollectionTransferOwnershipRecord,
   // Bulk contracts
   BulkIssueSendBatchRecord,
   BulkTransferSendBatchRecord,

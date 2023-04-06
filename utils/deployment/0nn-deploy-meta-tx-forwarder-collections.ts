@@ -29,18 +29,15 @@ export const deployMetaTxForwarderCollections = async (
     // Collections (proxies)
     MetaTxRequestType.CollectionCreateSRR,
     MetaTxRequestType.CollectionUpdateSRR,
-    MetaTxRequestType.CollectionUpdateSRRMetadata,
     MetaTxRequestType.CollectionUpdateSRRMetadataWithCid,
     MetaTxRequestType.CollectionUpdateSRRRoyalty,
-    MetaTxRequestType.CollectionApproveSRRByCommitment,
     MetaTxRequestType.CollectionApproveSRRByCommitmentV2,
-    MetaTxRequestType.CollectionApproveSRRByCommitmentWithCustomHistoryId,
     MetaTxRequestType.CollectionApproveSRRByCommitmentWithCustomHistoryIdV2,
     MetaTxRequestType.CollectionCancelSRRCommitment,
     MetaTxRequestType.CollectionAddHistory,
     MetaTxRequestType.CollectionSetLockExternalTransfer,
-    MetaTxRequestType.CollectionTransferFromWithProvenance,
     MetaTxRequestType.CollectionTransferFromWithProvenanceV2,
+    MetaTxRequestType.CollectionTransferOwnership,
   ])
 
   return deployedContracts

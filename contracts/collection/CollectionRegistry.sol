@@ -2,9 +2,6 @@
 
 pragma solidity 0.8.13;
 
-import {Ownable, OwnableStorage} from "@solidstate/contracts/access/ownable/Ownable.sol";
-import {AddressUtils} from "@solidstate/contracts/utils/AddressUtils.sol";
-
 import "./features/ERC721Feature.sol";
 import "./features/OwnableFeature.sol";
 import "./CollectionProxy.sol";
@@ -13,16 +10,21 @@ import "./CollectionProxy.sol";
  * @title Registry of Startrail NFT Collection contracts
  * @author Chris Hatch - <chris.hatch@startbahn.jp>
  */
-contract CollectionRegistry is Ownable {
-    using OwnableStorage for OwnableStorage.Layout;
+contract CollectionRegistry {
+    error OnlyCollectionFactory();
 
     mapping(address => bool) public registry;
 
-    constructor() {
-        OwnableStorage.layout().setOwner(msg.sender);
+    address public collectionFactory;
+
+    constructor(address collectionFactory_) {
+        collectionFactory = collectionFactory_;
     }
 
     function addCollection(address collectionAddress) external {
+        if (msg.sender != collectionFactory) {
+            revert OnlyCollectionFactory();
+        }
         registry[collectionAddress] = true;
     }
 }

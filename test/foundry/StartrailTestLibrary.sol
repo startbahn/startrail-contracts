@@ -71,6 +71,10 @@ contract StartrailTestLibrary is Test {
         return uint256(keccak256(abi.encode(block.timestamp)));
     }
 
+    function bytes32ToAddress(bytes32 b32) internal pure returns (address) {
+        return address(bytes20(b32 << 96));
+    }
+
     function createSRRWithDefaults(
         address collectionAddress,
         address eip2771TrustedForwarder,
@@ -79,10 +83,10 @@ contract StartrailTestLibrary is Test {
         bool isPrimaryIssuer = true;
         address artist = vm.addr(pseudorandomUint256());
         string memory metadataCID = A_CID;
-        bool lockExternalTransfer = true;
+        bool lockExternalTransfer = false;
         address to = address(0);
         address royaltyReceiver = address(0);
-        uint16 royaltyPercentage = 100;
+        uint16 royaltyBasisPoints = 0;
 
         return
             createSRR(
@@ -95,7 +99,7 @@ contract StartrailTestLibrary is Test {
                 lockExternalTransfer,
                 to,
                 royaltyReceiver,
-                royaltyPercentage,
+                royaltyBasisPoints,
                 bytes4(0)
             );
     }
@@ -110,7 +114,7 @@ contract StartrailTestLibrary is Test {
         bool lockExternalTransfer,
         address to,
         address royaltyReceiver,
-        uint16 royaltyPercentage,
+        uint16 royaltyBasisPoints,
         bytes4 expectRevertError
     ) internal returns (uint256 tokenId) {
         vm.prank(eip2771TrustedForwarder);
@@ -129,7 +133,7 @@ contract StartrailTestLibrary is Test {
                     lockExternalTransfer,
                     to,
                     royaltyReceiver,
-                    royaltyPercentage
+                    royaltyBasisPoints
                 ),
                 minter
             )
@@ -176,5 +180,26 @@ contract StartrailTestLibrary is Test {
         );
 
         require(success);
+    }
+
+    function setLockExternalTransfer(
+        address collectionAddress,
+        address collectionOwnerLU,
+        address trustedForwarder,
+        uint256 tokenId
+    ) internal returns (bool success) {
+        vm.prank(trustedForwarder);
+        (success, ) = collectionAddress.call(
+            eip2771AppendSender(
+                abi.encodeWithSelector(
+                    ILockExternalTransferFeature
+                        .setLockExternalTransfer
+                        .selector,
+                    tokenId,
+                    true
+                ),
+                collectionOwnerLU
+            )
+        );
     }
 }

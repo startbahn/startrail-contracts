@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  node: circleci/node@4.9.0
+  node: circleci/node@5.1.0
 
 qa-branch-only: &qa_branch_only
   filters:
@@ -9,7 +9,7 @@ qa-branch-only: &qa_branch_only
       only:
         - qa
 
-qa-tag-only:  &qa_tag_only
+qa-tag-only: &qa_tag_only
   filters:
     branches:
       ignore: /.*/
@@ -17,11 +17,10 @@ qa-tag-only:  &qa_tag_only
       only:
         - '/^subgraph-v\d+(\.\d+){3}-qa$/'
 
-master-branch-only:  &master_branch_only
+master-branch-only: &master_branch_only
   filters:
     branches:
       only: master
-
 
 stg-tag-only: &stg_tag_only
   filters:
@@ -30,7 +29,6 @@ stg-tag-only: &stg_tag_only
     tags:
       only:
         - '/^subgraph-v\d+(\.\d+){3}-stg$/'
-
 
 prod-tag-only: &prod_tag_only
   filters:
@@ -49,41 +47,32 @@ executors:
     docker:
       # foundry doesn't have a stable tag so lock at a specific commit here.
       # periodically upgrade this:
-      - image: ghcr.io/foundry-rs/foundry:nightly-6d94a105de767911c630f15c39cb9f2e82dfe078
-
+      - image: ghcr.io/foundry-rs/foundry:nightly-28b2ae6d5ad3e802b813b679e26bc15b9b8d230b
 commands:
   #
   # Shared Commands
   #
-  restore_node_dependencies:
+  install_node_dependencies_startrail:
     steps:
-      - restore_cache:
-          name: Restore node dependencies cache
-          keys:
-            - v3-node-dependencies-{{ checksum "yarn.lock" }}-{{ checksum "subgraph/yarn.lock" }}
-  install_node_dependencies:
-    steps:
-      - run:
-          name: Install Startrail node dependencies
+      - node/install-packages:
+          pkg-manager: yarn
+          include-branch-in-cache-key: false
           # Run yarn 3 times to workaround bug: https://github.com/yarnpkg/yarn/issues/4563#issuecomment-552256526
           #
           # Yarn 2 could be another solution but it has an issue with git urls so can't install startrail-common-js:
           #   https://github.com/yarnpkg/berry/issues/2240
           #
           # Npm could be another solution but the startrail-common-js `prepare` script only runs from Yarn (API-1012)
-          command: yarn || yarn || yarn
-      - run:
-          name: Install Subgraph node dependencies
-          command: cd subgraph && yarn --ignore-optional
-  save_node_dependencies:
+          override-ci-command: yarn || yarn || yarn
+
+  install_node_dependencies_subgraph:
     steps:
-      - save_cache:
-          name: Save node dependencies cache
-          key: v3-node-dependencies-{{ checksum "yarn.lock" }}-{{ checksum "subgraph/yarn.lock" }}
-          paths:
-            - node_modules
-            - subgraph/node_modules
-            - ~/.cache/yarn
+      - node/install-packages:
+          app-dir: subgraph
+          pkg-manager: yarn
+          include-branch-in-cache-key: false
+          override-ci-command: yarn --ignore-optional
+
   install_forge_dependencies:
     steps:
       - run:
@@ -164,6 +153,34 @@ commands:
           name: Build subgraph source and generate code
           command: |
             cd subgraph && yarn run codegen-develop && yarn run build-develop
+
+  build_subgraph_develop_source:
+    steps:
+      - run:
+          name: Build subgraph source and generate code
+          command: |
+            cd subgraph && yarn run codegen-develop && yarn run build-develop
+  build_subgraph_release_source:
+    steps:
+      - run:
+          name: Build subgraph qa source and generate code
+          command: |
+            cd subgraph && yarn run codegen-release && yarn run build-release
+
+  build_subgraph_staging_source:
+    steps:
+      - run:
+          name: Build subgraph staging source and generate code
+          command: |
+            cd subgraph && yarn run codegen-staging && yarn run build-staging
+
+  build_subgraph_polygon_source:
+    steps:
+      - run:
+          name: Build subgraph polygon source and generate code
+          command: |
+            cd subgraph && yarn run codegen-polygon && yarn run build-polygon
+
   run_subgraph_test:
     steps:
       - run:
@@ -195,9 +212,17 @@ commands:
   install_nodejs:
     steps:
       - node/install:
-          install-npm: false # saves ~9seconds
-          install-yarn: true
           node-version: 16.13.2
+          install-yarn: false
+
+  # Workaround because using 'install-yarn' from the node orb is failing
+  # on the ubuntu machine and it's unclear why.
+  install_yarn_on_ubuntu_machine:
+    steps:
+      - run:
+          name: Install Yarn with corepack
+          command: |
+            corepack enable && corepack prepare yarn@v1.22.19 --activate
 
 jobs:
   #
@@ -207,9 +232,8 @@ jobs:
     executor: default
     steps:
       - checkout
-      - restore_node_dependencies
-      - install_node_dependencies
-      - save_node_dependencies
+      - install_node_dependencies_startrail
+      - install_node_dependencies_subgraph
 
   #
   # Startrail Jobs
@@ -218,45 +242,38 @@ jobs:
     executor: default
     steps:
       - checkout
-      - restore_node_dependencies
-      - install_node_dependencies
-      - save_node_dependencies
+      - install_node_dependencies_startrail
       - run_hardhat_compile
   test_startrail_hardhat:
     executor: default
     steps:
       - checkout
-      - restore_node_dependencies
-      - install_node_dependencies
-      - save_node_dependencies
+      - install_node_dependencies_startrail
       - run_hardhat_compile
       - run_hardhat_unit_test
-
   test_startrail_forge:
     executor: foundry
     steps:
       - install_dependencies_on_foundry_image
-      # have problems with the install_nodejs command here so installed yarn and
-      # nodejs with the previous command. unfortunately the nodejs minor version
-      # is different. for now it works fine but would be better to resolve this.
-      # - install_nodejs
+      # had problems using node/install orb to install node and yarn here so
+      # nstalled with apt in the previous command. unfortunately the nodejs
+      # minor version is different. for now it works fine but would be better
+      # to resolve this.
       - checkout
-      - restore_node_dependencies
-      - install_node_dependencies
-      - save_node_dependencies
+      - install_node_dependencies_startrail
       - install_forge_dependencies
       - run_forge_unit_test
 
   test_subgraph:
     machine:
-      image: ubuntu-2004:202111-01
+      image: ubuntu-2004:2022.10.1
     resource_class: medium
     steps:
       - install_nodejs
+      - install_yarn_on_ubuntu_machine
       - checkout
-      - restore_node_dependencies
-      - install_node_dependencies
-      - save_node_dependencies
+      - install_node_dependencies_startrail
+      - install_node_dependencies_subgraph
       - start_stack
       - run_startrail_deploy_and_seed
       - run_subgraph_deploy
@@ -269,45 +286,35 @@ jobs:
     executor: default
     steps:
       - checkout
-      - restore_node_dependencies
-      - install_node_dependencies
-      - save_node_dependencies
+      - install_node_dependencies_subgraph
       - build_subgraph_source
   mumbai_develop:
     executor: default
     steps:
       - checkout
-      - restore_node_dependencies
-      - install_node_dependencies
-      - save_node_dependencies
-      - build_subgraph_source
+      - install_node_dependencies_subgraph
+      - build_subgraph_develop_source
       - deploy_develop
   mumbai_release:
     executor: default
     steps:
       - checkout
-      - restore_node_dependencies
-      - install_node_dependencies
-      - save_node_dependencies
-      - build_subgraph_source
+      - install_node_dependencies_subgraph
+      - build_subgraph_release_source
       - deploy_release
   mumbai_staging:
     executor: default
     steps:
       - checkout
-      - restore_node_dependencies
-      - install_node_dependencies
-      - save_node_dependencies
-      - build_subgraph_source
+      - install_node_dependencies_subgraph
+      - build_subgraph_staging_source
       - deploy_staging
   polygon_mainnet:
     executor: default
     steps:
       - checkout
-      - restore_node_dependencies
-      - install_node_dependencies
-      - save_node_dependencies
-      - build_subgraph_source
+      - install_node_dependencies_subgraph
+      - build_subgraph_polygon_source
       - deploy_polygon
 
 workflows:
@@ -324,7 +331,9 @@ workflows:
       - test_startrail_hardhat:
           requires:
             - build_startrail
-      - test_startrail_forge
+      - test_startrail_forge:
+          requires:
+            - build_startrail
       - test_subgraph:
           requires:
             - build_subgraph

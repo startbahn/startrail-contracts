@@ -4,6 +4,7 @@
 # include these
 !abi/**
 !deployments/*/deploy.json
+!deployments/*/initCodeHash.json
 
 # but not these
 deployments/hardhat

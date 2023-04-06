@@ -11,7 +11,7 @@ import {
   logInvocation,
   secondsToMillis,
   toUTCString,
-} from './utils'
+} from './lib/utils'
 
 export function handleBatchPrepared(event: BatchPreparedEvent): void {
   logInvocation('handleBatchPrepared', event)
