@@ -30,8 +30,8 @@ library LibERC2981RoyaltyStorage {
         }
     }
 
-    function notToExceedSalePrice(uint16 royaltyPercentage) internal pure {
-        if (royaltyPercentage > 10_000) {
+    function notToExceedSalePrice(uint16 royaltyBasisPoints) internal pure {
+        if (royaltyBasisPoints > 10_000) {
             revert RoyaltyFeeNotToExceedSalePrice();
         }
     }
@@ -49,13 +49,13 @@ library LibERC2981RoyaltyStorage {
     function upsertRoyalty(
         uint256 tokenId,
         address royaltyReceiver,
-        uint16 royaltyPercentage
+        uint16 royaltyBasisPoints
     ) internal {
-        if (royaltyReceiver != address(0) && royaltyPercentage <= 10_000) {
+        if (royaltyReceiver != address(0) && royaltyBasisPoints <= 10_000) {
             LibERC2981RoyaltyTypes.RoyaltyInfo storage royalty = layout()
                 .royalties[tokenId];
             royalty.receiver = royaltyReceiver;
-            royalty.percentage = royaltyPercentage;
+            royalty.basisPoints = royaltyBasisPoints;
             emit LibERC2981RoyaltyEvents.RoyaltiesSet(tokenId, royalty);
         }
     }

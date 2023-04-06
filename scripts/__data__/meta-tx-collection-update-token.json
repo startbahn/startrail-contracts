@@ -1,0 +1,9 @@
+{
+  "requestTypeKey": "CollectionUpdateSRR",
+  "requestData": {
+    "destination": "0x5979B6061f1caC61F70A06Cd968a6f67fe0B8284",
+    "tokenId": 820869899430,
+    "isPrimaryIsser": false,
+    "artistAddress": "0x84A11021459404dae94b2c5E6F215A51f05d2DAB"
+  }
+}

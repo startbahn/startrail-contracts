@@ -1,26 +1,23 @@
-import hre, { ethers } from 'hardhat'
-import { BytesLike, Contract } from 'ethers'
+import { Contract, utils as ethersUtils } from 'ethers'
+import hre, { ethers, upgrades } from 'hardhat'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
+import stripHexPrefix from 'strip-hex-prefix'
+
 import {
   CollectionFactory,
   MetaTxForwarderV3,
   StartrailCollectionFeatureRegistry,
 } from '../../typechain-types'
-import { registerSelectors, getSelectors } from './utils'
-import { ERC165_INTERFACES_ERC721 } from './erc165.interfaces'
-import { ERC2981_INTERFACES } from './erc2981.interfaces'
-
 import {
-  erc721FeatureFunctionSelectors,
-  erc721MetadataFunctionSelectors,
-  erc721FunctionSelectors,
-  lockExternalTransferFeatureFunctionSelectors,
-  srrFeatureFunctionSelectors,
-  srrApproveTransferFeatureFunctionSelectors,
-  erc2981RoyaltyFeatureFunctionSelectors,
-} from './feature-selectors'
+  loadDeployJSON,
+  updateContractsInitCodeHashJSON,
+  updateDeployJSON,
+} from '../deployment/deploy-json'
+import { updateImplJSON } from '../deployment/impl-json'
 import { getAdministratorInstance, getContract } from '../hardhat-helpers'
-import { HardhatRuntimeEnvironment } from 'hardhat/types'
-import { loadDeployJSON, updateDeployJSON } from '../deployment/deploy-json'
+import ercInterfaces from './erc-interfaces'
+import featureSelectors from './feature-selectors'
+import { deployFeature, upgradeFeature } from './utils'
 
 const loggingOn = false
 
@@ -29,7 +26,7 @@ const setCollectionRegistryOnCollectionFactory = async (
   cf: CollectionFactory,
   metaTxForwarder: MetaTxForwarderV3
 ) => {
-  const crAddress = await cf._collectionRegistry()
+  const crAddress = await cf.collectionRegistry()
   const adminContract = await getAdministratorInstance(hre)
   const { data: setCREncoded } =
     await metaTxForwarder.populateTransaction.setCollectionRegistry(crAddress)
@@ -46,42 +43,6 @@ const setCollectionRegistryOnCollectionFactory = async (
   }
 }
 
-const deployFeature = async ({
-  featureRegistry,
-  featureName,
-  selectors,
-  supportedInterfaceIds = [],
-  initData,
-  linkLibraries = {},
-}: {
-  featureRegistry: StartrailCollectionFeatureRegistry
-  featureName: string
-  selectors?: string[]
-  supportedInterfaceIds?: string[]
-  initData?: BytesLike
-  linkLibraries?: Record<string, string>
-}): Promise<Contract> => {
-  const featureFactory = await ethers.getContractFactory(featureName, {
-    libraries: linkLibraries,
-  })
-  const feature = await featureFactory.deploy()
-  await feature.deployed()
-  // console.log(`${featureName} deployed: ${feature.address}`)
-
-  await registerSelectors(
-    featureRegistry,
-    feature.address,
-    selectors || getSelectors(feature),
-    initData
-  )
-
-  for (const interfaceId of supportedInterfaceIds) {
-    await featureRegistry.setSupportedInterface(interfaceId, true)
-  }
-
-  return feature
-}
-
 const deployERC721Feature = async (
   featureRegistry: StartrailCollectionFeatureRegistry
 ): Promise<Contract> => {
@@ -95,12 +56,8 @@ const deployERC721Feature = async (
   return deployFeature({
     featureRegistry,
     featureName: `ERC721Feature`,
-    selectors: [
-      ...(await erc721FeatureFunctionSelectors()),
-      ...(await erc721FunctionSelectors()),
-      ...(await erc721MetadataFunctionSelectors()),
-    ],
-    supportedInterfaceIds: Object.values(ERC165_INTERFACES_ERC721),
+    selectors: await featureSelectors.erc721(),
+    supportedInterfaceIds: [ercInterfaces.ERC721, ercInterfaces.ERC721Metadata],
     initData,
   })
 }
@@ -111,7 +68,7 @@ const deployLockExternalTransferFeature = async (
   deployFeature({
     featureRegistry,
     featureName: `LockExternalTransferFeature`,
-    selectors: await lockExternalTransferFeatureFunctionSelectors(),
+    selectors: await featureSelectors.lockExternalTransfer(),
   })
 
 const deploySRRFeature = async (
@@ -121,7 +78,7 @@ const deploySRRFeature = async (
   return deployFeature({
     featureRegistry,
     featureName: `SRRFeature`,
-    selectors: await srrFeatureFunctionSelectors(),
+    selectors: await featureSelectors.srr(),
     linkLibraries: {
       IDGeneratorV3: idGeneratorLibraryAddress,
     },
@@ -134,7 +91,17 @@ const deploySRRApproveTransferFeature = async (
   return deployFeature({
     featureRegistry,
     featureName: `SRRApproveTransferFeature`,
-    selectors: await srrApproveTransferFeatureFunctionSelectors(),
+    selectors: await featureSelectors.srrApproveTransfer(),
+  })
+}
+
+const deploySRRMetadataFeature = async (
+  featureRegistry: StartrailCollectionFeatureRegistry
+): Promise<Contract> => {
+  return deployFeature({
+    featureRegistry,
+    featureName: `SRRMetadataFeature`,
+    selectors: await featureSelectors.srrMetadata(),
   })
 }
 
@@ -144,9 +111,73 @@ const deployERC2981RoyaltyFeature = async (
   return deployFeature({
     featureRegistry,
     featureName: `ERC2981RoyaltyFeature`,
-    selectors: await erc2981RoyaltyFeatureFunctionSelectors(),
-    supportedInterfaceIds: Object.values(ERC2981_INTERFACES),
+    selectors: await featureSelectors.erc2981Royalty(),
+    supportedInterfaceIds: [ercInterfaces.ERC2981],
   })
+}
+
+/*
+ * NOTE: temporary implementation for a manual upgrade in QA
+ * Needs to be replaced by an implementation that takes a version parameter
+ * and upgrades from for example V01 to V02.
+ */
+const upgradeSRRFeature = async (
+  hre: HardhatRuntimeEnvironment
+): Promise<Contract> => {
+  const featureRegistry = await getContract(
+    hre,
+    `StartrailCollectionFeatureRegistry`
+  )
+  const { idGeneratorLibraryAddress } = loadDeployJSON(hre)
+  return upgradeFeature({
+    featureRegistry: featureRegistry as StartrailCollectionFeatureRegistry,
+    featureName: `SRRFeature`,
+    selectors: await featureSelectors.srr(),
+    linkLibraries: {
+      IDGeneratorV3: idGeneratorLibraryAddress,
+    },
+  })
+}
+
+const upgradeERC2981RoyaltyFeature = async (
+  hre: HardhatRuntimeEnvironment
+): Promise<Contract> => {
+  const featureRegistry = await getContract(
+    hre,
+    `StartrailCollectionFeatureRegistry`
+  )
+  const { idGeneratorLibraryAddress } = loadDeployJSON(hre)
+  return upgradeFeature({
+    featureRegistry: featureRegistry as StartrailCollectionFeatureRegistry,
+    featureName: `ERC2981RoyaltyFeature`,
+    selectors: await featureSelectors.erc2981Royalty(),
+  })
+}
+
+/**
+ * proxy init code prefixes from @solidstate/contracts/factory/MinimalProxyFactory.sol
+ * (@solidstate/contracts": "0.0.40")
+ */
+const computeCollectionProxyInitCodeHash = async (
+  collectionProxyImplementationAddress: string
+): Promise<string> => {
+  const MINIMAL_PROXY_INIT_CODE_PREFIX =
+    '0x3d602d80600a3d3981f3363d3d373d3d3d363d73' // strip _
+
+  const MINIMAL_PROXY_INIT_CODE_SUFFIX = '0x5af43d82803e903d91602b57fd5bf3'
+
+  const encodedInput =
+    stripHexPrefix(MINIMAL_PROXY_INIT_CODE_PREFIX) +
+    stripHexPrefix(collectionProxyImplementationAddress) +
+    stripHexPrefix(MINIMAL_PROXY_INIT_CODE_SUFFIX)
+
+  console.log(
+    `computeCollectionProxyInitCodeHash's encodedInput: ${encodedInput}`
+  )
+
+  const initCodeHash = ethersUtils.keccak256(Buffer.from(encodedInput, 'hex'))
+
+  return initCodeHash
 }
 
 const deployCollectionsCore = async (
@@ -170,10 +201,10 @@ const deployCollectionsCore = async (
   )
 
   const { nameRegistryProxyAddress } = loadDeployJSON(hre)
-  const featureRegistry = await frFactory.deploy(
+  const featureRegistry = (await frFactory.deploy(
     trustedForwarder || metaTxForwarder.address,
     nameRegistryProxyAddress
-  )
+  )) as StartrailCollectionFeatureRegistry
   await featureRegistry.deployed()
   loggingOn &&
     console.log(`FeatureRegistry deployed to: ${featureRegistry.address}`)
@@ -182,14 +213,44 @@ const deployCollectionsCore = async (
     startrailCollectionFeatureRegistryAddress: featureRegistry.address,
   })
 
+  const cpFactory = await hre.ethers.getContractFactory('CollectionProxy')
+  const cpImpl = await cpFactory.deploy()
+  await cpImpl.deployed()
+  // TODO: the previous and the next tx's should be atomic - wrap them in a single tx
+  await cpImpl.__CollectionProxy_initialize(
+    `0x0000000000000000000000000000000000000001`
+  )
+
   const cfFactory = await hre.ethers.getContractFactory('CollectionFactory')
-  const cf = await cfFactory.deploy(featureRegistry.address)
-  await cf.deployed()
+  const cfContract: Contract = await upgrades.deployProxy(
+    cfFactory,
+    [featureRegistry.address, cpImpl.address],
+    {
+      kind: 'uups',
+    }
+  )
+
+  const txReceipt = await cfContract.deployTransaction.wait()
+  const cfImplAddress = ethers.utils.getAddress(
+    ethers.utils.hexDataSlice(txReceipt.logs[0].topics[1], 12)
+  )
+
+  const cf = cfContract as CollectionFactory
   loggingOn && console.log(`CollectionFactory deployed to: ${cf.address}`)
 
   updateDeployJSON(hre, {
-    collectionFactoryAddress: cf.address,
+    collectionFactoryProxyAddress: cf.address,
   })
+  updateImplJSON(hre, {
+    collectionFactoryImplementationAddress: cfImplAddress,
+  })
+
+  updateImplJSON(hre, {
+    collectionProxyImplementationAddress: cpImpl.address,
+  })
+
+  const { startrailAdministratorAddress } = loadDeployJSON(hre)
+  await cf.transferOwnership(startrailAdministratorAddress)
 
   await setCollectionRegistryOnCollectionFactory(hre, cf, metaTxForwarder)
 
@@ -228,7 +289,25 @@ const deployCollectionsCore = async (
       `ERC2981RoyaltyFeature deployed to: ${erc2981RoyaltyFeature.address}`
     )
 
+  const srrMetadataFeature = await deploySRRMetadataFeature(featureRegistry)
+  loggingOn &&
+    console.log(`SRRMetadataFeature deployed to: ${srrMetadataFeature.address}`)
+
+  const collectionProxyInitCodeHash = await computeCollectionProxyInitCodeHash(
+    cpImpl.address
+  )
+
+  await updateContractsInitCodeHashJSON(hre, {
+    collectionProxy: collectionProxyInitCodeHash,
+  })
+
   return { featureRegistry, collectionFactory: cf }
 }
 
-export { deployCollectionsCore, deployERC721Feature, deployFeature }
+export {
+  deployCollectionsCore,
+  deployERC721Feature,
+  deployFeature,
+  upgradeSRRFeature,
+  upgradeERC2981RoyaltyFeature,
+}

@@ -6,7 +6,7 @@ import {
   RequestTypeUnregistered as RequestTypeUnregisteredEvent,
 } from '../generated/MetaTxForwarder/MetaTxForwarder'
 import { MetaTxExecution, MetaTxRequestType } from '../generated/schema'
-import { eventUTCMillis, logInvocation, toUTCString } from './utils'
+import { eventUTCMillis, logInvocation, toUTCString } from './lib/utils'
 
 export function handleRequestTypeRegistered(
   event: RequestTypeRegisteredEvent

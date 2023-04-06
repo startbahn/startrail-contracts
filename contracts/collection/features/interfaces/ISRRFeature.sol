@@ -6,7 +6,6 @@ pragma solidity 0.8.13;
  * @dev Functions for minting SRR tokens on collections.
  */
 interface ISRRFeature {
-    error MetadataEmpty();
     error OnlyIssuerOrArtistOrAdministrator();
     error ZeroAddress();
 
@@ -38,7 +37,7 @@ interface ISRRFeature {
      * @param lockExternalTransfer transfer lock flag (see LockExternalTransferFeatuer.sol)
      * @param to the address this token will be transferred to after the creation
      * @param royaltyReceiver royalty receiver
-     * @param royaltyPercentage royalty percentage
+     * @param royaltyBasisPoints royalty basis points
      */
     function createSRR(
         bool isPrimaryIssuer,
@@ -47,7 +46,7 @@ interface ISRRFeature {
         bool lockExternalTransfer,
         address to,
         address royaltyReceiver,
-        uint16 royaltyPercentage
+        uint16 royaltyBasisPoints
     ) external;
 
     /**

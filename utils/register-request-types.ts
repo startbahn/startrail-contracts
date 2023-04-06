@@ -1,13 +1,14 @@
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
+import { Operation } from '../startrail-common-js/contracts/types'
+import { metaTxRequests } from '../startrail-common-js/meta-tx/meta-tx-request-registry'
 import {
   MetaTxRequest,
   MetaTxRequestType,
 } from '../startrail-common-js/meta-tx/types'
+
+import pMap from 'p-map'
+
 import { ZERO_ADDRESS } from '../test/helpers/utils'
-
-import { metaTxRequests } from '../startrail-common-js/meta-tx/meta-tx-request-registry'
-import { HardhatRuntimeEnvironment } from 'hardhat/types'
-import { Operation } from '../startrail-common-js/contracts/types'
-
 import { getProxyAddressByContractName } from './deployment/deploy-json'
 import { getAdministratorInstance, getContract } from './hardhat-helpers'
 
@@ -131,9 +132,45 @@ const getDestinationAddress = (hre, requestTypeKey): string => {
       getProxyAddressByContractName(hre, metaTxRequest.destinationContract)
 }
 
+// For deployed environments - must send from Admin contract
+const unregisterRequestTypeCallByAdmin = async (hre, requestType) => {
+  console.log(`\n=====    unregisterRequestTypeCallByAdmin invoked    ======\n`)
+  console.log(`type: [${requestType}]\n`)
+
+  const mtfContract = await getContract(hre, 'MetaTxForwarder')
+  const requestCalldata = await mtfContract.populateTransaction
+    .unregisterRequestType(requestType)
+    .then((tx) => tx.data)
+
+  const adminContract = await getAdministratorInstance(hre)
+  await adminContract.execTransaction({
+    data: requestCalldata,
+    to: mtfContract.address,
+    waitConfirmed: true,
+  })
+}
+
+const unregisterRequestTypesCallByAdmin = async (
+  hre,
+  requestTypeHashes: string[]
+) => {
+  await pMap(
+    requestTypeHashes,
+    async (typeHash) => {
+      await unregisterRequestTypeCallByAdmin(hre, typeHash)
+    },
+    {
+      stopOnError: true,
+      concurrency: 1,
+    }
+  )
+}
+
 export {
   buildRegisterRequestTypeInputProps,
   getDestinationAddress,
   registerRequestTypes,
   registerRequestTypesGenesisSet,
+  unregisterRequestTypeCallByAdmin,
+  unregisterRequestTypesCallByAdmin,
 }

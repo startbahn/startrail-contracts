@@ -1,0 +1,13 @@
+{
+  "requestTypeKey": "CollectionCreateSRR",
+  "requestData": {
+    "destination": "0x5979B6061f1caC61F70A06Cd968a6f67fe0B8284",
+    "isPrimaryIssuer": true,
+    "artistAddress": "0xeBA6851DB73174C0Bb847C0172721836b3ba267C",
+    "metadataCID": "QmPMc4tcBsMqLRuCQtPmPe84bpSjrC3Ky7t3JWuHXYB4aS",
+    "lockExternalTransfer": false,
+    "to": "0x0000000000000000000000000000000000000000",
+    "royaltyReceiver": "0xC18fD8c2BA912C8687b005056121E87731612Cc9",
+    "royaltyBasisPoints": 500
+  }
+}

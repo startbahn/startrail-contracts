@@ -18,16 +18,17 @@ beforeAll(() => {
 test('srrs', async () => {
   const query = `
   {
-    srrs(orderBy: id) {
+    srrs(orderBy: tokenId) {
       id
       collection {
         id
+        ownerAddress
       }
       tokenId
       ownerAddress
       artistAddress
       royaltyReceiver
-      royaltyPercentage
+      royaltyBasisPoints
       artist {
         id
         englishName
@@ -48,6 +49,8 @@ test('srrs', async () => {
       }
       originChain
       lockExternalTransfer
+      royaltyReceiver
+      royaltyBasisPoints
     }
   }
 `
@@ -59,7 +62,7 @@ test('srrs', async () => {
         "artistAddress": "0x35902f4f4c94dcba48a71202b795e3ad2f75c56f",
         "collection": null,
         "history": Array [],
-        "id": "129020582412",
+        "id": "0x3259569b92ac03de59b4320670ebee609e353bc192b528d43c9d0b7f03d8a533",
         "issuer": Object {
           "englishName": "New English Name",
           "id": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
@@ -68,9 +71,31 @@ test('srrs', async () => {
         "metadataDigest": "0x001c7d6fdb9885b02689d0d76b34fe73e7706b3e9e841c16a8f8264077d197cd",
         "originChain": "eip155:31337",
         "ownerAddress": "0xdfb64492cdd303e86788af19123cf9f1bc65b084",
-        "royaltyPercentage": null,
+        "royaltyBasisPoints": null,
         "royaltyReceiver": null,
         "tokenId": "129020582412",
+        "transferCommitment": null,
+      },
+      Object {
+        "artist": null,
+        "artistAddress": "0xeba6851db73174c0bb847c0172721836b3ba267c",
+        "collection": Object {
+          "id": "0x5979b6061f1cac61f70a06cd968a6f67fe0b8284",
+          "ownerAddress": "0xad87f0b51a8788192edd0640ab5ed58e48145c82",
+        },
+        "history": Array [],
+        "id": "0x7722fed27cd514bc7a1899d245da7d84975bccfb021a43273cabe7e19dfc0835",
+        "issuer": Object {
+          "englishName": "New English Name",
+          "id": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+        },
+        "lockExternalTransfer": false,
+        "metadataDigest": "QmPMc4tcBsMqLRuCQtPmPe84bpSjrC3Ky7t3JWuHXYB4aS",
+        "originChain": "eip155:31337",
+        "ownerAddress": "0xf1dbd215d72d99422693ca61f7bbecfcd0edb16f",
+        "royaltyBasisPoints": 500,
+        "royaltyReceiver": "0xc18fd8c2ba912c8687b005056121e87731612cc9",
+        "tokenId": "20398948250",
         "transferCommitment": null,
       },
       Object {
@@ -78,7 +103,7 @@ test('srrs', async () => {
         "artistAddress": "0x35902f4f4c94dcba48a71202b795e3ad2f75c56f",
         "collection": null,
         "history": Array [],
-        "id": "245330455638",
+        "id": "0xd00fc54c9ed215e3472945e1aef320981556e69623e6e5475edaa3a76c9da3b8",
         "issuer": Object {
           "englishName": "Artist English",
           "id": "0x84a11021459404dae94b2c5e6f215a51f05d2dab",
@@ -87,7 +112,7 @@ test('srrs', async () => {
         "metadataDigest": "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
         "originChain": "eip155:31337",
         "ownerAddress": "0x84a11021459404dae94b2c5e6f215a51f05d2dab",
-        "royaltyPercentage": null,
+        "royaltyBasisPoints": null,
         "royaltyReceiver": null,
         "tokenId": "245330455638",
         "transferCommitment": null,
@@ -97,7 +122,7 @@ test('srrs', async () => {
         "artistAddress": "0x864d38b2989553080dbe893f7366b2dc675cac1f",
         "collection": null,
         "history": Array [],
-        "id": "436104791396",
+        "id": "0xda5483b655cdcefbca259d1e937e1a194bcc11d8ac7f68c1ffebf9e3decfd49a",
         "issuer": Object {
           "englishName": "New English Name",
           "id": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
@@ -106,7 +131,7 @@ test('srrs', async () => {
         "metadataDigest": "bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsr",
         "originChain": "eip155:31337",
         "ownerAddress": "0xbb1010f86fcfd7223f5e95dcb7899af069493b80",
-        "royaltyPercentage": 500,
+        "royaltyBasisPoints": 500,
         "royaltyReceiver": "0x864d38b2989553080dbe893f7366b2dc675cac1f",
         "tokenId": "436104791396",
         "transferCommitment": null,
@@ -116,7 +141,7 @@ test('srrs', async () => {
         "artistAddress": "0x35902f4f4c94dcba48a71202b795e3ad2f75c56f",
         "collection": null,
         "history": Array [],
-        "id": "482308692111",
+        "id": "0x39c32547d845d79d79e849239d56a37ffdffc66ba32cfc645291d8ef02ad4404",
         "issuer": Object {
           "englishName": "New English Name",
           "id": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
@@ -125,7 +150,7 @@ test('srrs', async () => {
         "metadataDigest": "0x0002ca461ee4aaada3921c9322155af8ec3f884e345701cfa169ef214f5e6660",
         "originChain": "eip155:31337",
         "ownerAddress": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
-        "royaltyPercentage": null,
+        "royaltyBasisPoints": null,
         "royaltyReceiver": null,
         "tokenId": "482308692111",
         "transferCommitment": "0xc4f14afe6b607470ab21c7b60c09270a73c2ed19a520bee05ccc58f62df7b99e",
@@ -135,7 +160,7 @@ test('srrs', async () => {
         "artistAddress": "0x35902f4f4c94dcba48a71202b795e3ad2f75c56f",
         "collection": null,
         "history": Array [],
-        "id": "693334704620",
+        "id": "0x34ff0fed7335d27f98e652dd9d0846fa8a977f50bbeeab3b6aa6c61cdda1be56",
         "issuer": Object {
           "englishName": "New English Name",
           "id": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
@@ -144,7 +169,7 @@ test('srrs', async () => {
         "metadataDigest": "0x5dfdd11afc70980aa3f2bc222563acfba856d0a9e4225b62c7948ded7495ca1a",
         "originChain": "eip155:31337",
         "ownerAddress": "0xbb1010f86fcfd7223f5e95dcb7899af069493b80",
-        "royaltyPercentage": null,
+        "royaltyBasisPoints": null,
         "royaltyReceiver": null,
         "tokenId": "693334704620",
         "transferCommitment": null,
@@ -168,7 +193,7 @@ test('srrs', async () => {
             },
           },
         ],
-        "id": "761762342424",
+        "id": "0x8bf770e0226d7d8952654071adfc9e70418aed113fcd4800dea1c6e601e761b7",
         "issuer": Object {
           "englishName": "New English Name",
           "id": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
@@ -177,7 +202,7 @@ test('srrs', async () => {
         "metadataDigest": "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
         "originChain": "eip155:31337",
         "ownerAddress": "0xb31f2241cb4d48dcf7825a75b46b4f6b13829a20",
-        "royaltyPercentage": null,
+        "royaltyBasisPoints": null,
         "royaltyReceiver": null,
         "tokenId": "761762342424",
         "transferCommitment": null,
@@ -187,7 +212,7 @@ test('srrs', async () => {
         "artistAddress": "0x35902f4f4c94dcba48a71202b795e3ad2f75c56f",
         "collection": null,
         "history": Array [],
-        "id": "762614211005",
+        "id": "0xa198398f01edee84d6deffec5d027b39b559865719039da5cbefb2cb7c0550ea",
         "issuer": Object {
           "englishName": "New English Name",
           "id": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
@@ -196,7 +221,7 @@ test('srrs', async () => {
         "metadataDigest": "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
         "originChain": "eip155:31337",
         "ownerAddress": "0xfa08ed057457f857e9f1672cd979f5ef0628cd9a",
-        "royaltyPercentage": null,
+        "royaltyBasisPoints": null,
         "royaltyReceiver": null,
         "tokenId": "762614211005",
         "transferCommitment": null,
@@ -206,7 +231,7 @@ test('srrs', async () => {
         "artistAddress": "0x35902f4f4c94dcba48a71202b795e3ad2f75c56f",
         "collection": null,
         "history": Array [],
-        "id": "817842853989",
+        "id": "0x4d3c9f3eaa639739d8ad3a1d0c1024981ca3ac69eeb8e783275c2c3b3fedd6bc",
         "issuer": Object {
           "englishName": "New English Name",
           "id": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
@@ -215,26 +240,33 @@ test('srrs', async () => {
         "metadataDigest": "0x0c01cc79da2f4087d0c1cc9a01cff151b2656a3734d394e20f3e590da2cf2e8b",
         "originChain": "eip155:31337",
         "ownerAddress": "0xf1dbd215d72d99422693ca61f7bbecfcd0edb16f",
-        "royaltyPercentage": null,
+        "royaltyBasisPoints": null,
         "royaltyReceiver": null,
         "tokenId": "817842853989",
         "transferCommitment": null,
       },
       Object {
-        "artist": null,
-        "artistAddress": "0xeba6851db73174c0bb847c0172721836b3ba267c",
+        "artist": Object {
+          "englishName": "Artist English",
+          "id": "0x84a11021459404dae94b2c5e6f215a51f05d2dab",
+        },
+        "artistAddress": "0x84a11021459404dae94b2c5e6f215a51f05d2dab",
         "collection": Object {
-          "id": "0xd5a7e49b3cbe731838fcffcee5ce947497061585",
+          "id": "0x5979b6061f1cac61f70a06cd968a6f67fe0b8284",
+          "ownerAddress": "0xad87f0b51a8788192edd0640ab5ed58e48145c82",
         },
         "history": Array [],
-        "id": "820869899430",
-        "issuer": null,
-        "lockExternalTransfer": false,
-        "metadataDigest": "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi",
-        "originChain": null,
-        "ownerAddress": null,
-        "royaltyPercentage": null,
-        "royaltyReceiver": null,
+        "id": "0xcd645bb3aec38991b92dc8221126bdb7e87b6bbc4d06b97f7f91fd37c71bbf2f",
+        "issuer": Object {
+          "englishName": "New English Name",
+          "id": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+        },
+        "lockExternalTransfer": true,
+        "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
+        "originChain": "eip155:31337",
+        "ownerAddress": "0x921aff57fc983b1461bf94c3b9dfafbb8423d6a0",
+        "royaltyBasisPoints": 650,
+        "royaltyReceiver": "0x3fd167a0db0cc5faf90a72d2b6839f723e1d99a5",
         "tokenId": "820869899430",
         "transferCommitment": null,
       },
@@ -243,7 +275,7 @@ test('srrs', async () => {
         "artistAddress": "0x864d38b2989553080dbe893f7366b2dc675cac1f",
         "collection": null,
         "history": Array [],
-        "id": "899260479738",
+        "id": "0xc75c9db3f953c6e96ca08440333bf3ea54df1c0f3f971436e60930c020cca735",
         "issuer": Object {
           "englishName": "New English Name",
           "id": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
@@ -252,7 +284,7 @@ test('srrs', async () => {
         "metadataDigest": "bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsq",
         "originChain": "eip155:31337",
         "ownerAddress": "0xf1dbd215d72d99422693ca61f7bbecfcd0edb16f",
-        "royaltyPercentage": null,
+        "royaltyBasisPoints": null,
         "royaltyReceiver": null,
         "tokenId": "899260479738",
         "transferCommitment": null,
@@ -311,7 +343,7 @@ test('licensedUserWallets ', async () => {
         "englishName": "Artist English",
         "issuedSRRs": Array [
           Object {
-            "id": "245330455638",
+            "id": "0xd00fc54c9ed215e3472945e1aef320981556e69623e6e5475edaa3a76c9da3b8",
             "metadataDigest": "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
             "tokenId": "245330455638",
             "transferCommitment": null,
@@ -333,49 +365,61 @@ test('licensedUserWallets ', async () => {
         "englishName": "New English Name",
         "issuedSRRs": Array [
           Object {
-            "id": "129020582412",
+            "id": "0x3259569b92ac03de59b4320670ebee609e353bc192b528d43c9d0b7f03d8a533",
             "metadataDigest": "0x001c7d6fdb9885b02689d0d76b34fe73e7706b3e9e841c16a8f8264077d197cd",
             "tokenId": "129020582412",
             "transferCommitment": null,
           },
           Object {
-            "id": "436104791396",
+            "id": "0x7722fed27cd514bc7a1899d245da7d84975bccfb021a43273cabe7e19dfc0835",
+            "metadataDigest": "QmPMc4tcBsMqLRuCQtPmPe84bpSjrC3Ky7t3JWuHXYB4aS",
+            "tokenId": "20398948250",
+            "transferCommitment": null,
+          },
+          Object {
+            "id": "0xda5483b655cdcefbca259d1e937e1a194bcc11d8ac7f68c1ffebf9e3decfd49a",
             "metadataDigest": "bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsr",
             "tokenId": "436104791396",
             "transferCommitment": null,
           },
           Object {
-            "id": "482308692111",
+            "id": "0x39c32547d845d79d79e849239d56a37ffdffc66ba32cfc645291d8ef02ad4404",
             "metadataDigest": "0x0002ca461ee4aaada3921c9322155af8ec3f884e345701cfa169ef214f5e6660",
             "tokenId": "482308692111",
             "transferCommitment": "0xc4f14afe6b607470ab21c7b60c09270a73c2ed19a520bee05ccc58f62df7b99e",
           },
           Object {
-            "id": "693334704620",
+            "id": "0x34ff0fed7335d27f98e652dd9d0846fa8a977f50bbeeab3b6aa6c61cdda1be56",
             "metadataDigest": "0x5dfdd11afc70980aa3f2bc222563acfba856d0a9e4225b62c7948ded7495ca1a",
             "tokenId": "693334704620",
             "transferCommitment": null,
           },
           Object {
-            "id": "761762342424",
+            "id": "0x8bf770e0226d7d8952654071adfc9e70418aed113fcd4800dea1c6e601e761b7",
             "metadataDigest": "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
             "tokenId": "761762342424",
             "transferCommitment": null,
           },
           Object {
-            "id": "762614211005",
+            "id": "0xa198398f01edee84d6deffec5d027b39b559865719039da5cbefb2cb7c0550ea",
             "metadataDigest": "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
             "tokenId": "762614211005",
             "transferCommitment": null,
           },
           Object {
-            "id": "817842853989",
+            "id": "0x4d3c9f3eaa639739d8ad3a1d0c1024981ca3ac69eeb8e783275c2c3b3fedd6bc",
             "metadataDigest": "0x0c01cc79da2f4087d0c1cc9a01cff151b2656a3734d394e20f3e590da2cf2e8b",
             "tokenId": "817842853989",
             "transferCommitment": null,
           },
           Object {
-            "id": "899260479738",
+            "id": "0xcd645bb3aec38991b92dc8221126bdb7e87b6bbc4d06b97f7f91fd37c71bbf2f",
+            "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
+            "tokenId": "820869899430",
+            "transferCommitment": null,
+          },
+          Object {
+            "id": "0xc75c9db3f953c6e96ca08440333bf3ea54df1c0f3f971436e60930c020cca735",
             "metadataDigest": "bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsq",
             "tokenId": "899260479738",
             "transferCommitment": null,
@@ -428,6 +472,7 @@ test('srrmetadataHistories', async () => {
   {
     srrmetadataHistories(orderBy: metadataDigest, orderDirection: desc) {
       srr {
+        id
         metadataDigest
         transferCommitment
         metadataHistory {
@@ -447,8 +492,72 @@ test('srrmetadataHistories', async () => {
   expect(result.srrmetadataHistories).toMatchInlineSnapshot(`
     Array [
       Object {
+        "metadataDigest": "QmPMc4tcBsMqLRuCQtPmPe84bpSjrC3Ky7t3JWuHXYB4aS",
+        "srr": Object {
+          "id": "0x7722fed27cd514bc7a1899d245da7d84975bccfb021a43273cabe7e19dfc0835",
+          "metadataDigest": "QmPMc4tcBsMqLRuCQtPmPe84bpSjrC3Ky7t3JWuHXYB4aS",
+          "metadataHistory": Array [
+            Object {
+              "metadataDigest": "QmPMc4tcBsMqLRuCQtPmPe84bpSjrC3Ky7t3JWuHXYB4aS",
+              "srr": Object {
+                "metadataDigest": "QmPMc4tcBsMqLRuCQtPmPe84bpSjrC3Ky7t3JWuHXYB4aS",
+              },
+            },
+          ],
+          "originChain": "eip155:31337",
+          "transferCommitment": null,
+        },
+      },
+      Object {
+        "metadataDigest": "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi",
+        "srr": Object {
+          "id": "0xcd645bb3aec38991b92dc8221126bdb7e87b6bbc4d06b97f7f91fd37c71bbf2f",
+          "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
+          "metadataHistory": Array [
+            Object {
+              "metadataDigest": "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi",
+              "srr": Object {
+                "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
+              },
+            },
+            Object {
+              "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
+              "srr": Object {
+                "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
+              },
+            },
+          ],
+          "originChain": "eip155:31337",
+          "transferCommitment": null,
+        },
+      },
+      Object {
+        "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
+        "srr": Object {
+          "id": "0xcd645bb3aec38991b92dc8221126bdb7e87b6bbc4d06b97f7f91fd37c71bbf2f",
+          "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
+          "metadataHistory": Array [
+            Object {
+              "metadataDigest": "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi",
+              "srr": Object {
+                "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
+              },
+            },
+            Object {
+              "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
+              "srr": Object {
+                "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
+              },
+            },
+          ],
+          "originChain": "eip155:31337",
+          "transferCommitment": null,
+        },
+      },
+      Object {
         "metadataDigest": "bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsr",
         "srr": Object {
+          "id": "0xda5483b655cdcefbca259d1e937e1a194bcc11d8ac7f68c1ffebf9e3decfd49a",
           "metadataDigest": "bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsr",
           "metadataHistory": Array [
             Object {
@@ -465,6 +574,7 @@ test('srrmetadataHistories', async () => {
       Object {
         "metadataDigest": "bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsq",
         "srr": Object {
+          "id": "0xc75c9db3f953c6e96ca08440333bf3ea54df1c0f3f971436e60930c020cca735",
           "metadataDigest": "bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsq",
           "metadataHistory": Array [
             Object {
@@ -481,6 +591,7 @@ test('srrmetadataHistories', async () => {
       Object {
         "metadataDigest": "0x5dfdd11afc70980aa3f2bc222563acfba856d0a9e4225b62c7948ded7495ca1a",
         "srr": Object {
+          "id": "0x34ff0fed7335d27f98e652dd9d0846fa8a977f50bbeeab3b6aa6c61cdda1be56",
           "metadataDigest": "0x5dfdd11afc70980aa3f2bc222563acfba856d0a9e4225b62c7948ded7495ca1a",
           "metadataHistory": Array [
             Object {
@@ -497,6 +608,7 @@ test('srrmetadataHistories', async () => {
       Object {
         "metadataDigest": "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
         "srr": Object {
+          "id": "0xa198398f01edee84d6deffec5d027b39b559865719039da5cbefb2cb7c0550ea",
           "metadataDigest": "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
           "metadataHistory": Array [
             Object {
@@ -513,6 +625,7 @@ test('srrmetadataHistories', async () => {
       Object {
         "metadataDigest": "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
         "srr": Object {
+          "id": "0x8bf770e0226d7d8952654071adfc9e70418aed113fcd4800dea1c6e601e761b7",
           "metadataDigest": "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
           "metadataHistory": Array [
             Object {
@@ -529,6 +642,7 @@ test('srrmetadataHistories', async () => {
       Object {
         "metadataDigest": "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
         "srr": Object {
+          "id": "0xd00fc54c9ed215e3472945e1aef320981556e69623e6e5475edaa3a76c9da3b8",
           "metadataDigest": "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
           "metadataHistory": Array [
             Object {
@@ -545,6 +659,7 @@ test('srrmetadataHistories', async () => {
       Object {
         "metadataDigest": "0x0c01cc79da2f4087d0c1cc9a01cff151b2656a3734d394e20f3e590da2cf2e8b",
         "srr": Object {
+          "id": "0x4d3c9f3eaa639739d8ad3a1d0c1024981ca3ac69eeb8e783275c2c3b3fedd6bc",
           "metadataDigest": "0x0c01cc79da2f4087d0c1cc9a01cff151b2656a3734d394e20f3e590da2cf2e8b",
           "metadataHistory": Array [
             Object {
@@ -561,6 +676,7 @@ test('srrmetadataHistories', async () => {
       Object {
         "metadataDigest": "0x001c7d6fdb9885b02689d0d76b34fe73e7706b3e9e841c16a8f8264077d197cd",
         "srr": Object {
+          "id": "0x3259569b92ac03de59b4320670ebee609e353bc192b528d43c9d0b7f03d8a533",
           "metadataDigest": "0x001c7d6fdb9885b02689d0d76b34fe73e7706b3e9e841c16a8f8264077d197cd",
           "metadataHistory": Array [
             Object {
@@ -577,6 +693,7 @@ test('srrmetadataHistories', async () => {
       Object {
         "metadataDigest": "0x0002ca461ee4aaada3921c9322155af8ec3f884e345701cfa169ef214f5e6660",
         "srr": Object {
+          "id": "0x39c32547d845d79d79e849239d56a37ffdffc66ba32cfc645291d8ef02ad4404",
           "metadataDigest": "0x0002ca461ee4aaada3921c9322155af8ec3f884e345701cfa169ef214f5e6660",
           "metadataHistory": Array [
             Object {
@@ -630,19 +747,9 @@ test('metaTxRequestTypes', async () => {
         "typeString": "CollectionAddHistory(address from,uint256 nonce,bytes data,address destination,uint256[] tokenIds,uint256[] customHistoryIds)",
       },
       Object {
-        "id": "0x05bf23bc05f237b03ae14a55ea54ee5b256e5519e6e11dde7cd325463a872d24",
-        "typeHash": "0x05bf23bc05f237b03ae14a55ea54ee5b256e5519e6e11dde7cd325463a872d24",
-        "typeString": "CollectionApproveSRRByCommitment(address from,uint256 nonce,bytes data,address destination,uint256 tokenId,bytes32 commitment,string historyMetadataDigest)",
-      },
-      Object {
         "id": "0x706c1f7bd199d621f4b28f17019128660044cd3f15bb02749fee5af4d07ce971",
         "typeHash": "0x706c1f7bd199d621f4b28f17019128660044cd3f15bb02749fee5af4d07ce971",
         "typeString": "CollectionApproveSRRByCommitmentV2(address from,uint256 nonce,bytes data,address destination,uint256 tokenId,bytes32 commitment,string historyMetadataHash)",
-      },
-      Object {
-        "id": "0xd7c0a389ad471c51354f4762563f5c631f841a6a66bea230a9219144b8e54175",
-        "typeHash": "0xd7c0a389ad471c51354f4762563f5c631f841a6a66bea230a9219144b8e54175",
-        "typeString": "CollectionApproveSRRByCommitmentWithCustomHistoryId(address from,uint256 nonce,bytes data,address destination,uint256 tokenId,bytes32 commitment,string historyMetadataDigest,uint256 customHistoryId)",
       },
       Object {
         "id": "0xed2b2e4d2ccf36c92564638fa6e4b4a8269a22572966daf5ae6d51a64483853d",
@@ -655,14 +762,14 @@ test('metaTxRequestTypes', async () => {
         "typeString": "CollectionCancelSRRCommitment(address from,uint256 nonce,address destination,uint256 tokenId)",
       },
       Object {
-        "id": "0xff500d0a3ba303173e03b4dfc421d2559386ff0330e6472897716ef5a6a6d215",
-        "typeHash": "0xff500d0a3ba303173e03b4dfc421d2559386ff0330e6472897716ef5a6a6d215",
-        "typeString": "CollectionCreateSRR(address from,uint256 nonce,bytes data,address destination,bool isPrimaryIssuer,address artistAddress,string metadataCID,bool lockExternalTransfer,address to,address royaltyReceiver,uint16 royaltyPercentage)",
+        "id": "0xf9ecd4ef65c9b99f50e0c984f293286d31fce07d8cc05ba149887855c0d0352b",
+        "typeHash": "0xf9ecd4ef65c9b99f50e0c984f293286d31fce07d8cc05ba149887855c0d0352b",
+        "typeString": "CollectionCreateSRR(address from,uint256 nonce,bytes data,address destination,bool isPrimaryIssuer,address artistAddress,string metadataCID,bool lockExternalTransfer,address to,address royaltyReceiver,uint16 royaltyBasisPoints)",
       },
       Object {
-        "id": "0xf9c3cc6a7e81c67d00591e481b030b955925f92cf3eb611b2bc1ef2927627028",
-        "typeHash": "0xf9c3cc6a7e81c67d00591e481b030b955925f92cf3eb611b2bc1ef2927627028",
-        "typeString": "CollectionFactoryCreateCollection(address from,uint256 nonce,bytes data,string name,string symbol,string metadataCID,bytes32 salt)",
+        "id": "0x6cd612fe41a1ac5b7afb6cb0b942bcbaeb050b2528aaa34eccb7acc69f2ae0bf",
+        "typeHash": "0x6cd612fe41a1ac5b7afb6cb0b942bcbaeb050b2528aaa34eccb7acc69f2ae0bf",
+        "typeString": "CollectionFactoryCreateCollection(address from,uint256 nonce,bytes data,string name,string symbol,bytes32 salt)",
       },
       Object {
         "id": "0x8648ca5094960f0e19bdff764e6b9b70484c54375d7afc9efe496d8bc93335a1",
@@ -670,14 +777,14 @@ test('metaTxRequestTypes', async () => {
         "typeString": "CollectionSetLockExternalTransfer(address from,uint256 nonce,address destination,uint256 tokenId,bool flag)",
       },
       Object {
-        "id": "0x5e4cd81c273015962a434caa2aa9ec18c8af726d2215e4f1d8d73271ef7d4e1d",
-        "typeHash": "0x5e4cd81c273015962a434caa2aa9ec18c8af726d2215e4f1d8d73271ef7d4e1d",
-        "typeString": "CollectionTransferFromWithProvenance(address from,uint256 nonce,bytes data,address destination,address to,uint256 tokenId,string historyMetadataDigest,uint256 customHistoryId,bool isIntermediary)",
-      },
-      Object {
         "id": "0x6e4a36acbcd7a4b37f49d842a89b415ccfd7e76dd90e9901c5f4ecbfc2c87b3a",
         "typeHash": "0x6e4a36acbcd7a4b37f49d842a89b415ccfd7e76dd90e9901c5f4ecbfc2c87b3a",
         "typeString": "CollectionTransferFromWithProvenanceV2(address from,uint256 nonce,bytes data,address destination,address to,uint256 tokenId,string historyMetadataHash,uint256 customHistoryId,bool isIntermediary)",
+      },
+      Object {
+        "id": "0xa760cce759820221fe9ff186c207372e9f0a8c1ddbaa10b38bd4178cf0f26da6",
+        "typeHash": "0xa760cce759820221fe9ff186c207372e9f0a8c1ddbaa10b38bd4178cf0f26da6",
+        "typeString": "CollectionTransferOwnership(address from,uint256 nonce,address destination,address newOwner)",
       },
       Object {
         "id": "0x8cc39e4b9764b571078c76c303a1da6e54128ddaffe37718ae8bfeb44ea65606",
@@ -685,19 +792,14 @@ test('metaTxRequestTypes', async () => {
         "typeString": "CollectionUpdateSRR(address from,uint256 nonce,address destination,uint256 tokenId,bool isPrimaryIssuer,address artistAddress)",
       },
       Object {
-        "id": "0x547944ec29bf28f7926de9b4a4c0c11cd6512cd83d10c7c6dc048258c11c143e",
-        "typeHash": "0x547944ec29bf28f7926de9b4a4c0c11cd6512cd83d10c7c6dc048258c11c143e",
-        "typeString": "CollectionUpdateSRRMetadata(address from,uint256 nonce,address destination,uint256 tokenId,bytes32 metadataDigest)",
-      },
-      Object {
         "id": "0x07d16a7371085e8f0f61d0d29741714c9f0e244c83d522adb54a15fd2f39e2ca",
         "typeHash": "0x07d16a7371085e8f0f61d0d29741714c9f0e244c83d522adb54a15fd2f39e2ca",
         "typeString": "CollectionUpdateSRRMetadataWithCid(address from,uint256 nonce,bytes data,address destination,uint256 tokenId,string metadataCID)",
       },
       Object {
-        "id": "0x796de3fb74c239fa827ee07f17274a255550cc0b2441d53b527d792f2c50a4ff",
-        "typeHash": "0x796de3fb74c239fa827ee07f17274a255550cc0b2441d53b527d792f2c50a4ff",
-        "typeString": "CollectionUpdateSRRRoyalty(address from,uint256 nonce,address destination,uint256 tokenId,address royaltyReceiver,uint16 royaltyPercentage)",
+        "id": "0x39e8d8ef714a9190229f8577e4b79fb4fdd8133a3a9acdda0286c2e210f3d3c0",
+        "typeHash": "0x39e8d8ef714a9190229f8577e4b79fb4fdd8133a3a9acdda0286c2e210f3d3c0",
+        "typeString": "CollectionUpdateSRRRoyalty(address from,uint256 nonce,address destination,uint256 tokenId,address royaltyReceiver,uint16 royaltyBasisPoints)",
       },
       Object {
         "id": "0x1f6bcc34496ca1b52d584f9a76e6a39b27989a9c186f8bcac08b53d1b03bb293",
@@ -740,9 +842,9 @@ test('metaTxRequestTypes', async () => {
         "typeString": "StartrailRegistryCreateSRRFromLicensedUserWithCid(address from,uint256 nonce,bytes data,bool isPrimaryIssuer,address artistAddress,bytes32 metadataDigest,string metadataCID,bool lockExternalTransfer,address to)",
       },
       Object {
-        "id": "0x89ddd5e5b12935384bffffa1d2fcaa0767f6aaf42823f725c16e2c3dc36d04e1",
-        "typeHash": "0x89ddd5e5b12935384bffffa1d2fcaa0767f6aaf42823f725c16e2c3dc36d04e1",
-        "typeString": "StartrailRegistryCreateSRRFromLicensedUserWithRoyalty(address from,uint256 nonce,bytes data,bool isPrimaryIssuer,address artistAddress,bytes32 metadataDigest,string metadataCID,bool lockExternalTransfer,address to,address royaltyReceiver,uint16 royaltyPercentage)",
+        "id": "0xbef83078847679e2da773c6b3be6b96d45b196fe69acdd04f4a54671d57ff4aa",
+        "typeHash": "0xbef83078847679e2da773c6b3be6b96d45b196fe69acdd04f4a54671d57ff4aa",
+        "typeString": "StartrailRegistryCreateSRRFromLicensedUserWithRoyalty(address from,uint256 nonce,bytes data,bool isPrimaryIssuer,address artistAddress,bytes32 metadataDigest,string metadataCID,bool lockExternalTransfer,address to,address royaltyReceiver,uint16 royaltyBasisPoints)",
       },
       Object {
         "id": "0x98ce74b76cbcc5f7fc9d14949a70627b5dc8b6d1ff04fc70f34c4839ccdabf11",
@@ -780,9 +882,9 @@ test('metaTxRequestTypes', async () => {
         "typeString": "StartrailRegistryUpdateSRRMetadataWithCid(address from,uint256 nonce,bytes data,uint256 tokenId,string metadataCID)",
       },
       Object {
-        "id": "0x5be9b1e84327c6055e25bdec5e1eebee8ed9298b86b19994e011ccb8d95f0535",
-        "typeHash": "0x5be9b1e84327c6055e25bdec5e1eebee8ed9298b86b19994e011ccb8d95f0535",
-        "typeString": "StartrailRegistryUpdateSRRRoyalty(address from,uint256 nonce,uint256 tokenId,address royaltyReceiver,uint16 royaltyPercentage)",
+        "id": "0x6242683d31e79def600a47158bc2d52201d339517d934b76bdb5a4b4812ada16",
+        "typeHash": "0x6242683d31e79def600a47158bc2d52201d339517d934b76bdb5a4b4812ada16",
+        "typeString": "StartrailRegistryUpdateSRRRoyalty(address from,uint256 nonce,uint256 tokenId,address royaltyReceiver,uint16 royaltyBasisPoints)",
       },
       Object {
         "id": "0xe40b02b26d5443f4479036538f991a995624f5cc199ecab72a0dde126115a16c",
@@ -865,7 +967,7 @@ test('srrprovenances', async () => {
         "metadataDigest": "0xba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70",
         "metadataURI": "https://api.startrail.io/api/v1/metadata/0xba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70.json",
         "srr": Object {
-          "id": "761762342424",
+          "id": "0x8bf770e0226d7d8952654071adfc9e70418aed113fcd4800dea1c6e601e761b7",
         },
         "to": "0xf1dbd215d72d99422693ca61f7bbecfcd0edb16f",
       },
@@ -876,7 +978,7 @@ test('srrprovenances', async () => {
         "metadataDigest": "0xba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70",
         "metadataURI": "https://api.startrail.io/api/v1/metadata/0xba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70.json",
         "srr": Object {
-          "id": "762614211005",
+          "id": "0xa198398f01edee84d6deffec5d027b39b559865719039da5cbefb2cb7c0550ea",
         },
         "to": "0xf1dbd215d72d99422693ca61f7bbecfcd0edb16f",
       },
@@ -887,7 +989,7 @@ test('srrprovenances', async () => {
         "metadataDigest": "0xba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70",
         "metadataURI": "https://api.startrail.io/api/v1/metadata/0xba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70.json",
         "srr": Object {
-          "id": "761762342424",
+          "id": "0x8bf770e0226d7d8952654071adfc9e70418aed113fcd4800dea1c6e601e761b7",
         },
         "to": "0xb31f2241cb4d48dcf7825a75b46b4f6b13829a20",
       },
@@ -898,7 +1000,7 @@ test('srrprovenances', async () => {
         "metadataDigest": "",
         "metadataURI": "",
         "srr": Object {
-          "id": "762614211005",
+          "id": "0xa198398f01edee84d6deffec5d027b39b559865719039da5cbefb2cb7c0550ea",
         },
         "to": "0xb31f2241cb4d48dcf7825a75b46b4f6b13829a20",
       },
@@ -909,7 +1011,7 @@ test('srrprovenances', async () => {
         "metadataDigest": "",
         "metadataURI": "",
         "srr": Object {
-          "id": "762614211005",
+          "id": "0xa198398f01edee84d6deffec5d027b39b559865719039da5cbefb2cb7c0550ea",
         },
         "to": "0xfa08ed057457f857e9f1672cd979f5ef0628cd9a",
       },
@@ -922,7 +1024,7 @@ test('srrprovenances', async () => {
         "metadataDigest": "0xba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70",
         "metadataURI": "https://api.startrail.io/api/v1/metadata/0xba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70.json",
         "srr": Object {
-          "id": "817842853989",
+          "id": "0x4d3c9f3eaa639739d8ad3a1d0c1024981ca3ac69eeb8e783275c2c3b3fedd6bc",
         },
         "to": "0xf1dbd215d72d99422693ca61f7bbecfcd0edb16f",
       },
@@ -935,7 +1037,7 @@ test('srrprovenances', async () => {
         "metadataDigest": "0x565aa707ce293c9e815871d6d0913f449283bf55f72c28a4222ef62698d246e1",
         "metadataURI": "https://api.startrail.io/api/v1/metadata/0x565aa707ce293c9e815871d6d0913f449283bf55f72c28a4222ef62698d246e1.json",
         "srr": Object {
-          "id": "129020582412",
+          "id": "0x3259569b92ac03de59b4320670ebee609e353bc192b528d43c9d0b7f03d8a533",
         },
         "to": "0xdfb64492cdd303e86788af19123cf9f1bc65b084",
       },
@@ -946,7 +1048,7 @@ test('srrprovenances', async () => {
         "metadataDigest": "",
         "metadataURI": "",
         "srr": Object {
-          "id": "693334704620",
+          "id": "0x34ff0fed7335d27f98e652dd9d0846fa8a977f50bbeeab3b6aa6c61cdda1be56",
         },
         "to": "0xbb1010f86fcfd7223f5e95dcb7899af069493b80",
       },
@@ -959,7 +1061,7 @@ test('srrprovenances', async () => {
         "metadataDigest": "bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsq",
         "metadataURI": "ipfs://bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsq",
         "srr": Object {
-          "id": "899260479738",
+          "id": "0xc75c9db3f953c6e96ca08440333bf3ea54df1c0f3f971436e60930c020cca735",
         },
         "to": "0xf1dbd215d72d99422693ca61f7bbecfcd0edb16f",
       },
@@ -970,9 +1072,35 @@ test('srrprovenances', async () => {
         "metadataDigest": "",
         "metadataURI": "",
         "srr": Object {
-          "id": "436104791396",
+          "id": "0xda5483b655cdcefbca259d1e937e1a194bcc11d8ac7f68c1ffebf9e3decfd49a",
         },
         "to": "0xbb1010f86fcfd7223f5e95dcb7899af069493b80",
+      },
+      Object {
+        "customHistory": Object {
+          "id": "2",
+        },
+        "from": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+        "isIntermediary": true,
+        "metadataDigest": "bafybeibro7fxpk7sk2nfvslumxraol437ug35qz4xx2p7ygjctunb2wi3i",
+        "metadataURI": "ipfs://bafybeibro7fxpk7sk2nfvslumxraol437ug35qz4xx2p7ygjctunb2wi3i",
+        "srr": Object {
+          "id": "0xcd645bb3aec38991b92dc8221126bdb7e87b6bbc4d06b97f7f91fd37c71bbf2f",
+        },
+        "to": "0x921aff57fc983b1461bf94c3b9dfafbb8423d6a0",
+      },
+      Object {
+        "customHistory": Object {
+          "id": "1",
+        },
+        "from": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+        "isIntermediary": true,
+        "metadataDigest": "bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsq",
+        "metadataURI": "ipfs://bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsq",
+        "srr": Object {
+          "id": "0x7722fed27cd514bc7a1899d245da7d84975bccfb021a43273cabe7e19dfc0835",
+        },
+        "to": "0xf1dbd215d72d99422693ca61f7bbecfcd0edb16f",
       },
     ]
   `)
@@ -991,26 +1119,30 @@ test('srrtransferCommits', async () => {
 `
   const result = await client.query(query)
 
-  const data = [
-    {
-      commitment:
-        '0xc4f14afe6b607470ab21c7b60c09270a73c2ed19a520bee05ccc58f62df7b99e',
-      id: '482308692111',
-      lastAction: 'approve',
-    },
-    {
-      commitment: null,
-      id: '761762342424',
-      lastAction: 'transfer',
-    },
-    {
-      commitment: null,
-      id: '762614211005',
-      lastAction: 'transfer',
-    },
-  ]
-
-  expect(result.srrtransferCommits).toStrictEqual(data)
+  expect(result.srrtransferCommits).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "commitment": "0xc4f14afe6b607470ab21c7b60c09270a73c2ed19a520bee05ccc58f62df7b99e",
+        "id": "0x39c32547d845d79d79e849239d56a37ffdffc66ba32cfc645291d8ef02ad4404",
+        "lastAction": "approve",
+      },
+      Object {
+        "commitment": null,
+        "id": "0x8bf770e0226d7d8952654071adfc9e70418aed113fcd4800dea1c6e601e761b7",
+        "lastAction": "transfer",
+      },
+      Object {
+        "commitment": null,
+        "id": "0xa198398f01edee84d6deffec5d027b39b559865719039da5cbefb2cb7c0550ea",
+        "lastAction": "transfer",
+      },
+      Object {
+        "commitment": null,
+        "id": "0xcd645bb3aec38991b92dc8221126bdb7e87b6bbc4d06b97f7f91fd37c71bbf2f",
+        "lastAction": "transfer",
+      },
+    ]
+  `)
 })
 
 // ignoring createdAt and updatedAt field
@@ -1099,7 +1231,7 @@ test('customHistories', async () => {
       srrHistory: [
         {
           srr: {
-            id: '761762342424',
+            id: '0x8bf770e0226d7d8952654071adfc9e70418aed113fcd4800dea1c6e601e761b7',
           },
         },
       ],
@@ -1185,7 +1317,7 @@ test('srrHistories', async () => {
         id: '1',
       },
       srr: {
-        id: '761762342424',
+        id: '0x8bf770e0226d7d8952654071adfc9e70418aed113fcd4800dea1c6e601e761b7',
       },
     },
   ]

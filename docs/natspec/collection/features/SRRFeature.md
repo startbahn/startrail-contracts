@@ -30,7 +30,7 @@ function createSRR(bool isPrimaryIssuer, address artistAddress, string metadataC
 | lockExternalTransfer | bool | transfer lock flag (see LockExternalTransferFeatuer.sol) |
 | to | address | the address this token will be transferred to after the creation |
 | royaltyReceiver | address | royalty receiver |
-| royaltyPercentage | uint16 | royalty percentage |
+| royaltyBasisPoints | uint16 | royalty basis points |
 
 ### getSRR
 

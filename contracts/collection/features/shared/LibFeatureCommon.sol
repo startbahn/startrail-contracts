@@ -8,12 +8,16 @@ import "../../registry/interfaces/IStartrailCollectionFeatureRegistry.sol";
 import "../../shared/LibEIP2771.sol";
 import "../../CollectionProxyStorage.sol";
 import "../erc721/ERC721Errors.sol";
+import "../storage/LibLockExternalTransferStorage.sol";
+import "../storage/LibSRRMetadataStorage.sol";
 import {LibERC721Storage} from "../erc721/LibERC721Storage.sol";
+import "./LibSRRProvenanceEvents.sol";
 
 library LibFeatureCommon {
     error NotAdministrator();
     error NotOwner();
     error OnlyIssuerOrArtistOrAdministrator();
+    error ERC721ExternalTransferLocked();
 
     function getNameRegistry() internal view returns (address) {
         return
@@ -43,6 +47,48 @@ library LibFeatureCommon {
             LibEIP2771.onlyLicensedUser(
                 CollectionProxyStorage.layout().featureRegistry
             );
+    }
+
+    function onlyExternalTransferUnlocked(uint256 tokenId) internal view {
+        if (
+            LibLockExternalTransferStorage.layout().tokenIdToLockFlag[tokenId]
+        ) {
+            revert ERC721ExternalTransferLocked();
+        }
+    }
+
+    function logProvenance(
+        uint256 tokenId,
+        address from,
+        address to,
+        string memory historyMetadataHash,
+        uint256 customHistoryId,
+        bool isIntermediary
+    ) internal {
+        string memory historyMetadataURI = LibSRRMetadataStorage.buildTokenURI(
+            historyMetadataHash
+        );
+
+        if (customHistoryId != 0) {
+            emit LibSRRProvenanceEvents.Provenance(
+                tokenId,
+                from,
+                to,
+                customHistoryId,
+                historyMetadataHash,
+                historyMetadataURI,
+                isIntermediary
+            );
+        } else {
+            emit LibSRRProvenanceEvents.Provenance(
+                tokenId,
+                from,
+                to,
+                historyMetadataHash,
+                historyMetadataURI,
+                isIntermediary
+            );
+        }
     }
 
     function isEmptyString(string memory str) internal pure returns (bool) {

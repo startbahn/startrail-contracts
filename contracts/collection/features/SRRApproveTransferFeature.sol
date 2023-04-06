@@ -7,6 +7,7 @@ import "./shared/LibFeatureCommon.sol";
 import "./shared/LibFeatureStartrailRegistry.sol";
 import "./shared/LibSRRApproveTransferFeatureEvents.sol";
 import "./storage/LibApproveTransferStorage.sol";
+import "./storage/LibSRRMetadataStorage.sol";
 
 /**
  * @title Feature implementing approve and transfer by commitment.
@@ -119,7 +120,7 @@ contract SRRApproveTransferFeature is ISRRApproveTransferFeature {
 
         address from = LibERC721Storage.layout().ownerOf[tokenId];
 
-        _historyProvenance(
+        LibFeatureCommon.logProvenance(
             tokenId,
             from,
             to,
@@ -208,40 +209,6 @@ contract SRRApproveTransferFeature is ISRRApproveTransferFeature {
                 tokenId,
                 commitment,
                 customHistoryId
-            );
-        }
-    }
-
-    function _historyProvenance(
-        uint256 tokenId,
-        address from,
-        address to,
-        string memory historyMetadataHash,
-        uint256 customHistoryId, // adding this to support common private function to use emit history provenance
-        bool isIntermediary
-    ) private {
-        // TODO: convert this once metadata feature is done?
-        // string memory historyMetadataURI = tokenURI(historyMetadataHash);
-        string memory historyMetadataURI = "todo";
-
-        if (customHistoryId != NO_CUSTOM_HISTORY) {
-            emit LibSRRApproveTransferFeatureEvents.Provenance(
-                tokenId,
-                from,
-                to,
-                customHistoryId,
-                historyMetadataHash,
-                historyMetadataURI,
-                isIntermediary
-            );
-        } else {
-            emit LibSRRApproveTransferFeatureEvents.Provenance(
-                tokenId,
-                from,
-                to,
-                historyMetadataHash,
-                historyMetadataURI,
-                isIntermediary
             );
         }
     }

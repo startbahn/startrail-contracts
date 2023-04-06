@@ -14,6 +14,13 @@ import "./storage/LibLockExternalTransferStorage.sol";
  */
 contract LockExternalTransferFeature is ILockExternalTransferFeature {
     /**
+     * @dev Emitted when flag is explicitly set
+     * @param tokenId NFT id
+     * @param flag Lock flag
+     */
+    event LockExternalTransferSetLock(uint256 indexed tokenId, bool flag);
+
+    /**
      * @inheritdoc ILockExternalTransferFeature
      */
     function setLockExternalTransfer(

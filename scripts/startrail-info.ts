@@ -1,4 +1,7 @@
-import { StartrailCollectionFeatureRegistry } from '../typechain-types'
+import {
+  CollectionFactory,
+  StartrailCollectionFeatureRegistry,
+} from '../typechain-types'
 
 /* eslint-disable no-console */
 const { green, red } = require('colors')
@@ -132,7 +135,13 @@ const featureRegistryInfo = async () => {
   )
   console.log(`address: ${fr.address}\n`)
 
-  console.log(`facets: ${await fr.facets()}\n`)
+  console.log(`facets: ${JSON.stringify(await fr.facets(), null, 2)}\n`)
+}
+
+const collectionFactoryInfo = async () => {
+  const cf: CollectionFactory = await getContract(hre, 'CollectionFactory')
+  console.log(`address: ${cf.address}`)
+  console.log(`owner: ${await cf.owner()}\n`)
 }
 
 const main = async () => {
@@ -154,6 +163,9 @@ const main = async () => {
 
   console.log(`\n\n=======  StartrailRegistry properties  =======\n`)
   await srInfo()
+
+  console.log(`\n\n=======  CollectionFactory properties  =======\n`)
+  await collectionFactoryInfo()
 
   console.log(`\n`)
 }

@@ -32,6 +32,10 @@ interface IStartrailRegistry {
     ) external returns (uint256);
 }
 
+/**
+ * @title BulkIssueV5
+ * @notice this contract was deprecated
+ */
 contract BulkIssueV5 is 
     Contracts,
     InitializableWithGap,

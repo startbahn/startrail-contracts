@@ -9,14 +9,6 @@ contract MockERC721Upgradeable is ERC721UpgradeableBase {
         __ERC721_init(_name, _symbol);
     }
 
-    function tokenURI(uint256)
-        public
-        pure
-        virtual
-        override
-        returns (string memory)
-    {}
-
     function mint(address to, uint256 tokenId) external virtual {
         LibERC721Storage._mint(to, tokenId);
     }

@@ -207,7 +207,7 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct IStartrailRegistryV19.SRR",
+        "internalType": "struct IStartrailRegistryV22.SRR",
         "name": "registryRecord",
         "type": "tuple"
       },
@@ -255,7 +255,7 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct IStartrailRegistryV19.SRR",
+        "internalType": "struct IStartrailRegistryV22.SRR",
         "name": "registryRecord",
         "type": "tuple"
       },
@@ -297,7 +297,7 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct IStartrailRegistryV19.SRR",
+        "internalType": "struct IStartrailRegistryV22.SRR",
         "name": "registryRecord",
         "type": "tuple"
       },
@@ -785,12 +785,12 @@
           },
           {
             "internalType": "uint16",
-            "name": "percentage",
+            "name": "basisPoints",
             "type": "uint16"
           }
         ],
         "indexed": false,
-        "internalType": "struct IStartrailRegistryV19.RoyaltyInfo",
+        "internalType": "struct IStartrailRegistryV22.RoyaltyInfo",
         "name": "royalty",
         "type": "tuple"
       }
@@ -1143,7 +1143,7 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct IStartrailRegistryV19.SRR",
+        "internalType": "struct IStartrailRegistryV22.SRR",
         "name": "registryRecord",
         "type": "tuple"
       }
@@ -1551,7 +1551,7 @@
       },
       {
         "internalType": "uint16",
-        "name": "royaltyPercentage",
+        "name": "royaltyBasisPoints",
         "type": "uint16"
       }
     ],
@@ -1666,7 +1666,7 @@
       },
       {
         "internalType": "uint16",
-        "name": "royaltyPercentage",
+        "name": "royaltyBasisPoints",
         "type": "uint16"
       }
     ],
@@ -1876,7 +1876,7 @@
             "type": "address"
           }
         ],
-        "internalType": "struct IStartrailRegistryV19.SRR",
+        "internalType": "struct IStartrailRegistryV22.SRR",
         "name": "registryRecord",
         "type": "tuple"
       },
@@ -2081,7 +2081,7 @@
       },
       {
         "internalType": "uint16",
-        "name": "percentage",
+        "name": "basisPoints",
         "type": "uint16"
       }
     ],
@@ -2624,11 +2624,29 @@
       },
       {
         "internalType": "uint16",
-        "name": "royaltyPercentage",
+        "name": "royaltyBasisPoints",
         "type": "uint16"
       }
     ],
     "name": "updateSRRRoyalty",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "tokenIds",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "address",
+        "name": "royaltyReceiver",
+        "type": "address"
+      }
+    ],
+    "name": "updateSRRRoyaltyReceiverMulti",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

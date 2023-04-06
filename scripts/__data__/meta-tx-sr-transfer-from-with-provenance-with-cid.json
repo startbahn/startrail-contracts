@@ -1,6 +1,5 @@
 {
   "requestTypeKey": "StartrailRegistryTransferFromWithProvenanceV2",
-  "_comment": "",
   "requestData": {
     "to": "0xf1dbd215d72d99422693ca61f7bbecfcd0edb16f",
     "tokenId": 899260479738,

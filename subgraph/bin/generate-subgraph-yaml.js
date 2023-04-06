@@ -8,15 +8,15 @@
 const fs = require('fs')
 const path = require('path')
 const yaml = require('js-yaml')
-const lowerFirst = require('lodash/lowerFirst')
+const _ = require('lodash')
 
 const rootDir = path.dirname(path.dirname(require.main.filename))
 const rootPath = (rootFile) => path.join(rootDir, rootFile)
 const startrailPackagePath = rootPath(`..`)
 
-if (process.argv.length !== 3 && process.argv.length !== 6) {
+if (process.argv.length !== 4 && process.argv.length !== 7) {
   console.log(`
-  Usage: node ${process.argv[1]} <deployment name> [ <deploy.json path> <abis folder path> <startBlock> ]
+  Usage: node ${process.argv[1]} <deployment name> [ <deploy.json path> <abis folder path> <startBlock> collection=disabled/enabled]
     
   Script can be run in one of 2 ways:
 
@@ -45,10 +45,12 @@ if (['local', 'mainnet'].indexOf(deploymentName) !== -1) {
   throw new Error(`network unknown for deployment [${deploymentName}]`)
 }
 
+let enableCollectionFeature = false
+
 //
 // Collect and validate input arguments
 //
-const isStartrailPackageDeployment = process.argv.length === 3
+const isStartrailPackageDeployment = process.argv.length === 4
 
 let deploymentFilePath
 if (isStartrailPackageDeployment) {
@@ -58,8 +60,10 @@ if (isStartrailPackageDeployment) {
     deploymentName === `local` ? `localhost` : deploymentName,
     `deploy.json`
   )
+  enableCollectionFeature = process.argv[3] === 'collection=enabled'
 } else {
   deploymentFilePath = process.argv[3]
+  enableCollectionFeature = process.argv[6] === 'collection=enabled'
 }
 
 const contractAddresses = JSON.parse(fs.readFileSync(deploymentFilePath))
@@ -94,27 +98,27 @@ const subgraphYamlTemplate = yaml.safeLoad(
   fs.readFileSync(rootPath('subgraph.template.yaml'), 'utf8')
 )
 
-subgraphYamlTemplate.dataSources.forEach((ds) => {
+subgraphYamlTemplate.dataSources.forEach((ds, index) => {
   const contractName = ds.name
-  const isCollection = contractName === `Collection`
+
+  const isCollectionFeature = contractName.toLowerCase().includes('collection')
+  if (isCollectionFeature && !enableCollectionFeature) {
+    // don't include collection
+    delete subgraphYamlTemplate.dataSources[index]
+    return
+  }
 
   //
   // Get contractAddress
   //
-  let contractAddress
-  if (!isCollection) {
-    const addressKey = `${lowerFirst(contractName)}${
-      contractName === 'CollectionFactory' ? '' : 'Proxy'
-    }Address`
+  const addressKey = `${_.lowerFirst(contractName)}ProxyAddress`
 
-    contractAddress = contractAddresses[addressKey]
-
-    if (!contractAddress) {
-      console.error(
-        `ERROR: contract address not set for contract '${contractName}'\n`
-      )
-      process.exit(4)
-    }
+  const contractAddress = contractAddresses[addressKey]
+  if (!contractAddress) {
+    console.error(
+      `ERROR: contract address not set for contract '${contractName}'\n`
+    )
+    process.exit(4)
   }
 
   //
@@ -136,10 +140,8 @@ subgraphYamlTemplate.dataSources.forEach((ds) => {
   //
   // ABI file path
   //
-  const abiFilename = !isCollection
-    ? contractName
-    : `CollectionProxyFeaturesAggregate`
-  let abiFilePath = path.join(abisPath, `${abiFilename}.json`)
+  const abiFilename = `${contractName}.json`
+  let abiFilePath = path.join(abisPath, abiFilename)
 
   // Patch Bulk.json and BulkIssue.json for 2d array workaround
   if (contractName === 'Bulk' || contractName === 'BulkIssue') {
@@ -152,7 +154,7 @@ subgraphYamlTemplate.dataSources.forEach((ds) => {
       (e) => e.name !== 'createSRRWithProofMulti'
     )
     // abiFilePath = path.join(os.tmpdir(), `BulkIssue.json`)
-    abiFilePath = path.join(`modifyBuild/abi/`, `${abiFilename}.json`)
+    abiFilePath = path.join(`modifyBuild/abi/`, abiFilename)
     fs.writeFileSync(abiFilePath, JSON.stringify(bulkABIModified, null, 2))
   }
 
@@ -162,14 +164,31 @@ subgraphYamlTemplate.dataSources.forEach((ds) => {
   ds.mapping.abis[0].file = abiFilePath
   ds.network = network
   ds.source.startBlock = startBlock
-
-  if (!isCollection) {
-    ds.source.address = contractAddress
-  } else {
-    // data source template - multiple address so don't include it
-    delete ds.source.address
-  }
+  ds.source.address = contractAddress
 })
+
+if (enableCollectionFeature) {
+  subgraphYamlTemplate.templates.forEach((template) => {
+    const contractName = template.name
+    const abiFilename = `${
+      contractName === `Collection`
+        ? `CollectionProxyFeaturesAggregate`
+        : contractName
+    }.json`
+
+    template.mapping.abis[0].file = path.join(abisPath, abiFilename)
+    template.network = network
+  })
+} else {
+  // TODO: remove when enable/disable flag removed
+  delete subgraphYamlTemplate.templates
+}
+
+// delete empty items
+subgraphYamlTemplate.dataSources = _.filter(
+  subgraphYamlTemplate.dataSources,
+  (ds) => !!ds
+)
 
 fs.writeFileSync(
   rootPath(`subgraph.${deploymentName}.yaml`),

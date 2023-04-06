@@ -11,6 +11,9 @@ typechain-types/
 forge-cache/
 forge-out/
 
+# OZ upgrades
+.openzeppelin/unknown-*.json
+
 # Logs
 logs
 *.log

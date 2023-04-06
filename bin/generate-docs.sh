@@ -22,6 +22,10 @@ npx sol2uml -o $UML_DIR/LicensedUserManager.uml.svg -b LicensedUserManager contr
 npx sol2uml -o $UML_DIR/StartrailRegistry.uml.svg -b StartrailRegistryV9 contracts/startrailregistry 2>/dev/null
 npx sol2uml -o $UML_DIR/MetaTxForwarder.uml.svg -b MetaTxForwarderV2 contracts/metaTx 2>/dev/null
 npx sol2uml -o $UML_DIR/BulkIssue.uml.svg -b BulkIssueV3 contracts/bulk 2>/dev/null
+npx sol2uml -o $UML_DIR/CollectionFactory.uml.svg -b CollectionFactory contracts/collection 2>/dev/null
+npx sol2uml -o $UML_DIR/CollectionProxy.uml.svg -b CollectionProxy contracts/collection 2>/dev/null
+npx sol2uml -o $UML_DIR/StartrailCollectionFeatureRegistry.uml.svg -b StartrailCollectionFeatureRegistry contracts/collection/registry 2>/dev/null
+npx sol2uml -o $UML_DIR/CollectionFeatures.uml.svg contracts/collection/features 2>/dev/null
 npx sol2uml -o $UML_DIR/All.uml.svg contracts/ 2>/dev/null
 
 CALLGRAPH_DIR=$OUT/callgraph
@@ -30,7 +34,9 @@ echo "\nGenerating function call graphs [$CALLGRAPH_DIR] ...\n"
 npx surya graph `find contracts/licensedUser/ -name "*.sol"` 2>/dev/null | dot -Tpng > $CALLGRAPH_DIR/LicensedUserManager.callgraph.png 
 npx surya graph `find contracts/startrailregistry/ -name "*.sol"` 2>/dev/null | dot -Tpng > $CALLGRAPH_DIR/StartrailRegistry.callgraph.png 
 npx surya graph `find contracts/metaTx/ -name "*.sol"` 2>/dev/null | dot -Tpng > $CALLGRAPH_DIR/MetaTxForwarder.callgraph.png 
-npx surya graph `find contracts/bulk/ -name "*.sol"` 2>/dev/null | dot -Tpng > $CALLGRAPH_DIR/BulkIssue.callgraph.png 
+npx surya graph `find contracts/bulk/ -name "*.sol"` 2>/dev/null | dot -Tpng > $CALLGRAPH_DIR/Bulk.callgraph.png 
+npx surya graph `find contracts/collection/ -name "*.sol"` 2>/dev/null | dot -Tpng > $CALLGRAPH_DIR/Collection.callgraph.png 
+npx surya graph `find contracts/collection/features -name "*.sol"` 2>/dev/null | dot -Tpng > $CALLGRAPH_DIR/CollectionFeatures.callgraph.png 
 npx surya graph `find contracts -name "*.sol"` 2>/dev/null | dot -Tpng > $CALLGRAPH_DIR/All.callgraph.png 
 
 INHERIT_DIR=$OUT/inheritance
@@ -40,6 +46,7 @@ npx surya inheritance `find contracts/licensedUser/ -name "*.sol"` 2>/dev/null |
 npx surya inheritance `find contracts/startrailregistry/ -name "*.sol"` 2>/dev/null | dot -Tpng > $INHERIT_DIR/StartrailRegistry.inheritance.png 
 npx surya inheritance `find contracts/metaTx/ -name "*.sol"` 2>/dev/null | dot -Tpng > $INHERIT_DIR/MetaTxForwarder.inheritance.png 
 npx surya inheritance `find contracts/bulk/ -name "*.sol"` 2>/dev/null | dot -Tpng > $INHERIT_DIR/BulkIssue.inheritance.png 
+npx surya inheritance `find contracts/collection/ -name "*.sol"` 2>/dev/null | dot -Tpng > $INHERIT_DIR/Collection.inheritance.png 
 npx surya inheritance `find contracts/ -name "*.sol"` 2>/dev/null | dot -Tpng > $INHERIT_DIR/All.inheritance.png 
 
 NATSPEC_DIR=$OUT/natspec

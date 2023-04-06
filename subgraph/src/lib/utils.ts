@@ -1,6 +1,8 @@
 import {
   Address,
   BigInt,
+  Bytes,
+  crypto,
   dataSource,
   ethereum,
   log,
@@ -95,4 +97,15 @@ export function logInvocation(
 
 export function toUTCString(timestamp: BigInt): string {
   return new Date(timestamp.toI64()).toUTCString()
+}
+
+export function srrEntityId(
+  collectionAddress: Address,
+  tokenId: BigInt
+): string {
+  return crypto
+    .keccak256(
+      collectionAddress.concat(Bytes.fromByteArray(Bytes.fromBigInt(tokenId)))
+    )
+    .toHex()
 }

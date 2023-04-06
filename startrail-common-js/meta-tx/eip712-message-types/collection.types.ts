@@ -4,24 +4,16 @@ import { buildTypeList } from './helpers'
 import {
   StartrailRegistryAddHistoryRecord,
   StartrailRegistryAddHistoryTypes,
-  StartrailRegistryApproveSRRByCommitmentRecord,
-  StartrailRegistryApproveSRRByCommitmentTypes,
   StartrailRegistryApproveSRRByCommitmentV2Record,
   StartrailRegistryApproveSRRByCommitmentV2Types,
-  StartrailRegistryApproveSRRByCommitmentWithCustomHistoryIdRecord,
-  StartrailRegistryApproveSRRByCommitmentWithCustomHistoryIdTypes,
   StartrailRegistryApproveSRRByCommitmentWithCustomHistoryIdV2Record,
   StartrailRegistryApproveSRRByCommitmentWithCustomHistoryIdV2Types,
   StartrailRegistryCancelSRRCommitmentRecord,
   StartrailRegistryCancelSRRCommitmentTypes,
   StartrailRegistrySetLockExternalTransferRecord,
   StartrailRegistrySetLockExternalTransferTypes,
-  StartrailRegistryTransferFromWithProvenanceRecord,
-  StartrailRegistryTransferFromWithProvenanceTypes,
   StartrailRegistryTransferFromWithProvenanceV2Record,
   StartrailRegistryTransferFromWithProvenanceV2Types,
-  StartrailRegistryUpdateSRRMetadataRecord,
-  StartrailRegistryUpdateSRRMetadataTypes,
   StartrailRegistryUpdateSRRMetadataWithCidRecord,
   StartrailRegistryUpdateSRRMetadataWithCidTypes,
   StartrailRegistryUpdateSRRRecord,
@@ -69,7 +61,7 @@ const CollectionCreateSRRTypes: ReadonlyArray<TypedDataField> = addDestinationFi
     lockExternalTransfer: 'bool',
     to: 'address',
     royaltyReceiver: 'address',
-    royaltyPercentage: 'uint16',
+    royaltyBasisPoints: 'uint16',
   })
 )
 
@@ -80,7 +72,17 @@ interface CollectionCreateSRRRecord extends DestinationRecord {
   lockExternalTransfer: boolean
   to: string
   royaltyReceiver: string
-  royaltyPercentage: string
+  royaltyBasisPoints: number
+}
+
+const CollectionTransferOwnershipTypes: ReadonlyArray<TypedDataField> = addDestinationField(
+  buildTypeList({
+    newOwner: 'address',
+  })
+)
+
+interface CollectionTransferOwnershipRecord extends DestinationRecord {
+  newOwner: string
 }
 
 //
@@ -112,22 +114,6 @@ interface CollectionUpdateSRRRoyaltyRecord
   extends DestinationRecord,
     StartrailRegistryUpdateSRRRoyaltyRecord {}
 
-const CollectionUpdateSRRMetadataTypes: ReadonlyArray<TypedDataField> = addDestinationField(
-  StartrailRegistryUpdateSRRMetadataTypes
-)
-
-interface CollectionUpdateSRRMetadataRecord
-  extends DestinationRecord,
-    StartrailRegistryUpdateSRRMetadataRecord {}
-
-const CollectionApproveSRRByCommitmentTypes: ReadonlyArray<TypedDataField> = addDestinationField(
-  StartrailRegistryApproveSRRByCommitmentTypes
-)
-
-interface CollectionApproveSRRByCommitmentRecord
-  extends DestinationRecord,
-    StartrailRegistryApproveSRRByCommitmentRecord {}
-
 const CollectionApproveSRRByCommitmentV2Types: ReadonlyArray<TypedDataField> = addDestinationField(
   StartrailRegistryApproveSRRByCommitmentV2Types
 )
@@ -135,14 +121,6 @@ const CollectionApproveSRRByCommitmentV2Types: ReadonlyArray<TypedDataField> = a
 interface CollectionApproveSRRByCommitmentV2Record
   extends DestinationRecord,
     StartrailRegistryApproveSRRByCommitmentV2Record {}
-
-const CollectionApproveSRRByCommitmentWithCustomHistoryIdTypes: ReadonlyArray<TypedDataField> = addDestinationField(
-  StartrailRegistryApproveSRRByCommitmentWithCustomHistoryIdTypes
-)
-
-interface CollectionApproveSRRByCommitmentWithCustomHistoryIdRecord
-  extends DestinationRecord,
-    StartrailRegistryApproveSRRByCommitmentWithCustomHistoryIdRecord {}
 
 const CollectionApproveSRRByCommitmentWithCustomHistoryIdV2Types: ReadonlyArray<TypedDataField> = addDestinationField(
   StartrailRegistryApproveSRRByCommitmentWithCustomHistoryIdV2Types
@@ -176,14 +154,6 @@ interface CollectionSetLockExternalTransferRecord
   extends DestinationRecord,
     StartrailRegistrySetLockExternalTransferRecord {}
 
-const CollectionTransferFromWithProvenanceTypes: ReadonlyArray<TypedDataField> = addDestinationField(
-  StartrailRegistryTransferFromWithProvenanceTypes
-)
-
-interface CollectionTransferFromWithProvenanceRecord
-  extends DestinationRecord,
-    StartrailRegistryTransferFromWithProvenanceRecord {}
-
 const CollectionTransferFromWithProvenanceV2Types: ReadonlyArray<TypedDataField> = addDestinationField(
   StartrailRegistryTransferFromWithProvenanceV2Types
 )
@@ -191,29 +161,12 @@ const CollectionTransferFromWithProvenanceV2Types: ReadonlyArray<TypedDataField>
 interface CollectionTransferFromWithProvenanceV2Record
   extends DestinationRecord,
     StartrailRegistryTransferFromWithProvenanceV2Record {}
-//
-// Collection message types (FOR TEMPORARY STUB ONLY - TO BE REMOVED)
-//
-
-const CreateCollectionTypes: ReadonlyArray<TypedDataField> = buildTypeList({
-  erc721Symbol: 'string',
-  metadataDigest: 'bytes32',
-})
-
-interface CreateCollection {
-  erc721Symbol: string
-  metadataDigest: Buffer | string
-}
 
 export {
   CollectionAddHistoryRecord,
   CollectionAddHistoryTypes,
-  CollectionApproveSRRByCommitmentRecord,
-  CollectionApproveSRRByCommitmentTypes,
   CollectionApproveSRRByCommitmentV2Record,
   CollectionApproveSRRByCommitmentV2Types,
-  CollectionApproveSRRByCommitmentWithCustomHistoryIdRecord,
-  CollectionApproveSRRByCommitmentWithCustomHistoryIdTypes,
   CollectionApproveSRRByCommitmentWithCustomHistoryIdV2Record,
   CollectionApproveSRRByCommitmentWithCustomHistoryIdV2Types,
   CollectionCancelSRRCommitmentRecord,
@@ -222,18 +175,14 @@ export {
   CollectionCreateSRRTypes,
   CollectionSetLockExternalTransferRecord,
   CollectionSetLockExternalTransferTypes,
-  CollectionTransferFromWithProvenanceRecord,
-  CollectionTransferFromWithProvenanceTypes,
   CollectionTransferFromWithProvenanceV2Record,
   CollectionTransferFromWithProvenanceV2Types,
-  CollectionUpdateSRRMetadataRecord,
-  CollectionUpdateSRRMetadataTypes,
+  CollectionTransferOwnershipRecord,
+  CollectionTransferOwnershipTypes,
   CollectionUpdateSRRMetadataWithCidRecord,
   CollectionUpdateSRRMetadataWithCidTypes,
   CollectionUpdateSRRRoyaltyRecord,
   CollectionUpdateSRRRoyaltyTypes,
   CollectionUpdateSRRRecord,
   CollectionUpdateSRRTypes,
-  CreateCollection,
-  CreateCollectionTypes,
 }

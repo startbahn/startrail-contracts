@@ -2,12 +2,16 @@
 
 pragma solidity 0.8.13;
 
+import {IERC721} from "@solidstate/contracts/token/ERC721/IERC721.sol";
 import "../../lib/IDGeneratorV3.sol";
 import "./interfaces/ISRRFeature.sol";
 import "./interfaces/IERC721Feature.sol";
 import "./shared/LibFeatureCommon.sol";
 import "./storage/LibSRRStorage.sol";
 import "./storage/LibERC2981RoyaltyStorage.sol";
+import "./storage/LibSRRMetadataStorage.sol";
+import "./storage/LibLockExternalTransferStorage.sol";
+import "./erc721/LibERC721Storage.sol";
 
 /**
  * @title Feature that enables standard ERC721 transfer methods to be disabled
@@ -24,26 +28,22 @@ contract SRRFeature is ISRRFeature {
         bool lockExternalTransfer,
         address to,
         address royaltyReceiver,
-        uint16 royaltyPercentage
+        uint16 royaltyBasisPoints
     ) external override {
-        // suppress unused variable warnings until they are used below:
-        lockExternalTransfer;
-        to;
-        royaltyReceiver;
-        royaltyPercentage;
-
         LibFeatureCommon.onlyTrustedForwarder();
         LibFeatureCommon.onlyOwner();
 
         if (LibFeatureCommon.isEmptyString(metadataCID)) {
-            revert MetadataEmpty();
+            revert LibSRRMetadataStorage.SRRMetadataNotEmpty();
         }
 
         if (artistAddress == address(0)) {
             revert ZeroAddress();
         }
 
-        LibERC2981RoyaltyStorage.notToExceedSalePrice(royaltyPercentage);
+        if (royaltyReceiver != address(0)) {
+            LibERC2981RoyaltyStorage.notToExceedSalePrice(royaltyBasisPoints);
+        }
 
         uint256 tokenId = IDGeneratorV3.generate(metadataCID, artistAddress);
         LibERC721Storage.onlyNonExistantToken(tokenId);
@@ -55,14 +55,16 @@ contract SRRFeature is ISRRFeature {
         srr.artist = artistAddress;
         srr.issuer = issuer;
 
+        LibSRRMetadataStorage.layout().srrs[tokenId] = metadataCID;
+
         LibERC721Storage._mint(issuer, tokenId);
 
-        // TODO: uncomment this to support transfer after mint to `to`
-        // if (to != address(0)) {
-        //   IERC721(address(this)).transfer(issuer, to, tokenId);
-        // }
-
-        // TODO: write to lockExternalTransfer (only if true? save gas as false already be set...)
+        // only if true - save gas as false already be set
+        if (lockExternalTransfer) {
+            LibLockExternalTransferStorage.layout().tokenIdToLockFlag[
+                    tokenId
+                ] = lockExternalTransfer;
+        }
 
         emit CreateSRR(
             tokenId,
@@ -74,8 +76,12 @@ contract SRRFeature is ISRRFeature {
         LibERC2981RoyaltyStorage.upsertRoyalty(
             tokenId,
             royaltyReceiver,
-            royaltyPercentage
+            royaltyBasisPoints
         );
+
+        if (to != address(0)) {
+            LibERC721Storage._transferFrom(issuer, to, tokenId);
+        }
     }
 
     /**

@@ -16,6 +16,7 @@ import "../../contracts/collection/features/LockExternalTransferFeature.sol";
 import "../../contracts/collection/features/SRRApproveTransferFeature.sol";
 import "../../contracts/collection/features/SRRFeature.sol";
 import "../../contracts/collection/features/ERC2981RoyaltyFeature.sol";
+import "../../contracts/collection/features/SRRMetadataFeature.sol";
 import "../../contracts/collection/registry/StartrailCollectionFeatureRegistry.sol";
 
 import "../../contracts/name/Contracts.sol";
@@ -26,11 +27,16 @@ import "./mock/MockStartrailRegistry.sol";
 
 import "./StartrailTestLibrary.sol";
 
+/*
+ * A base contract for Startrail collection tests that provides:
+ * -  a setUp function for deploying and configuring the core set
+ *    of collection contracts
+ * - helper functions
+ * - test data and addresses
+ */
 contract StartrailTestBase is StartrailTestLibrary, Contracts {
     string internal constant COLLECTION_NAME = "NoMoreApes";
     string internal constant COLLECTION_SYMBOL = "NOAPE";
-    string internal constant COLLECTION_METADATA_CID =
-        "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi";
 
     ///                                                          ///
     ///                          BASE SETUP                      ///
@@ -49,6 +55,8 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     address internal srrFeatureImpl;
     address internal srrApprovalFeatureImpl;
     address internal erc2981RoyaltyFeatureImpl;
+    address internal srrMetadataFeatureImpl;
+    address internal collectionProxyImpl;
 
     address internal admin;
     address internal collectionOwner1;
@@ -76,8 +84,17 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
             featureRegistryAddress
         );
 
+        collectionProxyImpl = address(new CollectionProxy());
+        CollectionProxy(payable(collectionProxyImpl))
+            .__CollectionProxy_initialize(address(0x1));
+
         vm.prank(admin);
-        collectionFactory = new CollectionFactory(featureRegistryAddress);
+
+        collectionFactory = new CollectionFactory();
+        collectionFactory.initialize(
+            featureRegistryAddress,
+            collectionProxyImpl
+        );
 
         // Deploy Feature Contracts
         erc721FeatureImpl = deployERC721Feature(featureRegistry);
@@ -91,6 +108,7 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
         erc2981RoyaltyFeatureImpl = deployERC2981RoyaltyFeature(
             featureRegistry
         );
+        srrMetadataFeatureImpl = deploySRRMetadataFeature(featureRegistry);
 
         // Mock LUM
         mockLicensedUserManager = new MockLicensedUserManager();
@@ -141,13 +159,14 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
         // Initialize the implementation contract for safety
         erc721Feature.__ERC721Feature_initialize("ImplOnly", "IMPLONLY");
 
-        bytes4[] memory selectors = new bytes4[](15);
+        bytes4[] memory selectors = new bytes4[](14);
 
         uint8 selIdx = 0;
 
         // ERC721Feature
         selectors[selIdx++] = ERC721Feature.__ERC721Feature_initialize.selector;
         selectors[selIdx++] = ERC721Feature.exists.selector;
+        selectors[selIdx++] = ERC721Feature.transferFromWithProvenance.selector;
 
         // ERC721
         selectors[selIdx++] = ERC721UpgradeableBase.balanceOf.selector;
@@ -163,7 +182,6 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
         // ERC721Metadata
         selectors[selIdx++] = ERC721UpgradeableBase.name.selector;
         selectors[selIdx++] = ERC721UpgradeableBase.symbol.selector;
-        selectors[selIdx++] = ERC721Feature.tokenURI.selector;
 
         erc721ddress = address(erc721Feature);
         deployFeature(admin, featureRegistry_, erc721ddress, selectors);
@@ -176,6 +194,7 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
             type(IERC721Metadata).interfaceId,
             true
         );
+        return erc721ddress;
     }
 
     function deployLockExternalTransferFeature(
@@ -276,6 +295,28 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
         return erc2981RoyaltyFeatureImpl;
     }
 
+    function deploySRRMetadataFeature(
+        StartrailCollectionFeatureRegistry featureRegistry_
+    ) internal returns (address) {
+        SRRMetadataFeature feature = new SRRMetadataFeature();
+
+        bytes4[] memory selectors = new bytes4[](3);
+
+        selectors[0] = SRRMetadataFeature.updateSRRMetadata.selector;
+        selectors[1] = SRRMetadataFeature.getSRRMetadata.selector;
+        selectors[2] = SRRMetadataFeature.tokenURI.selector;
+
+        srrMetadataFeatureImpl = address(feature);
+        deployFeature(
+            admin,
+            featureRegistry_,
+            srrMetadataFeatureImpl,
+            selectors
+        );
+
+        return srrMetadataFeatureImpl;
+    }
+
     function createCollection(address creatorLU) internal returns (address) {
         vm.recordLogs();
 
@@ -286,7 +327,6 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
                     CollectionFactory.createCollectionContract.selector,
                     COLLECTION_NAME,
                     COLLECTION_SYMBOL,
-                    COLLECTION_METADATA_CID,
                     bytes32(keccak256("random salt"))
                 ),
                 creatorLU
@@ -296,6 +336,6 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
 
         Vm.Log[] memory entries = vm.getRecordedLogs();
         Vm.Log memory collectionCreatedLog = entries[entries.length - 1];
-        return address(bytes20(collectionCreatedLog.topics[1] << 96));
+        return bytes32ToAddress(collectionCreatedLog.topics[1]);
     }
 }

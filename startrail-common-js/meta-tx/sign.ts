@@ -2,6 +2,8 @@ import { BigNumber, Wallet } from 'ethers'
 import { clone } from 'lodash'
 import stripHexPrefix from 'strip-hex-prefix'
 
+import { TypedDataField } from '@ethersproject/abstract-signer'
+
 import {
   EIP712TypedData,
   EIP712TypedDataBuilder,
@@ -84,7 +86,9 @@ const signTypedData = (
 
   // types field list is readonly but in _signTypedData it is not
   // so we clone here to allow it to be passed in:
-  const typesMutable = clone({ [primaryType]: types[primaryType] })
+  const typesMutable = clone({
+    [primaryType]: types[primaryType],
+  }) as { [x: string]: TypedDataField[] }
 
   // Signatures must be sent in a wallet addresses alphanum order.
   // This is due to the way owner addresses are stored in the

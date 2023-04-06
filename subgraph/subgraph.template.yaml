@@ -124,6 +124,8 @@ dataSources:
           handler: handleSRRHistory
         - event: LockExternalTransfer(indexed uint256,bool)
           handler: handleLockExternalTransfer
+        - event: RoyaltiesSet(indexed uint256,(address,uint16))
+          handler: handleRoyaltiesSet
 
         #
         # Events related to the migration
@@ -152,8 +154,6 @@ dataSources:
           handler: handleCreateCustomHistoryFromMigration
         - event: ProvenanceDateMigrationFix(indexed uint256,uint256)
           handler: handleProvenanceDateMigrationFix
-        - event: RoyaltiesSet(indexed uint256,(address,uint16))
-          handler: handleRoyaltiesSet
 
   - kind: ethereum/contract
     name: BulkIssue
@@ -244,16 +244,18 @@ dataSources:
         - name: CollectionFactory
           file: ##AUTOFILL##
       eventHandlers:
-        - event: CollectionCreated(indexed address,string,string,string)
+        - event: CollectionCreated(indexed address,indexed address,string,string,bytes32)
+          handler: handleCollectionCreated
+        # legacy event - only in qa and hasn't made to prod - so can be removed at some point soon
+        - event: CollectionCreated(indexed address,indexed address,string,string,string,bytes32)
           handler: handleCollectionCreated
       file: ./src/collection-factory-mapping.ts
+templates:
   - kind: ethereum/contract
     name: Collection
     network: ##AUTOFILL##
     source:
-      address: ##AUTOFILL##
       abi: CollectionProxyFeaturesAggregate
-      startBlock: ##AUTOFILL##
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -264,6 +266,28 @@ dataSources:
         - name: CollectionProxyFeaturesAggregate
           file: ##AUTOFILL##
       eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
         - event: CreateSRR(indexed uint256,(bool,address,address),string,bool)
           handler: handleCreateSRR
+        - event: UpdateSRR(indexed uint256,bool,address,address)
+          handler: handleUpdateSRRWithSender
+        - event: UpdateSRRMetadataDigest(indexed uint256,string)
+          handler: handleUpdateSRRMetadataWithCid
+        - event: SRRCommitment(indexed uint256,indexed bytes32)
+          handler: handleSRRCommitment
+        - event: SRRCommitment(indexed uint256,indexed bytes32,indexed uint256)
+          handler: handleSRRCommitmentWithCustomHistory
+        - event: SRRCommitmentCancelled(indexed uint256)
+          handler: handleSRRCommitmentCancelled
+        - event: Provenance(indexed uint256,indexed address,indexed address,string,string,bool)
+          handler: handleSRRProvenanceWithIntermediary
+        - event: Provenance(indexed uint256,indexed address,indexed address,uint256,string,string,bool)
+          handler: handleSRRProvenanceWithCustomHistoryAndIntermediary
+        - event: LockExternalTransferSetLock(indexed uint256,bool)
+          handler: handleLockExternalTransfer
+        - event: RoyaltiesSet(indexed uint256,(address,uint16))
+          handler: handleRoyaltiesSet
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
       file: ./src/collection-mapping.ts

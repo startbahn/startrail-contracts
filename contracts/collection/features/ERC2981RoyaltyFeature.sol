@@ -31,7 +31,7 @@ contract ERC2981RoyaltyFeature is IERC2981RoyaltyFeature, IERC2981 {
     function updateSRRRoyalty(
         uint256 tokenId,
         address royaltyReceiver,
-        uint16 royaltyPercentage
+        uint16 royaltyBasisPoints
     ) external override {
         LibERC721Storage.onlyExistingToken(tokenId);
 
@@ -50,12 +50,12 @@ contract ERC2981RoyaltyFeature is IERC2981RoyaltyFeature, IERC2981 {
 
         LibERC2981RoyaltyStorage.notAddressZero(royaltyReceiver);
 
-        LibERC2981RoyaltyStorage.notToExceedSalePrice(royaltyPercentage);
+        LibERC2981RoyaltyStorage.notToExceedSalePrice(royaltyBasisPoints);
 
         LibERC2981RoyaltyStorage.upsertRoyalty(
             tokenId,
             royaltyReceiver,
-            royaltyPercentage
+            royaltyBasisPoints
         );
     }
 
@@ -83,7 +83,7 @@ contract ERC2981RoyaltyFeature is IERC2981RoyaltyFeature, IERC2981 {
             LibERC2981RoyaltyStorage.upsertRoyalty(
                 tokenIds[i],
                 royaltyReceiver,
-                royalty.percentage
+                royalty.basisPoints
             );
         }
     }
@@ -93,12 +93,12 @@ contract ERC2981RoyaltyFeature is IERC2981RoyaltyFeature, IERC2981 {
      */
     function getSRRRoyalty(
         uint256 tokenId
-    ) external view override returns (address receiver, uint16 percentage) {
+    ) external view override returns (address receiver, uint16 basisPoints) {
         LibERC2981RoyaltyTypes.RoyaltyInfo
             memory royalty = LibERC2981RoyaltyStorage.layout().royalties[
                 tokenId
             ];
-        return (royalty.receiver, royalty.percentage);
+        return (royalty.receiver, royalty.basisPoints);
     }
 
     /**
@@ -128,7 +128,7 @@ contract ERC2981RoyaltyFeature is IERC2981RoyaltyFeature, IERC2981 {
             );
         }
 
-        uint256 royaltyAmount = (salePrice * royalty.percentage) / 10_000;
+        uint256 royaltyAmount = (salePrice * royalty.basisPoints) / 10_000;
 
         return (royalty.receiver, royaltyAmount);
     }

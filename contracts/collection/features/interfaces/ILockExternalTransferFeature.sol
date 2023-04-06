@@ -8,13 +8,6 @@ pragma solidity 0.8.13;
  */
 interface ILockExternalTransferFeature {
     /**
-     * @dev Emitted when flag is explicitly set
-     * @param tokenId NFT id
-     * @param flag Lock flag
-     */
-    event LockExternalTransferSetLock(uint256 indexed tokenId, bool flag);
-
-    /**
      * @dev Set the lock flag for the given tokenId
      * @param tokenId NFT id
      * @param flag bool of the flag to disable standard ERC721 transfer methods
@@ -26,8 +19,7 @@ interface ILockExternalTransferFeature {
      * @param tokenId NFT id
      * @return Flag value
      */
-    function getLockExternalTransfer(uint256 tokenId)
-        external
-        view
-        returns (bool);
+    function getLockExternalTransfer(
+        uint256 tokenId
+    ) external view returns (bool);
 }

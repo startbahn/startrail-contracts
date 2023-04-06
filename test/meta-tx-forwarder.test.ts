@@ -1,23 +1,30 @@
-import hre, { ethers } from 'hardhat'
-import { Wallet } from '@ethersproject/wallet'
-
 import { expect, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers'
-
+import { BigNumber } from 'ethers'
+import hre, { ethers } from 'hardhat'
 import { ContractKeys } from '../startrail-common-js/contracts/types'
+import { zeroBytes32 } from '../startrail-common-js/ethereum/utils'
 import { Logger } from '../startrail-common-js/logger'
 import {
   CollectionSetLockExternalTransferRecord,
   StartrailRegistryApproveSRRByCommitmentV2Record,
   StartrailRegistryCancelSRRCommitmentRecord,
 } from '../startrail-common-js/meta-tx/eip712-message-types'
+import { CollectionApproveSRRByCommitmentV2Record } from '../startrail-common-js/meta-tx/eip712-message-types/collection.types'
 import { MetaTxRequestType } from '../startrail-common-js/meta-tx/meta-tx-request-registry'
 
+import { Wallet } from '@ethersproject/wallet'
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers'
+
+import { CollectionProxyFeaturesAggregate } from '../typechain-types'
+import { deployMetaTxForwarderCollections } from '../utils/deployment/0nn-deploy-meta-tx-forwarder-collections'
+import { getWallets } from '../utils/hardhat-helpers'
+import { nameRegistrySet } from '../utils/name-registry-set'
 import {
   assertExecutionSuccessEmitted,
   assertRevert,
 } from './helpers/assertions'
+import { setupCollection } from './helpers/collections'
 import { fixtureDefault } from './helpers/fixtures'
 import {
   createLicensedUserWalletDirect,
@@ -26,14 +33,6 @@ import {
   randomSha256,
   randomText,
 } from './helpers/utils'
-import { getWallets } from '../utils/hardhat-helpers'
-import { nameRegistrySet } from '../utils/name-registry-set'
-import { createCollection, createSRR } from '../utils/collection/utils'
-import { BigNumber } from 'ethers'
-import { CollectionProxyFeaturesAggregate } from '../typechain-types'
-import { deployMetaTxForwarderCollections } from '../utils/deployment/0nn-deploy-meta-tx-forwarder-collections'
-import { zeroBytes32 } from '../startrail-common-js/ethereum/utils'
-import { CollectionApproveSRRByCommitmentV2Record } from '../startrail-common-js/meta-tx/eip712-message-types/collection.types'
 
 use(chaiAsPromised)
 
@@ -50,57 +49,6 @@ const metadataDigest = randomSha256()
 
 // Contract handles
 let startrailRegistry
-
-/**
- * Shared setup logic for tests running against collection contracts
- */
-const setupCollection = async (
-  collectionOwnerWallet: Wallet
-): Promise<{
-  collectionOwnerLUAddress: string
-  collection: CollectionProxyFeaturesAggregate
-  tokenId: BigNumber
-}> => {
-  let collectionOwnerLUAddress: string
-  let collectionAddress: string
-  let collection: CollectionProxyFeaturesAggregate
-  let tokenId: BigNumber
-
-    // create an LU owned by the given wallet
-  ;({ walletAddress: collectionOwnerLUAddress } =
-    await createLicensedUserWalletDirect(
-      hre,
-      {
-        owners: [collectionOwnerWallet.address],
-      },
-      adminEOAWallet
-    ))
-
-  collectionAddress = await createCollection(
-    collectionOwnerLUAddress,
-    collectionOwnerWallet,
-    {}
-  )
-
-  tokenId = await createSRR(
-    collectionOwnerLUAddress,
-    collectionOwnerWallet,
-    collectionAddress,
-    {}
-  )
-
-  collection = await ethers.getContractAt(
-    'CollectionProxyFeaturesAggregate',
-    collectionAddress,
-    collectionOwnerWallet
-  )
-
-  return {
-    collectionOwnerLUAddress,
-    collection,
-    tokenId,
-  }
-}
 
 describe('MetaTxForwarder', () => {
   before(async function () {
@@ -303,7 +251,7 @@ describe('MetaTxForwarder', () => {
 
       before(async () => {
         ;({ collectionOwnerLUAddress, collection, tokenId } =
-          await setupCollection(handlerEOAWallet))
+          await setupCollection(hre, adminEOAWallet, handlerEOAWallet))
       })
 
       it('should execute with a valid destination contract', async () => {
@@ -480,7 +428,7 @@ describe('MetaTxForwarder', () => {
           collection,
           collectionOwnerLUAddress,
           tokenId: collectionTokenId,
-        } = await setupCollection(handlerEOAWallet))
+        } = await setupCollection(hre, adminEOAWallet, handlerEOAWallet))
 
         // transfer ownership of new token on new collection to an EOA owner
         // so we can use that new owner in the tests

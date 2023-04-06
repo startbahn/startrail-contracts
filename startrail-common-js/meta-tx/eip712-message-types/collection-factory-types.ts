@@ -10,15 +10,13 @@ const CollectionFactoryCreateCollectionTypes: ReadonlyArray<TypedDataField> = bu
   {
     name: 'string',
     symbol: 'string',
-    metadataCID: 'string',
     salt: 'bytes32',
   }
 )
 
 interface CollectionFactoryCreateCollectionRecord {
-  name: 'string'
-  symbol: 'string'
-  metadataCID: 'string'
+  name: string
+  symbol: string
   salt: Buffer | string
 }
 

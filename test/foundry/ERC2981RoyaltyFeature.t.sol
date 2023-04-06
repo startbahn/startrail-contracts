@@ -14,10 +14,10 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
     address internal notAnOwner;
 
     address royaltyReceiver1;
-    uint16 royaltyPercentage1;
+    uint16 royaltyBasisPoints1;
 
     address royaltyReceiver2;
-    uint16 royaltyPercentage2;
+    uint16 royaltyBasisPoints2;
 
     uint256 tokenIdNoRoyaltyShared;
     uint256 tokenId1Shared;
@@ -30,10 +30,10 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
         notAnOwner = vm.addr(0x7788);
 
         royaltyReceiver1 = vm.addr(0x9911);
-        royaltyPercentage1 = 1_570; // 15.7%
+        royaltyBasisPoints1 = 1_570; // 15.7%
 
         royaltyReceiver2 = vm.addr(0x9922);
-        royaltyPercentage2 = 1_000; // 10%
+        royaltyBasisPoints2 = 1_000; // 10%
 
         collectionAddress = createCollection(collectionOwnerLU);
 
@@ -55,7 +55,7 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
             false,
             address(0),
             royaltyReceiver1,
-            royaltyPercentage1,
+            royaltyBasisPoints1,
             bytes4(0)
         );
 
@@ -69,7 +69,7 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
             false,
             address(0),
             royaltyReceiver2,
-            royaltyPercentage2,
+            royaltyBasisPoints2,
             bytes4(0)
         );
     }
@@ -84,7 +84,7 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
         feature.updateSRRRoyalty(
             tokenId1Shared,
             royaltyReceiver1,
-            royaltyPercentage1
+            royaltyBasisPoints1
         );
     }
 
@@ -95,7 +95,7 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
 
         uint256 tokenId = 12345; // no token exists with this id
 
-        feature.updateSRRRoyalty(tokenId, royaltyReceiver1, royaltyPercentage1);
+        feature.updateSRRRoyalty(tokenId, royaltyReceiver1, royaltyBasisPoints1);
     }
 
     function testRevertUpdateSRRRoyalty_RoyaltyNotExists() public {
@@ -106,7 +106,7 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
         feature.updateSRRRoyalty(
             tokenIdNoRoyaltyShared, // no royalty
             royaltyReceiver1,
-            royaltyPercentage1
+            royaltyBasisPoints1
         );
     }
 
@@ -122,7 +122,7 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
         feature.updateSRRRoyalty(
             tokenId1Shared,
             royaltyReceiver,
-            royaltyPercentage1
+            royaltyBasisPoints1
         );
     }
 
@@ -145,7 +145,7 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
                     feature.updateSRRRoyalty.selector,
                     tokenId1Shared,
                     royaltyReceiver2,
-                    royaltyPercentage2
+                    royaltyBasisPoints2
                 ),
                 collectionOwnerLU
             )
@@ -153,12 +153,12 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
         require(success);
 
         // verify the updated royalty
-        (address receiver, uint16 percentage) = feature.getSRRRoyalty(
+        (address receiver, uint16 basisPoints) = feature.getSRRRoyalty(
             tokenId1Shared
         );
 
         assertEq(royaltyReceiver2, receiver);
-        assertEq(royaltyPercentage2, percentage);
+        assertEq(royaltyBasisPoints2, basisPoints);
     }
 
     function testRevertUpdateSRRRoyaltyReceiverMulti_TokenNotExists() public {
@@ -218,30 +218,30 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
         feature.updateSRRRoyaltyReceiverMulti(tokenIds, updatedReceiver);
 
         // verify the updated royalty receiver
-        (address receiver1, uint16 percentage1) = feature.getSRRRoyalty(
+        (address receiver1, uint16 basisPoints1) = feature.getSRRRoyalty(
             tokenId1Shared
         );
 
         assertEq(updatedReceiver, receiver1);
-        assertGe(percentage1, 0);
+        assertGe(basisPoints1, 0);
 
-        (address receiver2, uint16 percentage2) = feature.getSRRRoyalty(
+        (address receiver2, uint16 basisPoints2) = feature.getSRRRoyalty(
             tokenId2Shared
         );
 
         assertEq(updatedReceiver, receiver2);
-        assertGe(percentage2, 0);
+        assertGe(basisPoints2, 0);
     }
 
     function testRoyaltyInfoTokenExists() public {
         vm.prank(notAnOwner);
 
-        (address expectedRoyaltyReceiver, uint16 percentage) = feature
+        (address expectedRoyaltyReceiver, uint16 basisPoints) = feature
             .getSRRRoyalty(tokenId1Shared);
 
         uint256 salePrice = 1_000_000;
 
-        uint256 expectedRoyaltyAmount = (salePrice * percentage) / 10_000;
+        uint256 expectedRoyaltyAmount = (salePrice * basisPoints) / 10_000;
 
         (address receiver, uint256 royaltyAmount) = feature.royaltyInfo(
             tokenId1Shared,

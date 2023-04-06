@@ -35,22 +35,14 @@ contract LockExternalTransferFeatureTest is StartrailTestBase {
             lockExternalTransferFeature.getLockExternalTransfer(tokenId)
         );
 
-        vm.prank(trustedForwarder);
-
-        (bool success, ) = collectionAddress.call(
-            eip2771AppendSender(
-                abi.encodeWithSelector(
-                    lockExternalTransferFeature
-                        .setLockExternalTransfer
-                        .selector,
-                    tokenId,
-                    true
-                ),
-                collectionOwnerLU
+        require(
+            setLockExternalTransfer(
+                collectionAddress,
+                collectionOwnerLU,
+                trustedForwarder,
+                tokenId
             )
         );
-        require(success);
-
         assertTrue(
             lockExternalTransferFeature.getLockExternalTransfer(tokenId)
         );

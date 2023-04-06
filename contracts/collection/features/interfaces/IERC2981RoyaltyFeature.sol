@@ -4,9 +4,9 @@ pragma solidity 0.8.13;
 
 /**
  * @dev Functions for the srr royalty info.
- *  Events are defined in ERC2981RoyaltyEvents.sol.
- *  Errors are defined in ERC2981RoyaltStorage.sol.
- *  Types are defined in ERC2981RoyaltyTypes.sol.
+ *  Events are defined in LibERC2981RoyaltyEvents.sol.
+ *  Errors are defined in LibERC2981RoyaltyStorage.sol.
+ *  Types are defined in LibERC2981RoyaltyTypes.sol.
  */
 interface IERC2981RoyaltyFeature {
     /**
@@ -14,12 +14,12 @@ interface IERC2981RoyaltyFeature {
      * Only apply to srrs created with royalty info
      * @param tokenId uint256 of StartrailRegistryRecordID
      * @param royaltyReceiver royalty receiver
-     * @param royaltyPercentage royalty percentage
+     * @param royaltyBasisPoints royalty basis points
      */
     function updateSRRRoyalty(
         uint256 tokenId,
         address royaltyReceiver,
-        uint16 royaltyPercentage
+        uint16 royaltyBasisPoints
     ) external;
 
     /**
@@ -37,9 +37,9 @@ interface IERC2981RoyaltyFeature {
      * @dev Get the SRR Royalty
      * @param tokenId  token id
      * @return receiver royalty receiver
-     * @return percentage royalty percentage
+     * @return basisPoints royalty basis points
      */
     function getSRRRoyalty(
         uint256 tokenId
-    ) external view returns (address receiver, uint16 percentage);
+    ) external view returns (address receiver, uint16 basisPoints);
 }
