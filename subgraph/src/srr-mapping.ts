@@ -1,6 +1,4 @@
-import { BigInt, ByteArray, crypto } from '@graphprotocol/graph-ts'
-
-import { CustomHistoryType, SRR, SRRHistory } from '../generated/schema'
+import { CustomHistoryType, SRR } from '../generated/schema'
 import {
   CreateCustomHistory as CustomHistoryCreatedWithCIDEvent,
   CreateCustomHistory1 as CustomHistoryCreatedEvent,
@@ -8,7 +6,6 @@ import {
   CreateSRR as CreateSRRWithCIDEvent,
   CreateSRR1 as CreateSRREventLegacy,
   CreateSRR2 as CreateSRRWithLockExternalTransferEvent,
-  History as SRRHistoryEvent,
   Provenance2 as SRRProvenanceEventLegacy,
   Provenance3 as SRRProvenanceWithCustomHistoryEventLegacy,
   SRRCommitment as SRRCommitmentEvent,
@@ -24,6 +21,7 @@ import {
   handleRoyaltiesSet,
   handleSRRCommitmentCancelled,
   handleSRRCommitmentInternal,
+  handleSRRHistory,
   handleSRRProvenanceInternal,
   handleSRRProvenanceWithCustomHistoryAndIntermediary,
   handleSRRProvenanceWithIntermediary,
@@ -67,6 +65,7 @@ export {
   handleTransfer,
   handleUpdateSRRMetadataWithCid,
   handleUpdateSRRWithSender,
+  handleSRRHistory,
 
   // Migration handlers
   handleCreateCustomHistoryFromMigration,
@@ -243,38 +242,6 @@ export function handleCreateCustomHistoryWithCid(
     currentChainId(),
     event.transaction.hash
   )
-}
-
-export function handleSRRHistory(event: SRRHistoryEvent): void {
-  logInvocation('handleSRRHistory', event)
-
-  let tokenIds: BigInt[] = event.params.tokenIds
-  let customHistoryIds: BigInt[] = event.params.customHistoryIds
-
-  // NOTE: Sonarlint complains about not using forof loop here.
-  // However assemblyscript does not support iterators (for-of) or closures
-  // (required for Array forEach) so we use the old school for loop here.
-  // Also seems sonar does not support supressing warnings with the default
-  // setup..?
-  for (let tokenIdsIdx = 0; tokenIdsIdx < tokenIds.length; tokenIdsIdx++) {
-    let srrId = srrEntityId(event.address, tokenIds[tokenIdsIdx])
-    for (
-      let customHistoryIdsIdx = 0;
-      customHistoryIdsIdx < customHistoryIds.length;
-      customHistoryIdsIdx++
-    ) {
-      let customHistoryId = customHistoryIds[customHistoryIdsIdx].toString()
-      let historyId = crypto
-        .keccak256(ByteArray.fromUTF8(srrId + customHistoryId))
-        .toHex()
-      let history = new SRRHistory(historyId)
-      history.srr = srrId
-      history.customHistory = customHistoryId.toString()
-      history.createdAt = eventUTCMillis(event)
-      history.createdAtStr = toUTCString(history.createdAt)
-      history.save()
-    }
-  }
 }
 
 export function handleSRRCommitment(event: SRRCommitmentEvent): void {

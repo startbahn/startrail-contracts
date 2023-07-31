@@ -17,11 +17,10 @@ interface IFeatureRegistryBase {
      *   as this function is provided as a shared lookup for CollectionProxy
      *   contracts which will themselves provide that standard interface and
      *   proxy calls to this getter function.
-     * @param interfaceId 4 bytes interface id of the supported interface
+     * @param interfaceId 4 bytes interface id of thes supported interface
      * @return true if the interface is supported
      */
-    function getSupportedInterface(bytes4 interfaceId)
-        external
-        view
-        returns (bool);
+    function getSupportedInterface(
+        bytes4 interfaceId
+    ) external view returns (bool);
 }

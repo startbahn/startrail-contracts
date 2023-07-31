@@ -123,9 +123,12 @@ $NODE scripts/srr-transfer-by-reveal scripts/__data__/collection-transfer-by-rev
 
 sendMetaTx collection-update-token
 sendMetaTx collection-update-token-metadata
-sendMetaTx collection-update-token-royalty
+
+$NODE scripts/srr-update-royalty scripts/__data__/collection-update-royalty.json || exit $?
 
 sendMetaTx collection-lock-external-transfer
+
+sendMetaTx collection-emit-token-history
 
 sendMetaTx collection-issue-token2
 sendMetaTx collection-transfer-from-with-provenance

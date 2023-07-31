@@ -2,12 +2,12 @@ pragma solidity 0.8.13;
 
 import "../../contracts/collection/features/erc721/ERC721Errors.sol";
 import "../../contracts/collection/features/storage/LibERC2981RoyaltyStorage.sol";
-import {ERC2981RoyaltyFeature} from "../../contracts/collection/features/ERC2981RoyaltyFeature.sol";
+import {ERC2981RoyaltyFeatureV01} from "../../contracts/collection/features/ERC2981RoyaltyFeatureV01.sol";
 import "../../contracts/collection/features/shared/LibFeatureCommon.sol";
 import "./StartrailTestBase.sol";
 
 contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
-    ERC2981RoyaltyFeature internal feature;
+    ERC2981RoyaltyFeatureV01 internal feature;
 
     address internal collectionAddress;
     address internal collectionOwnerLU;
@@ -37,7 +37,7 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
 
         collectionAddress = createCollection(collectionOwnerLU);
 
-        feature = ERC2981RoyaltyFeature(collectionAddress);
+        feature = ERC2981RoyaltyFeatureV01(collectionAddress);
 
         tokenIdNoRoyaltyShared = createSRRWithDefaults(
             collectionAddress,
@@ -74,12 +74,10 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
         );
     }
 
-    function testRevertUpdateSRRRoyalty_OnlyIssuerOrArtistOrAdministrator()
-        public
-    {
+    function testRevertUpdateSRRRoyalty_OnlyAdmin() public {
         vm.prank(notAnOwner);
 
-        vm.expectRevert(ISRRFeature.OnlyIssuerOrArtistOrAdministrator.selector);
+        vm.expectRevert(LibFeatureCommon.NotAdministrator.selector);
 
         feature.updateSRRRoyalty(
             tokenId1Shared,
@@ -95,11 +93,15 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
 
         uint256 tokenId = 12345; // no token exists with this id
 
-        feature.updateSRRRoyalty(tokenId, royaltyReceiver1, royaltyBasisPoints1);
+        feature.updateSRRRoyalty(
+            tokenId,
+            royaltyReceiver1,
+            royaltyBasisPoints1
+        );
     }
 
     function testRevertUpdateSRRRoyalty_RoyaltyNotExists() public {
-        vm.prank(collectionOwnerLU);
+        vm.prank(admin);
 
         vm.expectRevert(LibERC2981RoyaltyStorage.RoyaltyNotExists.selector);
 
@@ -111,7 +113,7 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
     }
 
     function testRevertUpdateSRRRoyalty_ReceiverNotAddressZero() public {
-        vm.prank(collectionOwnerLU);
+        vm.prank(admin);
 
         vm.expectRevert(
             LibERC2981RoyaltyStorage.RoyaltyReceiverNotAddressZero.selector
@@ -127,7 +129,7 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
     }
 
     function testRevertUpdateSRRRoyalty_FeeNotToExceedSalePrice() public {
-        vm.prank(collectionOwnerLU);
+        vm.prank(admin);
 
         vm.expectRevert(
             LibERC2981RoyaltyStorage.RoyaltyFeeNotToExceedSalePrice.selector
@@ -137,17 +139,14 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
     }
 
     function testUpdateSRRRoyaltySuccess() public {
-        vm.prank(trustedForwarder);
+        vm.prank(admin);
 
         (bool success, ) = collectionAddress.call(
-            eip2771AppendSender(
-                abi.encodeWithSelector(
-                    feature.updateSRRRoyalty.selector,
-                    tokenId1Shared,
-                    royaltyReceiver2,
-                    royaltyBasisPoints2
-                ),
-                collectionOwnerLU
+            abi.encodeWithSelector(
+                feature.updateSRRRoyalty.selector,
+                tokenId1Shared,
+                royaltyReceiver2,
+                royaltyBasisPoints2
             )
         );
         require(success);

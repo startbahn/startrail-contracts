@@ -25,6 +25,4 @@ npx hardhat run --network localhost scripts/deploy/020-deploy-royalty-erc2981.ts
 npx hardhat run --network localhost scripts/deploy/021-deploy-change-ipfs-url.ts || exit $?
 npx hardhat run --network localhost scripts/deploy/022-deploy-royalty-receiver-multi-update.ts || exit $?
 npx hardhat run --network localhost scripts/deploy/023-deploy-royalty-refactor.ts || exit $?
-
-# deployment not ready for qa but we add it here for unit testing:
-npx hardhat run --network localhost scripts/deploy/0nn-deploy-meta-tx-forwarder-collections.ts || exit $?
+npx hardhat run --network localhost scripts/deploy/024-deploy-collections.ts || exit $?

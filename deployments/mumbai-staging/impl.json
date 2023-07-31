@@ -1,9 +1,11 @@
 {
   "nameRegistryImplementationAddress": "0xbeaf0454452fa453c106406041baBffb912Ed1Aa",
-  "metaTxForwarderImplementationAddress": "0xA5efc5c814Dae23e603FFB3B3833C8F9813d9BE1",
+  "metaTxForwarderImplementationAddress": "0x88504D08009800bBD458B35c7209205C7c67e44C",
   "licensedUserManagerImplementationAddress": "0x043Bb00f094e81b092cd2Dfe79c61920Dd52518f",
   "startrailRegistryImplementationAddress": "0x3A98F5B5259d3fA3c7a08e47320c02AF446644b0",
   "bulkIssueImplementationAddress": "0x766D758654ac2f9B36A3aa87B3Ae35B10BEf35a8",
   "bulkTransferImplementationAddress": "0x3eD92cCa405875Ee2706E3101d3c31eE72a6D724",
-  "bulkImplementationAddress": "0x4fD2B335Eef4eF8Ca3CbeC79a00acB9dCbf66e98"
+  "bulkImplementationAddress": "0x4fD2B335Eef4eF8Ca3CbeC79a00acB9dCbf66e98",
+  "collectionFactoryImplementationAddress": "0xC54018202bAAFFD76188F2B56cB8996ab9378ac9",
+  "collectionProxyImplementationAddress": "0x89e5D5E2E0D279ddf6FF5eCECf21E6017f9E9D66"
 }

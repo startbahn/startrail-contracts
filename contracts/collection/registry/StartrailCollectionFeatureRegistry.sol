@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.13;
 
-import {IERC173} from "@solidstate/contracts/access/IERC173.sol";
-import {IDiamondWritable} from "@solidstate/contracts/proxy/diamond/writable/DiamondWritable.sol";
+import {IERC173} from "@solidstate/contracts/interfaces/IERC173.sol";
+import {IDiamondWritable} from "@solidstate/contracts/proxy/diamond/writable/IDiamondWritable.sol";
+import {IDiamondWritableInternal} from "@solidstate/contracts/proxy/diamond/writable/IDiamondWritableInternal.sol";
 import {DiamondBaseStorage} from "@solidstate/contracts/proxy/diamond/base/DiamondBaseStorage.sol";
 
-import {OwnableFeature} from "../features/OwnableFeature.sol";
+import {OwnableFeatureV01} from "../features/OwnableFeatureV01.sol";
 
 import "./interfaces/IStartrailCollectionFeatureRegistry.sol";
 import "./storage/LibEIP2771RecipientStorage.sol";
@@ -24,9 +25,10 @@ contract StartrailCollectionFeatureRegistry is
 {
     using DiamondBaseStorage for DiamondBaseStorage.Layout;
 
-    constructor(address eip2771TrustedForwarder, address nameRegistry)
-        FeatureRegistryBase()
-    {
+    constructor(
+        address eip2771TrustedForwarder,
+        address nameRegistry
+    ) FeatureRegistryBase() {
         LibEIP2771RecipientStorage
             .layout()
             .trustedForwarder = eip2771TrustedForwarder;
@@ -36,24 +38,22 @@ contract StartrailCollectionFeatureRegistry is
         // OwnableFeature (ERC173 compatible)
         //
 
-        OwnableFeature ownableFeature = new OwnableFeature();
+        OwnableFeatureV01 ownableFeature = new OwnableFeatureV01();
         emit FeatureContractCreated(address(ownableFeature), "Ownable");
 
         bytes4[] memory selectors = new bytes4[](3);
         selectors[0] = IERC173.owner.selector;
         selectors[1] = IERC173.transferOwnership.selector;
-        selectors[2] = OwnableFeature.__OwnableFeature_initialize.selector;
+        selectors[2] = OwnableFeatureV01.__OwnableFeature_initialize.selector;
 
         FacetCut[] memory facetCuts = new FacetCut[](1);
         facetCuts[0] = FacetCut({
             target: address(ownableFeature),
-            action: IDiamondWritable.FacetCutAction.ADD,
+            action: IDiamondWritableInternal.FacetCutAction.ADD,
             selectors: selectors
         });
 
-        // Can't call DiamondWritable.diamondCut() from here so we just
-        // duplicate it's implementation here:
-        DiamondBaseStorage.layout().diamondCut(facetCuts, address(0), "");
+        _diamondCut(facetCuts, address(0), "");
 
         setSupportedInterfaceInternal(type(IERC173).interfaceId, true);
     }

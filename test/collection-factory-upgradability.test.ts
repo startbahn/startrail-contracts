@@ -4,7 +4,7 @@ import hre, { ethers, upgrades } from 'hardhat'
 import { randomAddress } from '../startrail-common-js/test-helpers/test-utils'
 
 import { CollectionFactory } from '../typechain-types'
-import { getWallets } from '../utils/hardhat-helpers'
+import { getContractFactory, getWallets } from '../utils/hardhat-helpers'
 
 use(chaiAsPromised)
 
@@ -32,7 +32,7 @@ describe('CollectionFactory upgradability', () => {
   })
 
   beforeEach(async () => {
-    const cfFactory = await hre.ethers.getContractFactory('CollectionFactory')
+    const cfFactory = await getContractFactory(hre, 'CollectionFactory')
     cf = (await upgrades.deployProxy(
       cfFactory,
       [featureRegistryAddress, collectionProxyImplAddress],

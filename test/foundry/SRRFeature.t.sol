@@ -1,9 +1,9 @@
 pragma solidity 0.8.13;
 
 import "../../contracts/collection/features/erc721/ERC721Errors.sol";
-import {SRRFeature} from "../../contracts/collection/features/SRRFeature.sol";
-import {ERC2981RoyaltyFeature} from "../../contracts/collection/features/ERC2981RoyaltyFeature.sol";
-import {LockExternalTransferFeature} from "../../contracts/collection/features/LockExternalTransferFeature.sol";
+import {SRRFeatureV01} from "../../contracts/collection/features/SRRFeatureV01.sol";
+import {ERC2981RoyaltyFeatureV01} from "../../contracts/collection/features/ERC2981RoyaltyFeatureV01.sol";
+import {LockExternalTransferFeatureV01} from "../../contracts/collection/features/LockExternalTransferFeatureV01.sol";
 import "../../contracts/collection/features/shared/LibFeatureCommon.sol";
 import "../../contracts/lib/IDGeneratorV3.sol";
 import "../../contracts/name/Contracts.sol";
@@ -13,11 +13,13 @@ import "../../contracts/collection/features/storage/LibSRRMetadataStorage.sol";
 import "./StartrailTestBase.sol";
 
 contract SRRFeatureTest is StartrailTestBase {
-    SRRFeature internal srrFeature;
+    SRRFeatureV01 internal srrFeature;
 
     address internal collectionAddress;
     address internal collectionOwnerLU;
     address internal notAnOwner;
+
+    uint256 testTokenId;
 
     function setUp() public override {
         super.setUp();
@@ -27,7 +29,13 @@ contract SRRFeatureTest is StartrailTestBase {
 
         collectionAddress = createCollection(collectionOwnerLU);
 
-        srrFeature = SRRFeature(collectionAddress);
+        srrFeature = SRRFeatureV01(collectionAddress);
+
+        testTokenId = createSRRWithDefaults(
+            collectionAddress,
+            trustedForwarder,
+            collectionOwnerLU
+        );
     }
 
     function testCreateSRRSuccess() public {
@@ -67,7 +75,7 @@ contract SRRFeatureTest is StartrailTestBase {
     }
 
     function testCreateSRRWithTransferSuccess() public {
-        ERC721Feature erc721 = ERC721Feature(collectionAddress);
+        ERC721FeatureV01 erc721 = ERC721FeatureV01(collectionAddress);
 
         string memory metadataCID = A_CID;
         address artist = vm.addr(0x79813);
@@ -91,7 +99,7 @@ contract SRRFeatureTest is StartrailTestBase {
     }
 
     function testCreateSRRWithRoyaltySuccess() public {
-        ERC2981RoyaltyFeature royaltyFeature = ERC2981RoyaltyFeature(
+        ERC2981RoyaltyFeatureV01 royaltyFeature = ERC2981RoyaltyFeatureV01(
             collectionAddress
         );
 
@@ -123,9 +131,9 @@ contract SRRFeatureTest is StartrailTestBase {
     }
 
     function testCreateSRRWithLockExternalTransferSuccess() public {
-        LockExternalTransferFeature lockFeature = LockExternalTransferFeature(
-            collectionAddress
-        );
+        LockExternalTransferFeatureV01 lockFeature = LockExternalTransferFeatureV01(
+                collectionAddress
+            );
 
         string memory metadataCID = A_CID;
         address artist = vm.addr(0x79815);
@@ -151,7 +159,7 @@ contract SRRFeatureTest is StartrailTestBase {
         assertEq(lock, true);
     }
 
-    function testRevert_CreateSRROnlyOwner() public {
+    function testRevert_CreateSRROnlyCollectionOwner() public {
         createSRR(
             collectionAddress,
             trustedForwarder,
@@ -163,7 +171,7 @@ contract SRRFeatureTest is StartrailTestBase {
             address(0),
             address(0),
             100,
-            LibFeatureCommon.NotOwner.selector // expect revert with this error
+            LibFeatureCommon.NotCollectionOwner.selector // expect revert with this error
         );
     }
 
@@ -179,7 +187,7 @@ contract SRRFeatureTest is StartrailTestBase {
             address(0),
             address(0),
             100,
-            ISRRFeature.ZeroAddress.selector // expect revert with this error
+            ISRRFeatureV01.ZeroAddress.selector // expect revert with this error
         );
     }
 
@@ -256,8 +264,8 @@ contract SRRFeatureTest is StartrailTestBase {
     }
 
     enum UpdateCaller {
-        ADMIN,
         ARTIST,
+        COLLECTION_OWNER,
         ISSUER
     }
 
@@ -277,14 +285,28 @@ contract SRRFeatureTest is StartrailTestBase {
         bool newIsPrimaryIssuer = !srrIsPrimaryIssuer;
         address newArtist = vm.addr(0x798ff);
 
-        if (caller == UpdateCaller.ADMIN) {
-            vm.prank(admin);
+        address sender;
+        if (caller == UpdateCaller.COLLECTION_OWNER) {
+            sender = collectionOwnerLU;
         } else if (caller == UpdateCaller.ARTIST) {
-            vm.prank(srrArtist);
+            sender = srrArtist;
         } else if (caller == UpdateCaller.ISSUER) {
-            vm.prank(srrIssuer);
+            sender = srrIssuer;
         }
-        srrFeature.updateSRR(tokenId, newIsPrimaryIssuer, newArtist);
+
+        vm.prank(trustedForwarder);
+        (bool success, ) = collectionAddress.call(
+            eip2771AppendSender(
+                abi.encodeWithSelector(
+                    srrFeature.updateSRR.selector,
+                    tokenId,
+                    newIsPrimaryIssuer,
+                    newArtist
+                ),
+                sender
+            )
+        );
+        require(success);
 
         (
             bool postUpdateIsPrimaryIssuer,
@@ -296,8 +318,8 @@ contract SRRFeatureTest is StartrailTestBase {
         assertEq(postUpdateArtist, newArtist);
     }
 
-    function testUpdateSRRFromAdminSuccess() public {
-        updateSRRSuccess(UpdateCaller.ADMIN);
+    function testUpdateSRRFromCollectionOwnerSuccess() public {
+        updateSRRSuccess(UpdateCaller.COLLECTION_OWNER);
     }
 
     function testUpdateSRRFromArtistSuccess() public {
@@ -308,31 +330,44 @@ contract SRRFeatureTest is StartrailTestBase {
         updateSRRSuccess(UpdateCaller.ISSUER);
     }
 
-    function testRevert_UpdateSRROnlyIssuerOrArtistOrAdministrator() public {
-        uint256 tokenId = createSRRWithDefaults(
-            collectionAddress,
-            trustedForwarder,
-            collectionOwnerLU
+    function testRevert_UpdateSRROnlyIssuerOrArtistOrCollectionOwner() public {
+        vm.prank(trustedForwarder);
+        vm.expectRevert(
+            LibFeatureCommon.OnlyIssuerOrArtistOrCollectionOwner.selector
         );
-
-        vm.prank(notAnOwner);
-        vm.expectRevert(ISRRFeature.OnlyIssuerOrArtistOrAdministrator.selector);
-        srrFeature.updateSRR(tokenId, true, vm.addr(0xffff));
+        (bool success, ) = collectionAddress.call(
+            eip2771AppendSender(
+                abi.encodeWithSelector(
+                    srrFeature.updateSRR.selector,
+                    testTokenId,
+                    true,
+                    vm.addr(0xffff)
+                ),
+                notAnOwner
+            )
+        );
+        assertTrue(success, "expectRevert: call did not revert");
     }
 
     function testRevert_UpdateSRRZeroAddressArtist() public {
-        uint256 tokenId = createSRRWithDefaults(
-            collectionAddress,
-            trustedForwarder,
-            collectionOwnerLU
+        vm.prank(trustedForwarder);
+        vm.expectRevert(ISRRFeatureV01.ZeroAddress.selector);
+        (bool success, ) = collectionAddress.call(
+            eip2771AppendSender(
+                abi.encodeWithSelector(
+                    srrFeature.updateSRR.selector,
+                    testTokenId,
+                    true,
+                    address(0)
+                ),
+                collectionOwnerLU
+            )
         );
-
-        vm.prank(collectionOwnerLU);
-        vm.expectRevert(ISRRFeature.ZeroAddress.selector);
-        srrFeature.updateSRR(tokenId, true, address(0));
+        assertTrue(success, "expectRevert: call did not revert");
     }
 
     function testRevert_UpdateSRRTokenNotExists() public {
+        vm.prank(trustedForwarder);
         vm.expectRevert(TokenNotExists.selector);
         srrFeature.updateSRR(12345, true, vm.addr(0xffff));
     }

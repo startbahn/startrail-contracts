@@ -6,11 +6,6 @@
   },
   {
     "inputs": [],
-    "name": "OnlyIssuerOrArtistOrAdministrator",
-    "type": "error"
-  },
-  {
-    "inputs": [],
     "name": "RoyaltyFeeNotToExceedSalePrice",
     "type": "error"
   },
@@ -77,25 +72,6 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes4",
-        "name": "interfaceId",
-        "type": "bytes4"
-      }
-    ],
-    "name": "supportsInterface",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -371,6 +347,25 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "bytes4",
+        "name": "interfaceId",
+        "type": "bytes4"
+      }
+    ],
+    "name": "supportsInterface",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "symbol",
     "outputs": [
@@ -441,12 +436,12 @@
   },
   {
     "inputs": [],
-    "name": "NotOwner",
+    "name": "NotTrustedForwarder",
     "type": "error"
   },
   {
     "inputs": [],
-    "name": "NotTrustedForwarder",
+    "name": "OnlyIssuerOrCollectionOwner",
     "type": "error"
   },
   {
@@ -507,7 +502,22 @@
   },
   {
     "inputs": [],
+    "name": "NotCollectionOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "OwnableFeatureAlreadyInitialized",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "Ownable__NotOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "Ownable__NotTransitiveOwner",
     "type": "error"
   },
   {
@@ -585,7 +595,7 @@
   },
   {
     "inputs": [],
-    "name": "NotSRROwnerOrAdministrator",
+    "name": "NotSRROwner",
     "type": "error"
   },
   {
@@ -739,6 +749,11 @@
   },
   {
     "inputs": [],
+    "name": "OnlyIssuerOrArtistOrCollectionOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "SRRMetadataNotEmpty",
     "type": "error"
   },
@@ -775,7 +790,7 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct ISRRFeature.SRR",
+        "internalType": "struct ISRRFeatureV01.SRR",
         "name": "registryRecord",
         "type": "tuple"
       },
@@ -917,6 +932,34 @@
       }
     ],
     "name": "updateSRR",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "AddHistoryNotPermitted",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "MaxCombinedTokensAndHistoriesExceeded",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "tokenIds",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "customHistoryIds",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "addHistory",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1138,6 +1181,25 @@
       }
     ],
     "name": "SRRCommitmentCancelled",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "tokenIds",
+        "type": "uint256[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "customHistoryIds",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "History",
     "type": "event"
   },
   {

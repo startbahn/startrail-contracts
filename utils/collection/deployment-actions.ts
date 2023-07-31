@@ -4,7 +4,7 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import stripHexPrefix from 'strip-hex-prefix'
 
 import {
-  CollectionFactory,
+  CollectionFactoryV01,
   MetaTxForwarderV3,
   StartrailCollectionFeatureRegistry,
 } from '../../typechain-types'
@@ -14,16 +14,20 @@ import {
   updateDeployJSON,
 } from '../deployment/deploy-json'
 import { updateImplJSON } from '../deployment/impl-json'
-import { getAdministratorInstance, getContract } from '../hardhat-helpers'
+import {
+  getAdministratorInstance,
+  getContract,
+  getContractFactory,
+} from '../hardhat-helpers'
 import ercInterfaces from './erc-interfaces'
 import featureSelectors from './feature-selectors'
 import { deployFeature, upgradeFeature } from './utils'
 
-const loggingOn = false
+const loggingOn = true
 
 const setCollectionRegistryOnCollectionFactory = async (
   hre: HardhatRuntimeEnvironment,
-  cf: CollectionFactory,
+  cf: CollectionFactoryV01,
   metaTxForwarder: MetaTxForwarderV3
 ) => {
   const crAddress = await cf.collectionRegistry()
@@ -46,7 +50,7 @@ const setCollectionRegistryOnCollectionFactory = async (
 const deployERC721Feature = async (
   featureRegistry: StartrailCollectionFeatureRegistry
 ): Promise<Contract> => {
-  const featureFactory = await ethers.getContractFactory('ERC721Feature')
+  const featureFactory = await getContractFactory(hre, 'ERC721Feature')
   const initData = featureFactory.interface.encodeFunctionData(
     featureFactory.interface.functions[
       `__ERC721Feature_initialize(string,string)`
@@ -105,6 +109,16 @@ const deploySRRMetadataFeature = async (
   })
 }
 
+const deploySRRHistoryFeature = async (
+  featureRegistry: StartrailCollectionFeatureRegistry
+): Promise<Contract> => {
+  return deployFeature({
+    featureRegistry,
+    featureName: `SRRHistoryFeature`,
+    selectors: await featureSelectors.srrHistory(),
+  })
+}
+
 const deployERC2981RoyaltyFeature = async (
   featureRegistry: StartrailCollectionFeatureRegistry
 ): Promise<Contract> => {
@@ -121,6 +135,20 @@ const deployERC2981RoyaltyFeature = async (
  * Needs to be replaced by an implementation that takes a version parameter
  * and upgrades from for example V01 to V02.
  */
+const upgradeERC721Feature = async (
+  hre: HardhatRuntimeEnvironment
+): Promise<Contract> => {
+  const featureRegistry = await getContract(
+    hre,
+    `StartrailCollectionFeatureRegistry`
+  )
+  return upgradeFeature({
+    featureRegistry: featureRegistry as StartrailCollectionFeatureRegistry,
+    featureName: `ERC721Feature`,
+    selectors: await featureSelectors.erc721(),
+  })
+}
+
 const upgradeSRRFeature = async (
   hre: HardhatRuntimeEnvironment
 ): Promise<Contract> => {
@@ -151,6 +179,48 @@ const upgradeERC2981RoyaltyFeature = async (
     featureRegistry: featureRegistry as StartrailCollectionFeatureRegistry,
     featureName: `ERC2981RoyaltyFeature`,
     selectors: await featureSelectors.erc2981Royalty(),
+  })
+}
+
+const upgradeSRRMetadataFeature = async (
+  hre: HardhatRuntimeEnvironment
+): Promise<Contract> => {
+  const featureRegistry = await getContract(
+    hre,
+    `StartrailCollectionFeatureRegistry`
+  )
+  return upgradeFeature({
+    featureRegistry: featureRegistry as StartrailCollectionFeatureRegistry,
+    featureName: `SRRMetadataFeature`,
+    selectors: await featureSelectors.srrMetadata(),
+  })
+}
+
+const upgradeSRRApproveTransferFeature = async (
+  hre: HardhatRuntimeEnvironment
+): Promise<Contract> => {
+  const featureRegistry = await getContract(
+    hre,
+    `StartrailCollectionFeatureRegistry`
+  )
+  return upgradeFeature({
+    featureRegistry: featureRegistry as StartrailCollectionFeatureRegistry,
+    featureName: `SRRApproveTransferFeature`,
+    selectors: await featureSelectors.srrApproveTransfer(),
+  })
+}
+
+const upgradeLockExternalTransferFeature = async (
+  hre: HardhatRuntimeEnvironment
+): Promise<Contract> => {
+  const featureRegistry = await getContract(
+    hre,
+    `StartrailCollectionFeatureRegistry`
+  )
+  return upgradeFeature({
+    featureRegistry: featureRegistry as StartrailCollectionFeatureRegistry,
+    featureName: `LockExternalTransferFeature`,
+    selectors: await featureSelectors.lockExternalTransfer(),
   })
 }
 
@@ -185,7 +255,7 @@ const deployCollectionsCore = async (
   trustedForwarder?: string
 ): Promise<{
   featureRegistry: StartrailCollectionFeatureRegistry
-  collectionFactory: CollectionFactory
+  collectionFactory: CollectionFactoryV01
 }> => {
   const metaTxForwarder: MetaTxForwarderV3 = (await getContract(
     hre,
@@ -221,7 +291,8 @@ const deployCollectionsCore = async (
     `0x0000000000000000000000000000000000000001`
   )
 
-  const cfFactory = await hre.ethers.getContractFactory('CollectionFactory')
+  const cfFactory = await getContractFactory(hre, 'CollectionFactory')
+
   const cfContract: Contract = await upgrades.deployProxy(
     cfFactory,
     [featureRegistry.address, cpImpl.address],
@@ -235,7 +306,7 @@ const deployCollectionsCore = async (
     ethers.utils.hexDataSlice(txReceipt.logs[0].topics[1], 12)
   )
 
-  const cf = cfContract as CollectionFactory
+  const cf = cfContract as CollectionFactoryV01
   loggingOn && console.log(`CollectionFactory deployed to: ${cf.address}`)
 
   updateDeployJSON(hre, {
@@ -293,6 +364,10 @@ const deployCollectionsCore = async (
   loggingOn &&
     console.log(`SRRMetadataFeature deployed to: ${srrMetadataFeature.address}`)
 
+  const srrHistoryFeature = await deploySRRHistoryFeature(featureRegistry)
+  loggingOn &&
+    console.log(`SRRHistoryFeature deployed to: ${srrHistoryFeature.address}`)
+
   const collectionProxyInitCodeHash = await computeCollectionProxyInitCodeHash(
     cpImpl.address
   )
@@ -308,6 +383,10 @@ export {
   deployCollectionsCore,
   deployERC721Feature,
   deployFeature,
+  upgradeERC721Feature,
   upgradeSRRFeature,
   upgradeERC2981RoyaltyFeature,
+  upgradeSRRMetadataFeature,
+  upgradeLockExternalTransferFeature,
+  upgradeSRRApproveTransferFeature,
 }

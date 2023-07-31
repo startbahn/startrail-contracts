@@ -6,6 +6,8 @@ import {IStartrailRegistrySubset} from "../../../contracts/collection/features/s
 contract MockStartrailRegistry is IStartrailRegistrySubset {
     mapping(uint256 => string) internal customHistoryIdToName;
 
+    uint256 public maxCombinedHistoryRecords = 4;
+
     function getCustomHistoryNameById(
         uint256 id
     ) external view returns (string memory) {
@@ -14,5 +16,9 @@ contract MockStartrailRegistry is IStartrailRegistrySubset {
 
     function addCustomHistory(uint256 id, string memory name) external {
         customHistoryIdToName[id] = name;
+    }
+
+    function setMaxCombinedHistoryRecords(uint256 newMax) external {
+        maxCombinedHistoryRecords = newMax;
     }
 }

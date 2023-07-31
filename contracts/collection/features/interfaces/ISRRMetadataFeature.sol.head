@@ -7,7 +7,7 @@ pragma solidity 0.8.13;
  *  Events are defined in LibSRRMetadataEvents.sol.
  *  Errors are defined in LibSRRMetadataStorage.sol.
  */
-interface ISRRMetadataFeature {
+interface ISRRMetadataFeatureV01 {
     /**
      * @dev Update the SRR Metadata
      * @param tokenId uint256 of StartrailRegistryRecordID

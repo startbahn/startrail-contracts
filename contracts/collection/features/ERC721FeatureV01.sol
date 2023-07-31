@@ -3,15 +3,15 @@ pragma solidity 0.8.13;
 
 import "./erc721/ERC721UpgradeableBase.sol";
 import "./erc721/LibERC721Storage.sol";
-import "./interfaces/IERC721Feature.sol";
-import "./interfaces/ILockExternalTransferFeature.sol";
+import "./interfaces/IERC721FeatureV01.sol";
+import "./interfaces/ILockExternalTransferFeatureV01.sol";
 import "./shared/LibFeatureCommon.sol";
 
 error ERC721FeatureAlreadyInitialized();
 
-contract ERC721Feature is IERC721Feature, ERC721UpgradeableBase {
+contract ERC721FeatureV01 is IERC721FeatureV01, ERC721UpgradeableBase {
     /**
-     * @inheritdoc IERC721Feature
+     * @inheritdoc IERC721FeatureV01
      */
     function __ERC721Feature_initialize(
         string memory name_,
@@ -27,7 +27,7 @@ contract ERC721Feature is IERC721Feature, ERC721UpgradeableBase {
     }
 
     /**
-     * @inheritdoc IERC721Feature
+     * @inheritdoc IERC721FeatureV01
      */
     function exists(uint256 tokenId) public view returns (bool) {
         return LibERC721Storage.exists(tokenId);
@@ -79,7 +79,7 @@ contract ERC721Feature is IERC721Feature, ERC721UpgradeableBase {
     }
 
     /**
-     * @inheritdoc IERC721Feature
+     * @inheritdoc IERC721FeatureV01
      */
     function transferFromWithProvenance(
         address to,

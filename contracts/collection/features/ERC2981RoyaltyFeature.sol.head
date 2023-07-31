@@ -3,7 +3,7 @@
 pragma solidity 0.8.13;
 
 import {IERC2981} from "@openzeppelin/contracts/interfaces/IERC2981.sol";
-import "./interfaces/IERC2981RoyaltyFeature.sol";
+import "./interfaces/IERC2981RoyaltyFeatureV01.sol";
 import "./storage/LibERC2981RoyaltyStorage.sol";
 import "./storage/LibSRRStorage.sol";
 import "./shared/LibERC2981RoyaltyTypes.sol";
@@ -15,7 +15,7 @@ import "./shared/LibFeatureCommon.sol";
  *  to enable universal support for royalty payments
  *  across all NFT marketplaces and ecosystem participants.
  */
-contract ERC2981RoyaltyFeature is IERC2981RoyaltyFeature, IERC2981 {
+contract ERC2981RoyaltyFeatureV01 is IERC2981RoyaltyFeatureV01, IERC2981 {
     /**
      * @dev See {IERC165-supportsInterface}.
      */
@@ -26,7 +26,7 @@ contract ERC2981RoyaltyFeature is IERC2981RoyaltyFeature, IERC2981 {
     }
 
     /**
-     * @inheritdoc IERC2981RoyaltyFeature
+     * @inheritdoc IERC2981RoyaltyFeatureV01
      */
     function updateSRRRoyalty(
         uint256 tokenId,
@@ -35,21 +35,10 @@ contract ERC2981RoyaltyFeature is IERC2981RoyaltyFeature, IERC2981 {
     ) external override {
         LibERC721Storage.onlyExistingToken(tokenId);
 
-        LibSRRStorage.SRR storage srr = LibSRRStorage.layout().srrs[tokenId];
-
-        address sendingWallet = LibFeatureCommon.msgSender();
-        if (
-            sendingWallet != srr.issuer &&
-            sendingWallet != srr.artist &&
-            sendingWallet != LibFeatureCommon.getAdministrator()
-        ) {
-            revert LibFeatureCommon.OnlyIssuerOrArtistOrAdministrator();
-        }
+        LibFeatureCommon.onlyAdministrator();
 
         LibERC2981RoyaltyStorage.onlyExistingRoyalty(tokenId);
-
         LibERC2981RoyaltyStorage.notAddressZero(royaltyReceiver);
-
         LibERC2981RoyaltyStorage.notToExceedSalePrice(royaltyBasisPoints);
 
         LibERC2981RoyaltyStorage.upsertRoyalty(
@@ -60,7 +49,7 @@ contract ERC2981RoyaltyFeature is IERC2981RoyaltyFeature, IERC2981 {
     }
 
     /**
-     * @inheritdoc IERC2981RoyaltyFeature
+     * @inheritdoc IERC2981RoyaltyFeatureV01
      */
     function updateSRRRoyaltyReceiverMulti(
         uint256[] calldata tokenIds,
@@ -89,7 +78,7 @@ contract ERC2981RoyaltyFeature is IERC2981RoyaltyFeature, IERC2981 {
     }
 
     /**
-     * @inheritdoc IERC2981RoyaltyFeature
+     * @inheritdoc IERC2981RoyaltyFeatureV01
      */
     function getSRRRoyalty(
         uint256 tokenId

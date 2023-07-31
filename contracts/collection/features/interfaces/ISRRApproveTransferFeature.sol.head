@@ -6,10 +6,10 @@ pragma solidity 0.8.13;
  * @dev Functions and errors for the approve and transfer by commit reveal
  *   scheme. Events are defined in LibSRRApproveTransferFeatureEvents.sol.
  */
-interface ISRRApproveTransferFeature {
+interface ISRRApproveTransferFeatureV01 {
     error CustomHistoryDoesNotExist();
     error IncorrectRevealHash();
-    error NotSRROwnerOrAdministrator();
+    error NotSRROwner();
 
     /**
      * @dev Register an approval to transfer ownership by commitment scheme

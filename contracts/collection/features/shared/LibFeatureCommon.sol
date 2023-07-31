@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.13;
 
-import {OwnableStorage} from "@solidstate/contracts/access/ownable/Ownable.sol";
+import {OwnableStorage} from "@solidstate/contracts/access/ownable/OwnableStorage.sol";
 
 import "../../../common/INameRegistry.sol";
 import "../../registry/interfaces/IStartrailCollectionFeatureRegistry.sol";
@@ -15,8 +15,9 @@ import "./LibSRRProvenanceEvents.sol";
 
 library LibFeatureCommon {
     error NotAdministrator();
-    error NotOwner();
+    error NotCollectionOwner();
     error OnlyIssuerOrArtistOrAdministrator();
+    error OnlyIssuerOrArtistOrCollectionOwner();
     error ERC721ExternalTransferLocked();
 
     function getNameRegistry() internal view returns (address) {
@@ -30,10 +31,14 @@ library LibFeatureCommon {
         return INameRegistry(getNameRegistry()).administrator();
     }
 
-    function onlyOwner() internal view {
+    function onlyCollectionOwner() internal view {
         if (msgSender() != OwnableStorage.layout().owner) {
-            revert NotOwner();
+            revert NotCollectionOwner();
         }
+    }
+
+    function getCollectionOwner() internal view returns (address) {
+        return OwnableStorage.layout().owner;
     }
 
     function onlyAdministrator() internal view {

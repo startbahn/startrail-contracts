@@ -1,5 +1,5 @@
 import {
-  CollectionFactory,
+  CollectionFactoryV01,
   StartrailCollectionFeatureRegistry,
 } from '../typechain-types'
 
@@ -139,7 +139,7 @@ const featureRegistryInfo = async () => {
 }
 
 const collectionFactoryInfo = async () => {
-  const cf: CollectionFactory = await getContract(hre, 'CollectionFactory')
+  const cf: CollectionFactoryV01 = await getContract(hre, 'CollectionFactory')
   console.log(`address: ${cf.address}`)
   console.log(`owner: ${await cf.owner()}\n`)
 }

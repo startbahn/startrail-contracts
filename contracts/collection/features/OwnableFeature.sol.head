@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.13;
 
-import {IERC173} from "@solidstate/contracts/access/IERC173.sol";
+import {IERC173} from "@solidstate/contracts/interfaces/IERC173.sol";
 import {IOwnable} from "@solidstate/contracts/access/ownable/IOwnable.sol";
-import {Ownable, OwnableStorage} from "@solidstate/contracts/access/ownable/Ownable.sol";
+import {Ownable} from "@solidstate/contracts/access/ownable/Ownable.sol";
+import {OwnableStorage} from "@solidstate/contracts/access/ownable/OwnableStorage.sol";
 import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
 
-import "./interfaces/IOwnableFeature.sol";
+import "./interfaces/IOwnableFeatureV01.sol";
 import "./shared/LibFeatureCommon.sol";
 
 error OwnableFeatureAlreadyInitialized();
@@ -16,11 +17,11 @@ error OwnableFeatureAlreadyInitialized();
  *
  * It adds an initializer function to set the owner.
  */
-contract OwnableFeature is IOwnable, IOwnableFeature, OwnableInternal {
+contract OwnableFeatureV01 is IOwnable, IOwnableFeatureV01, OwnableInternal {
     using OwnableStorage for OwnableStorage.Layout;
 
     /**
-     * @inheritdoc IOwnableFeature
+     * @inheritdoc IOwnableFeatureV01
      */
     function __OwnableFeature_initialize(address initialOwner) external {
         if (OwnableStorage.layout().owner != address(0)) {
@@ -41,7 +42,7 @@ contract OwnableFeature is IOwnable, IOwnableFeature, OwnableInternal {
      */
     function transferOwnership(address newOwner) external override {
         LibFeatureCommon.onlyTrustedForwarder();
-        LibFeatureCommon.onlyOwner();
+        LibFeatureCommon.onlyCollectionOwner();
 
         if (newOwner == address(0)) {
             revert ZeroAddress();

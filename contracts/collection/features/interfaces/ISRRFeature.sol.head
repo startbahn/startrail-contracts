@@ -5,8 +5,7 @@ pragma solidity 0.8.13;
 /**
  * @dev Functions for minting SRR tokens on collections.
  */
-interface ISRRFeature {
-    error OnlyIssuerOrArtistOrAdministrator();
+interface ISRRFeatureV01 {
     error ZeroAddress();
 
     struct SRR {
@@ -56,14 +55,12 @@ interface ISRRFeature {
      * @return artist
      * @return issuer
      */
-    function getSRR(uint256 tokenId)
+    function getSRR(
+        uint256 tokenId
+    )
         external
         view
-        returns (
-            bool isPrimaryIssuer,
-            address artist,
-            address issuer
-        );
+        returns (bool isPrimaryIssuer, address artist, address issuer);
 
     /**
      * @dev Update SRR details

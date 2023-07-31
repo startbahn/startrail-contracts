@@ -1,13 +1,13 @@
 pragma solidity 0.8.13;
 
-import {IERC173} from "@solidstate/contracts/access/IERC173.sol";
-import {IERC165} from "@solidstate/contracts/introspection/IERC165.sol";
-import {IERC721} from "@solidstate/contracts/token/ERC721/IERC721.sol";
+import {IERC173} from "@solidstate/contracts/interfaces/IERC173.sol";
+import {IERC165} from "@solidstate/contracts/interfaces/IERC165.sol";
+import {IERC721} from "@solidstate/contracts/interfaces/IERC721.sol";
 import {IERC721Metadata} from "@solidstate/contracts/token/ERC721/metadata/IERC721Metadata.sol";
 
-import "../../contracts/collection/CollectionFactory.sol";
-import "../../contracts/collection/features/ERC721Feature.sol";
-import "../../contracts/collection/features/OwnableFeature.sol";
+import "../../contracts/collection/CollectionFactoryV01.sol";
+import "../../contracts/collection/features/ERC721FeatureV01.sol";
+import "../../contracts/collection/features/OwnableFeatureV01.sol";
 import "../../contracts/collection/registry/StartrailCollectionFeatureRegistry.sol";
 
 import "./StartrailTestBase.sol";
@@ -24,7 +24,7 @@ contract CollectionFactoryTest is StartrailTestBase {
         IERC173 cERC173 = IERC173(collectionAddress);
         assertEq(cERC173.owner(), collectionCreator);
 
-        ERC721Feature cERC721Feature = ERC721Feature(collectionAddress);
+        ERC721FeatureV01 cERC721Feature = ERC721FeatureV01(collectionAddress);
         assertEq(cERC721Feature.name(), COLLECTION_NAME);
         assertEq(cERC721Feature.symbol(), COLLECTION_SYMBOL);
 

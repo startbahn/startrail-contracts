@@ -5,15 +5,19 @@ import "hardhat/console.sol";
 import "forge-std/Vm.sol";
 import {Test} from "forge-std/Test.sol";
 
+import {IDiamondWritable} from "@solidstate/contracts/proxy/diamond/writable/IDiamondWritable.sol";
+import {IDiamondWritableInternal} from "@solidstate/contracts/proxy/diamond/writable/IDiamondWritableInternal.sol";
+
 import "../../contracts/collection/registry/StartrailCollectionFeatureRegistry.sol";
-import "../../contracts/collection/features/SRRFeature.sol";
-import "../../contracts/collection/features/ERC721Feature.sol";
+import "../../contracts/collection/features/SRRFeatureV01.sol";
+import "../../contracts/collection/features/ERC721FeatureV01.sol";
 
 contract StartrailTestLibrary is Test {
     // Shared test data
     string internal constant A_CID =
         "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi";
     uint256 internal constant CUSTOM_HISTORY_ID_EXHIBITION = 1;
+    uint256 internal constant CUSTOM_HISTORY_ID_AUCTION = 2;
 
     function createFeatureRegistry(
         address registryOwner,
@@ -48,9 +52,9 @@ contract StartrailTestLibrary is Test {
     ) internal {
         IDiamondWritable.FacetCut[]
             memory cuts = new IDiamondWritable.FacetCut[](1);
-        cuts[0] = IDiamondWritable.FacetCut({
+        cuts[0] = IDiamondWritableInternal.FacetCut({
             target: featureAddress,
-            action: IDiamondWritable.FacetCutAction.ADD,
+            action: IDiamondWritableInternal.FacetCutAction.ADD,
             selectors: selectors
         });
         vm.prank(featureRegistryOwner);
@@ -104,6 +108,35 @@ contract StartrailTestLibrary is Test {
             );
     }
 
+    function createSRRWithToAddress(
+        address collectionAddress,
+        address eip2771TrustedForwarder,
+        address minter,
+        address to
+    ) internal returns (uint256 tokenId) {
+        bool isPrimaryIssuer = true;
+        address artist = vm.addr(pseudorandomUint256());
+        string memory metadataCID = A_CID;
+        bool lockExternalTransfer = false;
+        address royaltyReceiver = address(0);
+        uint16 royaltyBasisPoints = 0;
+
+        return
+            createSRR(
+                collectionAddress,
+                eip2771TrustedForwarder,
+                minter,
+                isPrimaryIssuer,
+                artist,
+                metadataCID,
+                lockExternalTransfer,
+                to,
+                royaltyReceiver,
+                royaltyBasisPoints,
+                bytes4(0)
+            );
+    }
+
     function createSRR(
         address collectionAddress,
         address eip2771TrustedForwarder,
@@ -126,7 +159,7 @@ contract StartrailTestLibrary is Test {
         (bool success, ) = collectionAddress.call(
             eip2771AppendSender(
                 abi.encodeWithSelector(
-                    SRRFeature.createSRR.selector,
+                    SRRFeatureV01.createSRR.selector,
                     isPrimaryIssuer,
                     artist,
                     metadataCID,
@@ -192,7 +225,7 @@ contract StartrailTestLibrary is Test {
         (success, ) = collectionAddress.call(
             eip2771AppendSender(
                 abi.encodeWithSelector(
-                    ILockExternalTransferFeature
+                    ILockExternalTransferFeatureV01
                         .setLockExternalTransfer
                         .selector,
                     tokenId,

@@ -13,11 +13,13 @@ import {
   CustomHistoryMetadataHistory,
   LicensedUserWallet,
   SRR,
+  SRRHistory,
   SRRMetadataHistory,
   SRRProvenance,
   SRRTransferCommit,
 } from '../../generated/schema'
 import {
+  History as SRRHistoryEvent,
   LockExternalTransfer as LockExternalTransferEvent,
   Provenance as SRRProvenanceWithIntermediaryEvent,
   Provenance1 as SRRProvenanceWithCustomHistoryAndIntermediaryEvent,
@@ -193,6 +195,38 @@ export function handleRoyaltiesSet(event: RoyaltiesSetEvent): void {
   srr.royaltyReceiver = royalty.receiver
 
   srr.save()
+}
+
+export function handleSRRHistory(event: SRRHistoryEvent): void {
+  logInvocation('handleSRRHistory', event)
+
+  let tokenIds: BigInt[] = event.params.tokenIds
+  let customHistoryIds: BigInt[] = event.params.customHistoryIds
+
+  // NOTE: Sonarlint complains about not using forof loop here.
+  // However assemblyscript does not support iterators (for-of) or closures
+  // (required for Array forEach) so we use the old school for loop here.
+  // Also seems sonar does not support supressing warnings with the default
+  // setup..?
+  for (let tokenIdsIdx = 0; tokenIdsIdx < tokenIds.length; tokenIdsIdx++) {
+    let srrId = srrEntityId(event.address, tokenIds[tokenIdsIdx])
+    for (
+      let customHistoryIdsIdx = 0;
+      customHistoryIdsIdx < customHistoryIds.length;
+      customHistoryIdsIdx++
+    ) {
+      let customHistoryId = customHistoryIds[customHistoryIdsIdx].toString()
+      let historyId = crypto
+        .keccak256(ByteArray.fromUTF8(srrId + customHistoryId))
+        .toHex()
+      let history = new SRRHistory(historyId)
+      history.srr = srrId
+      history.customHistory = customHistoryId.toString()
+      history.createdAt = eventUTCMillis(event)
+      history.createdAtStr = toUTCString(history.createdAt)
+      history.save()
+    }
+  }
 }
 
 /*============================================================================

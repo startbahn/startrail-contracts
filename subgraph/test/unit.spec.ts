@@ -65,7 +65,7 @@ test('srrs', async () => {
         "id": "0x3259569b92ac03de59b4320670ebee609e353bc192b528d43c9d0b7f03d8a533",
         "issuer": Object {
           "englishName": "New English Name",
-          "id": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+          "id": "0x62612f8ec95fc1eda905d97de86d6db4d3557c34",
         },
         "lockExternalTransfer": false,
         "metadataDigest": "0x001c7d6fdb9885b02689d0d76b34fe73e7706b3e9e841c16a8f8264077d197cd",
@@ -87,7 +87,7 @@ test('srrs', async () => {
         "id": "0x7722fed27cd514bc7a1899d245da7d84975bccfb021a43273cabe7e19dfc0835",
         "issuer": Object {
           "englishName": "New English Name",
-          "id": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+          "id": "0x62612f8ec95fc1eda905d97de86d6db4d3557c34",
         },
         "lockExternalTransfer": false,
         "metadataDigest": "QmPMc4tcBsMqLRuCQtPmPe84bpSjrC3Ky7t3JWuHXYB4aS",
@@ -106,12 +106,12 @@ test('srrs', async () => {
         "id": "0xd00fc54c9ed215e3472945e1aef320981556e69623e6e5475edaa3a76c9da3b8",
         "issuer": Object {
           "englishName": "Artist English",
-          "id": "0x84a11021459404dae94b2c5e6f215a51f05d2dab",
+          "id": "0x9241a1340fa5a9849ffd77aaf1cf0b6cf959a12c",
         },
         "lockExternalTransfer": false,
         "metadataDigest": "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
         "originChain": "eip155:31337",
-        "ownerAddress": "0x84a11021459404dae94b2c5e6f215a51f05d2dab",
+        "ownerAddress": "0x9241a1340fa5a9849ffd77aaf1cf0b6cf959a12c",
         "royaltyBasisPoints": null,
         "royaltyReceiver": null,
         "tokenId": "245330455638",
@@ -125,7 +125,7 @@ test('srrs', async () => {
         "id": "0xda5483b655cdcefbca259d1e937e1a194bcc11d8ac7f68c1ffebf9e3decfd49a",
         "issuer": Object {
           "englishName": "New English Name",
-          "id": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+          "id": "0x62612f8ec95fc1eda905d97de86d6db4d3557c34",
         },
         "lockExternalTransfer": false,
         "metadataDigest": "bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsr",
@@ -144,12 +144,12 @@ test('srrs', async () => {
         "id": "0x39c32547d845d79d79e849239d56a37ffdffc66ba32cfc645291d8ef02ad4404",
         "issuer": Object {
           "englishName": "New English Name",
-          "id": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+          "id": "0x62612f8ec95fc1eda905d97de86d6db4d3557c34",
         },
         "lockExternalTransfer": false,
         "metadataDigest": "0x0002ca461ee4aaada3921c9322155af8ec3f884e345701cfa169ef214f5e6660",
         "originChain": "eip155:31337",
-        "ownerAddress": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+        "ownerAddress": "0x62612f8ec95fc1eda905d97de86d6db4d3557c34",
         "royaltyBasisPoints": null,
         "royaltyReceiver": null,
         "tokenId": "482308692111",
@@ -163,7 +163,7 @@ test('srrs', async () => {
         "id": "0x34ff0fed7335d27f98e652dd9d0846fa8a977f50bbeeab3b6aa6c61cdda1be56",
         "issuer": Object {
           "englishName": "New English Name",
-          "id": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+          "id": "0x62612f8ec95fc1eda905d97de86d6db4d3557c34",
         },
         "lockExternalTransfer": false,
         "metadataDigest": "0x5dfdd11afc70980aa3f2bc222563acfba856d0a9e4225b62c7948ded7495ca1a",
@@ -196,7 +196,7 @@ test('srrs', async () => {
         "id": "0x8bf770e0226d7d8952654071adfc9e70418aed113fcd4800dea1c6e601e761b7",
         "issuer": Object {
           "englishName": "New English Name",
-          "id": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+          "id": "0x62612f8ec95fc1eda905d97de86d6db4d3557c34",
         },
         "lockExternalTransfer": false,
         "metadataDigest": "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
@@ -215,7 +215,7 @@ test('srrs', async () => {
         "id": "0xa198398f01edee84d6deffec5d027b39b559865719039da5cbefb2cb7c0550ea",
         "issuer": Object {
           "englishName": "New English Name",
-          "id": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+          "id": "0x62612f8ec95fc1eda905d97de86d6db4d3557c34",
         },
         "lockExternalTransfer": true,
         "metadataDigest": "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
@@ -234,7 +234,7 @@ test('srrs', async () => {
         "id": "0x4d3c9f3eaa639739d8ad3a1d0c1024981ca3ac69eeb8e783275c2c3b3fedd6bc",
         "issuer": Object {
           "englishName": "New English Name",
-          "id": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+          "id": "0x62612f8ec95fc1eda905d97de86d6db4d3557c34",
         },
         "lockExternalTransfer": false,
         "metadataDigest": "0x0c01cc79da2f4087d0c1cc9a01cff151b2656a3734d394e20f3e590da2cf2e8b",
@@ -246,20 +246,31 @@ test('srrs', async () => {
         "transferCommitment": null,
       },
       Object {
-        "artist": Object {
-          "englishName": "Artist English",
-          "id": "0x84a11021459404dae94b2c5e6f215a51f05d2dab",
-        },
-        "artistAddress": "0x84a11021459404dae94b2c5e6f215a51f05d2dab",
+        "artist": null,
+        "artistAddress": "0xeba6851db73174c0bb847c0172721836b3ba267c",
         "collection": Object {
           "id": "0x5979b6061f1cac61f70a06cd968a6f67fe0b8284",
           "ownerAddress": "0xad87f0b51a8788192edd0640ab5ed58e48145c82",
         },
-        "history": Array [],
+        "history": Array [
+          Object {
+            "customHistory": Object {
+              "metadataDigest": "bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsq",
+              "metadataHistory": Array [
+                Object {
+                  "metadataDigest": "0x001c7d6fdb9885b02689d0d76b34fe73e7706b3e9e841c16a8f8264077d197cd",
+                },
+                Object {
+                  "metadataDigest": "0xcc3b6344b207c582bd727005be2a5de5bbca7b46b590d9e9189f3a9a7ea8283e",
+                },
+              ],
+            },
+          },
+        ],
         "id": "0xcd645bb3aec38991b92dc8221126bdb7e87b6bbc4d06b97f7f91fd37c71bbf2f",
         "issuer": Object {
           "englishName": "New English Name",
-          "id": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+          "id": "0x62612f8ec95fc1eda905d97de86d6db4d3557c34",
         },
         "lockExternalTransfer": true,
         "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
@@ -278,7 +289,7 @@ test('srrs', async () => {
         "id": "0xc75c9db3f953c6e96ca08440333bf3ea54df1c0f3f971436e60930c020cca735",
         "issuer": Object {
           "englishName": "New English Name",
-          "id": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+          "id": "0x62612f8ec95fc1eda905d97de86d6db4d3557c34",
         },
         "lockExternalTransfer": false,
         "metadataDigest": "bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsq",
@@ -359,7 +370,7 @@ test('licensedUserWallets ', async () => {
         "salt": "0x64e604787cbf194841e7b68d7cd28786f6c9a0a3ab9f8b0a0e87cb4387ab0001",
         "threshold": 1,
         "userType": "artist",
-        "walletAddress": "0x84a11021459404dae94b2c5e6f215a51f05d2dab",
+        "walletAddress": "0x9241a1340fa5a9849ffd77aaf1cf0b6cf959a12c",
       },
       Object {
         "englishName": "New English Name",
@@ -435,7 +446,7 @@ test('licensedUserWallets ', async () => {
         "salt": "0x64e604787cbf194841e7b68d7cd28786f6c9a0a3ab9f8b0a0e87cb4387ab0002",
         "threshold": 1,
         "userType": "handler",
-        "walletAddress": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+        "walletAddress": "0x62612f8ec95fc1eda905d97de86d6db4d3557c34",
       },
     ]
   `)
@@ -475,7 +486,7 @@ test('srrmetadataHistories', async () => {
         id
         metadataDigest
         transferCommitment
-        metadataHistory {
+        metadataHistory(orderBy: metadataDigest) {
           srr {
             metadataDigest
           }
@@ -515,13 +526,13 @@ test('srrmetadataHistories', async () => {
           "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
           "metadataHistory": Array [
             Object {
-              "metadataDigest": "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi",
+              "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
               "srr": Object {
                 "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
               },
             },
             Object {
-              "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
+              "metadataDigest": "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi",
               "srr": Object {
                 "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
               },
@@ -538,13 +549,13 @@ test('srrmetadataHistories', async () => {
           "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
           "metadataHistory": Array [
             Object {
-              "metadataDigest": "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi",
+              "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
               "srr": Object {
                 "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
               },
             },
             Object {
-              "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
+              "metadataDigest": "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi",
               "srr": Object {
                 "metadataDigest": "bafybeicqb5qoqtxcmjuib3jqi2boxw4g5rpifnn5ys7hbpdmsrvugdoehe",
               },
@@ -962,7 +973,7 @@ test('srrprovenances', async () => {
     Array [
       Object {
         "customHistory": null,
-        "from": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+        "from": "0x62612f8ec95fc1eda905d97de86d6db4d3557c34",
         "isIntermediary": false,
         "metadataDigest": "0xba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70",
         "metadataURI": "https://api.startrail.io/api/v1/metadata/0xba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70.json",
@@ -973,7 +984,7 @@ test('srrprovenances', async () => {
       },
       Object {
         "customHistory": null,
-        "from": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+        "from": "0x62612f8ec95fc1eda905d97de86d6db4d3557c34",
         "isIntermediary": true,
         "metadataDigest": "0xba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70",
         "metadataURI": "https://api.startrail.io/api/v1/metadata/0xba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70.json",
@@ -1019,7 +1030,7 @@ test('srrprovenances', async () => {
         "customHistory": Object {
           "id": "1",
         },
-        "from": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+        "from": "0x62612f8ec95fc1eda905d97de86d6db4d3557c34",
         "isIntermediary": false,
         "metadataDigest": "0xba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70",
         "metadataURI": "https://api.startrail.io/api/v1/metadata/0xba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70.json",
@@ -1032,7 +1043,7 @@ test('srrprovenances', async () => {
         "customHistory": Object {
           "id": "1",
         },
-        "from": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+        "from": "0x62612f8ec95fc1eda905d97de86d6db4d3557c34",
         "isIntermediary": false,
         "metadataDigest": "0x565aa707ce293c9e815871d6d0913f449283bf55f72c28a4222ef62698d246e1",
         "metadataURI": "https://api.startrail.io/api/v1/metadata/0x565aa707ce293c9e815871d6d0913f449283bf55f72c28a4222ef62698d246e1.json",
@@ -1043,7 +1054,7 @@ test('srrprovenances', async () => {
       },
       Object {
         "customHistory": null,
-        "from": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+        "from": "0x62612f8ec95fc1eda905d97de86d6db4d3557c34",
         "isIntermediary": false,
         "metadataDigest": "",
         "metadataURI": "",
@@ -1056,7 +1067,7 @@ test('srrprovenances', async () => {
         "customHistory": Object {
           "id": "1",
         },
-        "from": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+        "from": "0x62612f8ec95fc1eda905d97de86d6db4d3557c34",
         "isIntermediary": false,
         "metadataDigest": "bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsq",
         "metadataURI": "ipfs://bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsq",
@@ -1067,7 +1078,7 @@ test('srrprovenances', async () => {
       },
       Object {
         "customHistory": null,
-        "from": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+        "from": "0x62612f8ec95fc1eda905d97de86d6db4d3557c34",
         "isIntermediary": false,
         "metadataDigest": "",
         "metadataURI": "",
@@ -1080,7 +1091,7 @@ test('srrprovenances', async () => {
         "customHistory": Object {
           "id": "2",
         },
-        "from": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+        "from": "0x62612f8ec95fc1eda905d97de86d6db4d3557c34",
         "isIntermediary": true,
         "metadataDigest": "bafybeibro7fxpk7sk2nfvslumxraol437ug35qz4xx2p7ygjctunb2wi3i",
         "metadataURI": "ipfs://bafybeibro7fxpk7sk2nfvslumxraol437ug35qz4xx2p7ygjctunb2wi3i",
@@ -1093,7 +1104,7 @@ test('srrprovenances', async () => {
         "customHistory": Object {
           "id": "1",
         },
-        "from": "0x2c1eda2d80e82a9b2b26b64da21e341636e8bab4",
+        "from": "0x62612f8ec95fc1eda905d97de86d6db4d3557c34",
         "isIntermediary": true,
         "metadataDigest": "bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsq",
         "metadataURI": "ipfs://bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsq",
@@ -1198,7 +1209,7 @@ test('customHistories', async () => {
       }
       srrHistory {
         srr {
-          id
+          tokenId
         }
       }
       originChain
@@ -1231,7 +1242,12 @@ test('customHistories', async () => {
       srrHistory: [
         {
           srr: {
-            id: '0x8bf770e0226d7d8952654071adfc9e70418aed113fcd4800dea1c6e601e761b7',
+            tokenId: '761762342424',
+          },
+        },
+        {
+          srr: {
+            tokenId: '820869899430',
           },
         },
       ],
@@ -1301,7 +1317,7 @@ test('srrHistories', async () => {
   {
     srrhistories {
       srr {
-        id
+        tokenId
       }
       customHistory {
         id
@@ -1317,7 +1333,15 @@ test('srrHistories', async () => {
         id: '1',
       },
       srr: {
-        id: '0x8bf770e0226d7d8952654071adfc9e70418aed113fcd4800dea1c6e601e761b7',
+        tokenId: '761762342424',
+      },
+    },
+    {
+      customHistory: {
+        id: '1',
+      },
+      srr: {
+        tokenId: '820869899430',
       },
     },
   ]

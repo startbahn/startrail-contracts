@@ -2,10 +2,10 @@
 
 pragma solidity 0.8.13;
 
-import {IERC721} from "@solidstate/contracts/token/ERC721/IERC721.sol";
+import {IERC721} from "@solidstate/contracts/interfaces/IERC721.sol";
 import "../../lib/IDGeneratorV3.sol";
-import "./interfaces/ISRRFeature.sol";
-import "./interfaces/IERC721Feature.sol";
+import "./interfaces/ISRRFeatureV01.sol";
+import "./interfaces/IERC721FeatureV01.sol";
 import "./shared/LibFeatureCommon.sol";
 import "./storage/LibSRRStorage.sol";
 import "./storage/LibERC2981RoyaltyStorage.sol";
@@ -17,9 +17,9 @@ import "./erc721/LibERC721Storage.sol";
  * @title Feature that enables standard ERC721 transfer methods to be disabled
  *   for a given token.
  */
-contract SRRFeature is ISRRFeature {
+contract SRRFeatureV01 is ISRRFeatureV01 {
     /**
-     * @inheritdoc ISRRFeature
+     * @inheritdoc ISRRFeatureV01
      */
     function createSRR(
         bool isPrimaryIssuer,
@@ -31,7 +31,7 @@ contract SRRFeature is ISRRFeature {
         uint16 royaltyBasisPoints
     ) external override {
         LibFeatureCommon.onlyTrustedForwarder();
-        LibFeatureCommon.onlyOwner();
+        LibFeatureCommon.onlyCollectionOwner();
 
         if (LibFeatureCommon.isEmptyString(metadataCID)) {
             revert LibSRRMetadataStorage.SRRMetadataNotEmpty();
@@ -85,7 +85,7 @@ contract SRRFeature is ISRRFeature {
     }
 
     /**
-     * @inheritdoc ISRRFeature
+     * @inheritdoc ISRRFeatureV01
      */
     function getSRR(
         uint256 tokenId
@@ -100,13 +100,14 @@ contract SRRFeature is ISRRFeature {
     }
 
     /**
-     * @inheritdoc ISRRFeature
+     * @inheritdoc ISRRFeatureV01
      */
     function updateSRR(
         uint256 tokenId,
         bool isPrimaryIssuer,
         address artistAddress
     ) external override {
+        LibFeatureCommon.onlyTrustedForwarder();
         LibERC721Storage.onlyExistingToken(tokenId);
 
         LibSRRStorage.SRR storage srr = LibSRRStorage.layout().srrs[tokenId];
@@ -115,9 +116,9 @@ contract SRRFeature is ISRRFeature {
         if (
             sendingWallet != srr.issuer &&
             sendingWallet != srr.artist &&
-            sendingWallet != LibFeatureCommon.getAdministrator()
+            sendingWallet != LibFeatureCommon.getCollectionOwner()
         ) {
-            revert OnlyIssuerOrArtistOrAdministrator();
+            revert LibFeatureCommon.OnlyIssuerOrArtistOrCollectionOwner();
         }
 
         if (artistAddress == address(0)) {

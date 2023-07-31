@@ -246,9 +246,6 @@ dataSources:
       eventHandlers:
         - event: CollectionCreated(indexed address,indexed address,string,string,bytes32)
           handler: handleCollectionCreated
-        # legacy event - only in qa and hasn't made to prod - so can be removed at some point soon
-        - event: CollectionCreated(indexed address,indexed address,string,string,string,bytes32)
-          handler: handleCollectionCreated
       file: ./src/collection-factory-mapping.ts
 templates:
   - kind: ethereum/contract
@@ -290,4 +287,6 @@ templates:
           handler: handleRoyaltiesSet
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
+        - event: History(uint256[],uint256[])
+          handler: handleSRRHistory
       file: ./src/collection-mapping.ts

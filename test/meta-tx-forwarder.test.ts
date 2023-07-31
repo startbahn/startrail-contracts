@@ -17,7 +17,6 @@ import { Wallet } from '@ethersproject/wallet'
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers'
 
 import { CollectionProxyFeaturesAggregate } from '../typechain-types'
-import { deployMetaTxForwarderCollections } from '../utils/deployment/0nn-deploy-meta-tx-forwarder-collections'
 import { getWallets } from '../utils/hardhat-helpers'
 import { nameRegistrySet } from '../utils/name-registry-set'
 import {
@@ -53,11 +52,6 @@ let startrailRegistry
 describe('MetaTxForwarder', () => {
   before(async function () {
     ;({ startrailRegistry } = await loadFixture(fixtureDefault))
-
-    // TODO: this will move to the fixtures and deploy-local but for now
-    //       we keep the feature separate from the main deployment
-    await deployMetaTxForwarderCollections(hre)
-
     // For unit testing set the administrator to an EOA wallet.
     // This will allow transactions to be sent directly.
     await nameRegistrySet(
