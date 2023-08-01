@@ -10,7 +10,7 @@ import '@primitivefi/hardhat-dodoc'
 import 'hardhat-contract-sizer'
 import 'hardhat-storage-layout'
 import '@openzeppelin/hardhat-upgrades'
-import "@nomiclabs/hardhat-etherscan"
+import '@nomiclabs/hardhat-etherscan'
 
 // STARTRAIL-1414 fix coverage:
 // import 'solidity-coverage'
@@ -25,7 +25,7 @@ import path from 'path'
 
 import chainIds from './utils/chain-ids'
 import {
-  getCollectionFeatureContractNames,
+  getCollectionFeatureContractPaths,
   getContractNameLatest,
 } from './utils/hardhat-helpers'
 
@@ -94,7 +94,7 @@ const abiExportList: string[] = [
 
 // used in our hardhat-diamond-abi config below to filter out duplicates from
 // between the interface and implementation contracts
-const featureContractNameList = getCollectionFeatureContractNames()
+const featureContractNameList = getCollectionFeatureContractPaths()
 
 // adapted from https://github.com/ItsNickBarry/hardhat-abi-exporter/blob/master/index.js
 task(TASK_COMPILE, async function (args, hre, runSuper) {
@@ -153,8 +153,8 @@ const networksLocalShared: Partial<HardhatNetworkConfig> & {
 
   // Reason 1: workaround for "Error: tx has a higher gas limit than the block"
   // see: https://github.com/nomiclabs/hardhat/issues/851#issuecomment-703177165
-  // Reason 2: Polygon blocks are 20M
-  blockGasLimit: 20_000_000,
+  // Reason 2: Polygon blocks are around 30M, but sometimes nodes produce blocks under 30M.
+  blockGasLimit: 29_000_000,
 
   // To replicate Mumbai/Polygon/live chain type behavior set these to false.
   // For unit tests and quick detection of errors locally set these to true.
@@ -241,6 +241,10 @@ export default {
         threshold: 1,
         owners: [POLYGON_DEPLOYER_ADDRESS, POLYGON_API_ADDRESS],
       },
+      // workaround for "Error: cannot estimate gas; transaction may fail or may require manual gas limit"
+      allowUnlimitedContractSize: true,
+      // workaround for "Error: transaction underpriced"
+      gasPrice: ethers.utils.parseUnits(process.env.POLYGON_GAS_PRICE_GWEI, `gwei`).toNumber(),
     },
   },
 
@@ -309,6 +313,16 @@ export default {
     exclude: featureContractNameList.map((name) => `I${name}`),
     // ignore duplicates - although most are avoided by the `exclude` above
     strict: false,
+    filter: (abiElement, index, abi, fullyQualifiedName) =>
+      // supportsInterface() appears in interfaces for ERC721 and ERC2981 which
+      // results in a duplicate in the generated CollectionProxyFeaturesAggregate
+      // ABI types. So in this filter we make sure only one (ERC721) is included.
+      //
+      // Side note: the implementation of supportsInterface() resides in
+      // FeatureRegistryBase and calls to CollectionProxy's will make call()'s
+      // to that one.
+      abiElement.name !== 'supportsInterface' ||
+      fullyQualifiedName.includes(`collection/features/ERC721Feature`),
   },
 
   etherscan: {

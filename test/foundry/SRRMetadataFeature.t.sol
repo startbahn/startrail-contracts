@@ -1,6 +1,6 @@
 pragma solidity 0.8.13;
 
-import {SRRMetadataFeature} from "../../contracts/collection/features/SRRMetadataFeature.sol";
+import {SRRMetadataFeatureV01} from "../../contracts/collection/features/SRRMetadataFeatureV01.sol";
 import "../../contracts/collection/features/storage/LibSRRMetadataStorage.sol";
 import "../../contracts/collection/features/shared/LibFeatureCommon.sol";
 import "./StartrailTestBase.sol";
@@ -8,7 +8,7 @@ import "./StartrailTestBase.sol";
 string constant updatedMetadataCID = "bafkreidsepqar4dhoupza7xvrkmiy56knyn5ckoacdoxmhxu5u37mozc7y";
 
 contract SRRMetadataFeatureTest is StartrailTestBase {
-    SRRMetadataFeature internal feature;
+    SRRMetadataFeatureV01 internal feature;
 
     address internal collectionAddress;
     address internal collectionOwnerLU;
@@ -27,7 +27,7 @@ contract SRRMetadataFeatureTest is StartrailTestBase {
 
         collectionAddress = createCollection(collectionOwnerLU);
 
-        feature = SRRMetadataFeature(collectionAddress);
+        feature = SRRMetadataFeatureV01(collectionAddress);
 
         tokenIdShared = createSRR(
             collectionAddress,
@@ -66,12 +66,14 @@ contract SRRMetadataFeatureTest is StartrailTestBase {
         feature.updateSRRMetadata(tokenIdShared, metadataCID);
     }
 
-    function testRevertUpdateSRRMetadata_OnlyIssuerOrArtistOrAdministrator()
+    function testRevertUpdateSRRMetadata_OnlyIssuerOrArtistOrCollectionOwner()
         public
     {
         vm.prank(notAnOwner);
 
-        vm.expectRevert(ISRRFeature.OnlyIssuerOrArtistOrAdministrator.selector);
+        vm.expectRevert(
+            LibFeatureCommon.OnlyIssuerOrArtistOrCollectionOwner.selector
+        );
 
         string memory metadataCID = A_CID;
 

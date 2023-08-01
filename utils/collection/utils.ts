@@ -1,9 +1,10 @@
 import { Contract } from 'ethers'
 import { BytesLike, Interface } from 'ethers/lib/utils'
-import { ethers } from 'hardhat'
+import hre, { ethers } from 'hardhat'
 
 import { ZERO_ADDRESS } from '../../test/helpers/utils'
 import { StartrailCollectionFeatureRegistry } from '../../typechain-types'
+import { getContractFactory } from '../hardhat-helpers'
 import { FacetCutAction, FacetCutDefinition } from './types'
 
 const registerSelectors = async (
@@ -119,10 +120,12 @@ const deployFeature = async ({
   initData?: BytesLike
   linkLibraries?: Record<string, string>
 }): Promise<Contract> => {
-  const featureFactory = await ethers.getContractFactory(featureName, {
+  const featureFactory = await getContractFactory(hre, featureName, {
     libraries: linkLibraries,
   })
-  const feature = await featureFactory.deploy()
+	const feature = await featureFactory.deploy({
+	  gasLimit: 29_000_000, // its needed to deploy the contract into polygon mainnet
+	})
   await feature.deployed()
   // console.log(`${featureName} deployed: ${feature.address}`)
 
@@ -151,7 +154,7 @@ const upgradeFeature = async ({
   selectors?: string[]
   linkLibraries?: Record<string, string>
 }): Promise<Contract> => {
-  const featureFactory = await ethers.getContractFactory(featureName, {
+  const featureFactory = await getContractFactory(hre, featureName, {
     libraries: linkLibraries,
   })
   const feature = await featureFactory.deploy()

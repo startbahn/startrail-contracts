@@ -12,6 +12,6 @@
   "openSeaMetaTransactionLibraryAddress": "0x21607c31b7B762303eDC1aBc174D75D6C811FDeF",
   "bulkProxyAddress": "0xC714BD9bb8b09106260cb94344A16d64146a021e",
   "startrailRegistryLibraryAddress": "0xA6e6571b24F957eD4aeb68FF574f2783F5AB6746",
-  "collectionFactoryProxyAddress": "0xDED2A912E3C321AD0e002B64E52aaE1C3F6756b6",
-  "startrailCollectionFeatureRegistryAddress": "0x4D6b8c7D2176EE46eB1CeB249BCe102B1d6872a9"
+  "collectionFactoryProxyAddress": "0xBe19CbB95B14c40C73B097b3DabaE82758Ca18af",
+  "startrailCollectionFeatureRegistryAddress": "0x1296b157BEbEA5dC09111C3Fa99C37DF918a0D27"
 }

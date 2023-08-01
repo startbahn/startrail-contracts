@@ -2,8 +2,8 @@
 
 pragma solidity 0.8.13;
 
-import "./features/ERC721Feature.sol";
-import "./features/OwnableFeature.sol";
+import "./features/ERC721FeatureV01.sol";
+import "./features/OwnableFeatureV01.sol";
 import "./CollectionProxy.sol";
 
 /**

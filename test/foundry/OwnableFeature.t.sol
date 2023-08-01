@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.13;
 
-import {OwnableFeature, OwnableFeatureAlreadyInitialized} from "../../contracts/collection/features/OwnableFeature.sol";
+import {OwnableFeatureV01, OwnableFeatureAlreadyInitialized} from "../../contracts/collection/features/OwnableFeatureV01.sol";
 import "../../contracts/collection/features/shared/LibFeatureCommon.sol";
 
 import "./StartrailTestBase.sol";
 
 contract OwnableFeatureTest is StartrailTestBase {
-    OwnableFeature internal ownableFeature;
+    OwnableFeatureV01 internal ownableFeature;
     address internal collectionAddress;
     address internal collectionOwnerLU;
 
@@ -22,7 +22,7 @@ contract OwnableFeatureTest is StartrailTestBase {
 
         collectionOwnerLU = licensedUser1;
         collectionAddress = createCollection(collectionOwnerLU);
-        ownableFeature = OwnableFeature(collectionAddress);
+        ownableFeature = OwnableFeatureV01(collectionAddress);
     }
 
     function testInitialized() public {
@@ -44,11 +44,11 @@ contract OwnableFeatureTest is StartrailTestBase {
         assertEq(ownableFeature.owner(), newOwner);
     }
 
-    function testRevert_TransferOwnershipNotOwner() public {
+    function testRevert_TransferOwnershipNotCollectionOwner() public {
         expectRevertTransferOwnership(
             notOwner,
             newOwner,
-            LibFeatureCommon.NotOwner.selector
+            LibFeatureCommon.NotCollectionOwner.selector
         );
     }
 
@@ -56,7 +56,7 @@ contract OwnableFeatureTest is StartrailTestBase {
         expectRevertTransferOwnership(
             collectionOwnerLU,
             address(0x0),
-            IOwnableFeature.ZeroAddress.selector
+            IOwnableFeatureV01.ZeroAddress.selector
         );
     }
 
@@ -87,6 +87,6 @@ contract OwnableFeatureTest is StartrailTestBase {
                 msgSender_
             )
         );
-        success; // suppresses unused variable warning
+        assertTrue(success, "expectRevert: call did not revert");
     }
 }

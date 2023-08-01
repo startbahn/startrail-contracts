@@ -1901,22 +1901,20 @@ describe('StartrailRegistry', () => {
       expect(await startrailRegistry.ownerOf(tokenId)).to.equal(toAddress)
     })
 
-    it('failed transferFromWithProvenance as a MetaTx if lock external transfer is true', async () => {
+    it('success to transferFromWithProvenance as a MetaTx even if lock external transfer is true', async () => {
       const tokenId = await createSRRFromLicensedUser()
       const toAddress = randomAddress()
 
       await setLockExternalTransfer(administratorWallet, tokenId, true)
 
-      await assertRevert(
-        transferFromWithProvenance(
-          toAddress,
-          tokenId,
-          metadataDigest,
-          0,
-          false
-        ),
-        `Transfer is locked for this token`
+      transferFromWithProvenance(
+        toAddress,
+        tokenId,
+        metadataDigest,
+        0,
+        false
       )
+      expect(await startrailRegistry.ownerOf(tokenId)).to.equal(toAddress)
     })
   })
 

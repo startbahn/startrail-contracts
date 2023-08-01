@@ -8,7 +8,7 @@ pragma solidity 0.8.13;
  *  Errors are defined in LibERC2981RoyaltyStorage.sol.
  *  Types are defined in LibERC2981RoyaltyTypes.sol.
  */
-interface IERC2981RoyaltyFeature {
+interface IERC2981RoyaltyFeatureV01 {
     /**
      * @dev Updates the SRR Royalty
      * Only apply to srrs created with royalty info

@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.13;
 
-import "./interfaces/ISRRMetadataFeature.sol";
+import "./interfaces/ISRRMetadataFeatureV01.sol";
 import "./storage/LibSRRMetadataStorage.sol";
 import "./shared/LibSRRMetadataEvents.sol";
 import "./shared/LibFeatureCommon.sol";
@@ -12,9 +12,9 @@ import "./storage/LibSRRStorage.sol";
  * @title Feature that enables srr's metadata can be updated
  *   for a given token.
  */
-contract SRRMetadataFeature is ISRRMetadataFeature {
+contract SRRMetadataFeatureV01 is ISRRMetadataFeatureV01 {
     /**
-     * @inheritdoc ISRRMetadataFeature
+     * @inheritdoc ISRRMetadataFeatureV01
      */
     function updateSRRMetadata(
         uint256 tokenId,
@@ -32,9 +32,9 @@ contract SRRMetadataFeature is ISRRMetadataFeature {
         if (
             sendingWallet != srr.issuer &&
             sendingWallet != srr.artist &&
-            sendingWallet != LibFeatureCommon.getAdministrator()
+            sendingWallet != LibFeatureCommon.getCollectionOwner()
         ) {
-            revert LibFeatureCommon.OnlyIssuerOrArtistOrAdministrator();
+            revert LibFeatureCommon.OnlyIssuerOrArtistOrCollectionOwner();
         }
 
         LibSRRMetadataStorage.layout().srrs[tokenId] = metadataCID;
@@ -43,7 +43,7 @@ contract SRRMetadataFeature is ISRRMetadataFeature {
     }
 
     /**
-     * @inheritdoc ISRRMetadataFeature
+     * @inheritdoc ISRRMetadataFeatureV01
      */
     function getSRRMetadata(
         uint256 tokenId
@@ -54,7 +54,7 @@ contract SRRMetadataFeature is ISRRMetadataFeature {
     }
 
     /**
-     * @inheritdoc ISRRMetadataFeature
+     * @inheritdoc ISRRMetadataFeatureV01
      */
     function tokenURI(
         uint256 tokenId

@@ -1,23 +1,30 @@
 pragma solidity 0.8.13;
 
 import "../../contracts/collection/features/erc721/ERC721Errors.sol";
-import {LockExternalTransferFeature} from "../../contracts/collection/features/LockExternalTransferFeature.sol";
+import {LockExternalTransferFeatureV01} from "../../contracts/collection/features/LockExternalTransferFeatureV01.sol";
 import "../../contracts/collection/features/shared/LibFeatureCommon.sol";
 import "../../contracts/name/Contracts.sol";
 
 import "./StartrailTestBase.sol";
 
 contract LockExternalTransferFeatureTest is StartrailTestBase {
-    LockExternalTransferFeature internal lockExternalTransferFeature;
+    LockExternalTransferFeatureV01 internal lockExternalTransferFeature;
+
     address internal collectionAddress;
     address internal collectionOwnerLU;
+    uint256 tokenId;
 
     function setUp() public override {
         super.setUp();
         collectionOwnerLU = licensedUser1;
         collectionAddress = createCollection(collectionOwnerLU);
-        lockExternalTransferFeature = LockExternalTransferFeature(
+        lockExternalTransferFeature = LockExternalTransferFeatureV01(
             collectionAddress
+        );
+        tokenId = createSRRWithDefaults(
+            collectionAddress,
+            trustedForwarder,
+            collectionOwnerLU
         );
     }
 
@@ -26,11 +33,6 @@ contract LockExternalTransferFeatureTest is StartrailTestBase {
     }
 
     function testSetLockExternalTransfer() public {
-        uint256 tokenId = createSRRWithDefaults(
-            collectionAddress,
-            trustedForwarder,
-            collectionOwnerLU
-        );
         assertFalse(
             lockExternalTransferFeature.getLockExternalTransfer(tokenId)
         );
@@ -63,6 +65,28 @@ contract LockExternalTransferFeatureTest is StartrailTestBase {
                 collectionOwnerLU
             )
         );
-        success; // suppresses unused variable warning
+        assertTrue(success, "expectRevert: call did not revert");
+    }
+
+    function testRevert_SetLockExternalTransferOnlyIssuerOrCollectionOwner()
+        public
+    {
+        vm.prank(trustedForwarder);
+        vm.expectRevert(
+            ILockExternalTransferFeatureV01.OnlyIssuerOrCollectionOwner.selector
+        );
+        (bool success, ) = collectionAddress.call(
+            eip2771AppendSender(
+                abi.encodeWithSelector(
+                    lockExternalTransferFeature
+                        .setLockExternalTransfer
+                        .selector,
+                    tokenId,
+                    true
+                ),
+                admin
+            )
+        );
+        assertTrue(success, "expectRevert: call did not revert");
     }
 }

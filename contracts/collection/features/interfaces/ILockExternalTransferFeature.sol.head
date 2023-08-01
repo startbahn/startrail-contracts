@@ -6,7 +6,9 @@ pragma solidity 0.8.13;
  * @dev Flag enabling standard ERC721 transfer methods to be disabled for a
  * given token.
  */
-interface ILockExternalTransferFeature {
+interface ILockExternalTransferFeatureV01 {
+    error OnlyIssuerOrCollectionOwner();
+
     /**
      * @dev Set the lock flag for the given tokenId
      * @param tokenId NFT id

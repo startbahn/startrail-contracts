@@ -41,13 +41,12 @@ prod-tag-only: &prod_tag_only
 executors:
   default:
     docker:
-      - image: cimg/node:16.13
-
+      - image: cimg/node:16.20
   foundry:
     docker:
       # foundry doesn't have a stable tag so lock at a specific commit here.
       # periodically upgrade this:
-      - image: ghcr.io/foundry-rs/foundry:nightly-28b2ae6d5ad3e802b813b679e26bc15b9b8d230b
+      - image: ghcr.io/foundry-rs/foundry:nightly-e15e33a07c0920189fc336391f538c3dad53da73
 commands:
   #
   # Shared Commands
@@ -212,7 +211,7 @@ commands:
   install_nodejs:
     steps:
       - node/install:
-          node-version: 16.13.2
+          node-version: 16.20.0
           install-yarn: false
 
   # Workaround because using 'install-yarn' from the node orb is failing

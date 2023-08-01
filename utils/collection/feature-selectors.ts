@@ -2,12 +2,15 @@ import hre from 'hardhat'
 
 import { Interface } from '@ethersproject/abi'
 
+import { getContractNameLatest } from '../hardhat-helpers'
 import funcSigs from './feature-signatures'
 
 const getContractInterface = async (
   contractName: string
 ): Promise<Interface> => {
-  const artifact = await hre.artifacts.readArtifact(contractName)
+  const artifact = await hre.artifacts.readArtifact(
+    getContractNameLatest(contractName)
+  )
   return new Interface(artifact.abi)
 }
 
@@ -39,6 +42,9 @@ const srrApproveTransferFunctionSelectors = () =>
 const srrMetadataFunctionSelectors = () =>
   getSelectors(`SRRMetadataFeature`, funcSigs.srrMetadata.v1)
 
+const srrHistoryFunctionSelectors = () =>
+  getSelectors(`SRRHistoryFeature`, funcSigs.srrHistory.v1)
+
 const erc2981RoyaltyFunctionSelectors = () =>
   getSelectors(`ERC2981RoyaltyFeature`, funcSigs.erc2981Royalty.v1)
 
@@ -49,6 +55,7 @@ const featureSelectors = {
   srrApproveTransfer: srrApproveTransferFunctionSelectors,
   erc2981Royalty: erc2981RoyaltyFunctionSelectors,
   srrMetadata: srrMetadataFunctionSelectors,
+  srrHistory: srrHistoryFunctionSelectors,
 }
 
 export default featureSelectors

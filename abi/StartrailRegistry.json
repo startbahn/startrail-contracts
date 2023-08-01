@@ -207,7 +207,7 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct IStartrailRegistryV22.SRR",
+        "internalType": "struct IStartrailRegistryV23.SRR",
         "name": "registryRecord",
         "type": "tuple"
       },
@@ -255,7 +255,7 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct IStartrailRegistryV22.SRR",
+        "internalType": "struct IStartrailRegistryV23.SRR",
         "name": "registryRecord",
         "type": "tuple"
       },
@@ -297,7 +297,7 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct IStartrailRegistryV22.SRR",
+        "internalType": "struct IStartrailRegistryV23.SRR",
         "name": "registryRecord",
         "type": "tuple"
       },
@@ -790,7 +790,7 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct IStartrailRegistryV22.RoyaltyInfo",
+        "internalType": "struct IStartrailRegistryV23.RoyaltyInfo",
         "name": "royalty",
         "type": "tuple"
       }
@@ -1143,7 +1143,7 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct IStartrailRegistryV22.SRR",
+        "internalType": "struct IStartrailRegistryV23.SRR",
         "name": "registryRecord",
         "type": "tuple"
       }
@@ -1876,7 +1876,7 @@
             "type": "address"
           }
         ],
-        "internalType": "struct IStartrailRegistryV22.SRR",
+        "internalType": "struct IStartrailRegistryV23.SRR",
         "name": "registryRecord",
         "type": "tuple"
       },

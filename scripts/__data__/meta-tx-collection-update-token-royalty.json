@@ -1,9 +1,0 @@
-{
-  "requestTypeKey": "CollectionUpdateSRRRoyalty",
-  "requestData": {
-    "destination": "0x5979B6061f1caC61F70A06Cd968a6f67fe0B8284",
-    "tokenId": 820869899430,
-    "royaltyReceiver": "0x3fD167a0Db0cC5FAf90a72D2b6839F723e1D99a5",
-    "royaltyBasisPoints": 650
-  }
-}

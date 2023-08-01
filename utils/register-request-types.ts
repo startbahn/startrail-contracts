@@ -38,7 +38,7 @@ const registerRequestTypesCallByAdmin = async (
   requestTypes,
   gasLimit = 1_500_000
 ) => {
-  const requestCalldataList = await Promise.all(
+  const requestCalldataList : string[] = await Promise.all(
     requestTypes.map((requestTypeKey) =>
       mtfContract.populateTransaction
         .registerRequestType(

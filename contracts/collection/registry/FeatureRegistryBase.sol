@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.13;
 
-import {Ownable, OwnableStorage} from "@solidstate/contracts/access/ownable/Ownable.sol";
-import {IERC165, ERC165Storage} from "@solidstate/contracts/introspection/ERC165.sol";
+import {Ownable} from "@solidstate/contracts/access/ownable/Ownable.sol";
+import {OwnableStorage} from "@solidstate/contracts/access/ownable/OwnableStorage.sol";
+import {ERC165BaseStorage} from "@solidstate/contracts/introspection/ERC165/base/ERC165BaseStorage.sol";
+import {IERC165} from "@solidstate/contracts/interfaces/IERC165.sol";
 import {DiamondReadable} from "@solidstate/contracts/proxy/diamond/readable/DiamondReadable.sol";
 import {DiamondWritable} from "@solidstate/contracts/proxy/diamond/writable/DiamondWritable.sol";
 
@@ -33,7 +35,7 @@ abstract contract FeatureRegistryBase is
     DiamondWritable,
     Ownable
 {
-    using ERC165Storage for ERC165Storage.Layout;
+    using ERC165BaseStorage for ERC165BaseStorage.Layout;
     using OwnableStorage for OwnableStorage.Layout;
 
     event FeatureContractCreated(address indexed featureAddress, string name);
@@ -48,7 +50,7 @@ abstract contract FeatureRegistryBase is
      * this base.
      */
     constructor() {
-        OwnableStorage.layout().setOwner(msg.sender);
+        OwnableStorage.layout().owner = msg.sender;
 
         // NOTE: This contract does not support the ERC165 interface however
         //   the proxies that use this registry will. Thus this call is
@@ -60,29 +62,26 @@ abstract contract FeatureRegistryBase is
     /**
      * @inheritdoc IFeatureRegistryBase
      */
-    function setSupportedInterface(bytes4 interfaceId, bool status)
-        external
-        override
-        onlyOwner
-    {
+    function setSupportedInterface(
+        bytes4 interfaceId,
+        bool status
+    ) external override onlyOwner {
         setSupportedInterfaceInternal(interfaceId, status);
     }
 
-    function setSupportedInterfaceInternal(bytes4 interfaceId, bool status)
-        internal
-    {
-        ERC165Storage.layout().setSupportedInterface(interfaceId, status);
+    function setSupportedInterfaceInternal(
+        bytes4 interfaceId,
+        bool status
+    ) internal {
+        ERC165BaseStorage.layout().supportedInterfaces[interfaceId] = status;
     }
 
     /**
      * @inheritdoc IFeatureRegistryBase
      */
-    function getSupportedInterface(bytes4 interfaceId)
-        external
-        view
-        override
-        returns (bool)
-    {
-        return ERC165Storage.layout().isSupportedInterface(interfaceId);
+    function getSupportedInterface(
+        bytes4 interfaceId
+    ) external view override returns (bool) {
+        return ERC165BaseStorage.layout().supportedInterfaces[interfaceId];
     }
 }

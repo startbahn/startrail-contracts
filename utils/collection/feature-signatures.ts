@@ -51,6 +51,9 @@ const functionSignatures = Object.freeze({
       `tokenURI(uint256)`,
     ],
   },
+  srrHistory: {
+    v1: [`addHistory(uint256[],uint256[])`],
+  },
   erc2981Royalty: {
     v1: [
       `updateSRRRoyalty(uint256,address,uint16)`,

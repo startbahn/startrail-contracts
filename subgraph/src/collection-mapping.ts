@@ -13,6 +13,7 @@ import {
   handleRoyaltiesSet,
   handleSRRCommitmentCancelled,
   handleSRRCommitmentInternal,
+  handleSRRHistory,
   handleSRRProvenanceWithCustomHistoryAndIntermediary,
   handleSRRProvenanceWithIntermediary,
   handleTransfer,
@@ -32,6 +33,7 @@ import {
 export {
   handleLockExternalTransfer,
   handleSRRCommitmentCancelled,
+  handleSRRHistory,
   handleSRRProvenanceWithCustomHistoryAndIntermediary,
   handleSRRProvenanceWithIntermediary,
   handleUpdateSRRWithSender,

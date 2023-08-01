@@ -5,18 +5,19 @@ import "forge-std/Vm.sol";
 import {Test} from "forge-std/Test.sol";
 
 import {IDiamondWritable} from "@solidstate/contracts/proxy/diamond/writable/IDiamondWritable.sol";
-import {IERC721} from "@solidstate/contracts/token/ERC721/IERC721.sol";
+import {IERC721} from "@solidstate/contracts/interfaces/IERC721.sol";
 import {IERC721Metadata} from "@solidstate/contracts/token/ERC721/metadata/IERC721Metadata.sol";
 import {IERC2981} from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 
-import "../../contracts/collection/CollectionFactory.sol";
+import "../../contracts/collection/CollectionFactoryV01.sol";
 import "../../contracts/collection/CollectionProxy.sol";
-import "../../contracts/collection/features/ERC721Feature.sol";
-import "../../contracts/collection/features/LockExternalTransferFeature.sol";
-import "../../contracts/collection/features/SRRApproveTransferFeature.sol";
-import "../../contracts/collection/features/SRRFeature.sol";
-import "../../contracts/collection/features/ERC2981RoyaltyFeature.sol";
-import "../../contracts/collection/features/SRRMetadataFeature.sol";
+import "../../contracts/collection/features/ERC721FeatureV02.sol";
+import "../../contracts/collection/features/LockExternalTransferFeatureV01.sol";
+import "../../contracts/collection/features/SRRApproveTransferFeatureV01.sol";
+import "../../contracts/collection/features/SRRFeatureV01.sol";
+import "../../contracts/collection/features/ERC2981RoyaltyFeatureV01.sol";
+import "../../contracts/collection/features/SRRHistoryFeatureV01.sol";
+import "../../contracts/collection/features/SRRMetadataFeatureV01.sol";
 import "../../contracts/collection/registry/StartrailCollectionFeatureRegistry.sol";
 
 import "../../contracts/name/Contracts.sol";
@@ -43,7 +44,7 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     ///                                                          ///
 
     StartrailCollectionFeatureRegistry internal featureRegistry;
-    CollectionFactory internal collectionFactory;
+    CollectionFactoryV01 internal collectionFactory;
     NameRegistry internal nameRegistry;
 
     MockLicensedUserManager internal mockLicensedUserManager;
@@ -56,6 +57,8 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     address internal srrApprovalFeatureImpl;
     address internal erc2981RoyaltyFeatureImpl;
     address internal srrMetadataFeatureImpl;
+    address internal srrHistoryFeatureImpl;
+
     address internal collectionProxyImpl;
 
     address internal admin;
@@ -90,7 +93,7 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
 
         vm.prank(admin);
 
-        collectionFactory = new CollectionFactory();
+        collectionFactory = new CollectionFactoryV01();
         collectionFactory.initialize(
             featureRegistryAddress,
             collectionProxyImpl
@@ -109,6 +112,7 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
             featureRegistry
         );
         srrMetadataFeatureImpl = deploySRRMetadataFeature(featureRegistry);
+        srrHistoryFeatureImpl = deploySRRHistoryFeature(featureRegistry);
 
         // Mock LUM
         mockLicensedUserManager = new MockLicensedUserManager();
@@ -132,10 +136,14 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
             address(mockStartrailRegistry)
         );
 
-        // Mock Custom History
+        // Mock Custom Histories
         mockStartrailRegistry.addCustomHistory(
             CUSTOM_HISTORY_ID_EXHIBITION,
             "The 54th SBI Art Auction"
+        );
+        mockStartrailRegistry.addCustomHistory(
+            CUSTOM_HISTORY_ID_AUCTION,
+            "Stratosphere Beijing Auction"
         );
 
         // Setup labels for traces
@@ -154,7 +162,7 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     function deployERC721Feature(
         StartrailCollectionFeatureRegistry featureRegistry_
     ) internal returns (address erc721ddress) {
-        ERC721Feature erc721Feature = new ERC721Feature();
+        ERC721FeatureV02 erc721Feature = new ERC721FeatureV02();
 
         // Initialize the implementation contract for safety
         erc721Feature.__ERC721Feature_initialize("ImplOnly", "IMPLONLY");
@@ -164,9 +172,13 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
         uint8 selIdx = 0;
 
         // ERC721Feature
-        selectors[selIdx++] = ERC721Feature.__ERC721Feature_initialize.selector;
-        selectors[selIdx++] = ERC721Feature.exists.selector;
-        selectors[selIdx++] = ERC721Feature.transferFromWithProvenance.selector;
+        selectors[selIdx++] = ERC721FeatureV02
+            .__ERC721Feature_initialize
+            .selector;
+        selectors[selIdx++] = ERC721FeatureV02.exists.selector;
+        selectors[selIdx++] = ERC721FeatureV02
+            .transferFromWithProvenance
+            .selector;
 
         // ERC721
         selectors[selIdx++] = ERC721UpgradeableBase.balanceOf.selector;
@@ -200,13 +212,13 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     function deployLockExternalTransferFeature(
         StartrailCollectionFeatureRegistry featureRegistry_
     ) internal returns (address) {
-        LockExternalTransferFeature lockExternalTransferFeature = new LockExternalTransferFeature();
+        LockExternalTransferFeatureV01 lockExternalTransferFeature = new LockExternalTransferFeatureV01();
 
         bytes4[] memory selectors = new bytes4[](2);
-        selectors[0] = LockExternalTransferFeature
+        selectors[0] = LockExternalTransferFeatureV01
             .getLockExternalTransfer
             .selector;
-        selectors[1] = LockExternalTransferFeature
+        selectors[1] = LockExternalTransferFeatureV01
             .setLockExternalTransfer
             .selector;
 
@@ -224,12 +236,12 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     function deploySRRFeature(
         StartrailCollectionFeatureRegistry featureRegistry_
     ) internal returns (address) {
-        SRRFeature feature = new SRRFeature();
+        SRRFeatureV01 feature = new SRRFeatureV01();
 
         bytes4[] memory selectors = new bytes4[](3);
-        selectors[0] = SRRFeature.createSRR.selector;
-        selectors[1] = SRRFeature.getSRR.selector;
-        selectors[2] = SRRFeature.updateSRR.selector;
+        selectors[0] = SRRFeatureV01.createSRR.selector;
+        selectors[1] = SRRFeatureV01.getSRR.selector;
+        selectors[2] = SRRFeatureV01.updateSRR.selector;
 
         srrFeatureImpl = address(feature);
         deployFeature(admin, featureRegistry_, srrFeatureImpl, selectors);
@@ -240,18 +252,22 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     function deploySRRApproveTransferFeature(
         StartrailCollectionFeatureRegistry featureRegistry_
     ) internal returns (address) {
-        SRRApproveTransferFeature feature = new SRRApproveTransferFeature();
+        SRRApproveTransferFeatureV01 feature = new SRRApproveTransferFeatureV01();
 
         bytes4[] memory selectors = new bytes4[](6);
 
         selectors[0] = 0xc0b00724; // approveSRRByCommitment(uint256,bytes32,string,uint256)
         selectors[1] = 0x81882bd0; // approveSRRByCommitment(uint256,bytes32,string)
-        selectors[2] = SRRApproveTransferFeature
+        selectors[2] = SRRApproveTransferFeatureV01
             .approveSRRByCommitmentFromBulk
             .selector;
-        selectors[3] = SRRApproveTransferFeature.cancelSRRCommitment.selector;
-        selectors[4] = SRRApproveTransferFeature.transferSRRByReveal.selector;
-        selectors[5] = SRRApproveTransferFeature.getSRRCommitment.selector;
+        selectors[3] = SRRApproveTransferFeatureV01
+            .cancelSRRCommitment
+            .selector;
+        selectors[4] = SRRApproveTransferFeatureV01
+            .transferSRRByReveal
+            .selector;
+        selectors[5] = SRRApproveTransferFeatureV01.getSRRCommitment.selector;
 
         srrApprovalFeatureImpl = address(feature);
         deployFeature(
@@ -267,16 +283,16 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     function deployERC2981RoyaltyFeature(
         StartrailCollectionFeatureRegistry featureRegistry_
     ) internal returns (address) {
-        ERC2981RoyaltyFeature feature = new ERC2981RoyaltyFeature();
+        ERC2981RoyaltyFeatureV01 feature = new ERC2981RoyaltyFeatureV01();
 
         bytes4[] memory selectors = new bytes4[](4);
 
-        selectors[0] = ERC2981RoyaltyFeature.updateSRRRoyalty.selector;
-        selectors[1] = ERC2981RoyaltyFeature
+        selectors[0] = ERC2981RoyaltyFeatureV01.updateSRRRoyalty.selector;
+        selectors[1] = ERC2981RoyaltyFeatureV01
             .updateSRRRoyaltyReceiverMulti
             .selector;
-        selectors[2] = ERC2981RoyaltyFeature.getSRRRoyalty.selector;
-        selectors[3] = ERC2981RoyaltyFeature.royaltyInfo.selector;
+        selectors[2] = ERC2981RoyaltyFeatureV01.getSRRRoyalty.selector;
+        selectors[3] = ERC2981RoyaltyFeatureV01.royaltyInfo.selector;
 
         erc2981RoyaltyFeatureImpl = address(feature);
         deployFeature(
@@ -298,13 +314,13 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     function deploySRRMetadataFeature(
         StartrailCollectionFeatureRegistry featureRegistry_
     ) internal returns (address) {
-        SRRMetadataFeature feature = new SRRMetadataFeature();
+        SRRMetadataFeatureV01 feature = new SRRMetadataFeatureV01();
 
         bytes4[] memory selectors = new bytes4[](3);
 
-        selectors[0] = SRRMetadataFeature.updateSRRMetadata.selector;
-        selectors[1] = SRRMetadataFeature.getSRRMetadata.selector;
-        selectors[2] = SRRMetadataFeature.tokenURI.selector;
+        selectors[0] = SRRMetadataFeatureV01.updateSRRMetadata.selector;
+        selectors[1] = SRRMetadataFeatureV01.getSRRMetadata.selector;
+        selectors[2] = SRRMetadataFeatureV01.tokenURI.selector;
 
         srrMetadataFeatureImpl = address(feature);
         deployFeature(
@@ -317,6 +333,26 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
         return srrMetadataFeatureImpl;
     }
 
+    function deploySRRHistoryFeature(
+        StartrailCollectionFeatureRegistry featureRegistry_
+    ) internal returns (address) {
+        SRRHistoryFeatureV01 feature = new SRRHistoryFeatureV01();
+
+        bytes4[] memory selectors = new bytes4[](1);
+
+        selectors[0] = SRRHistoryFeatureV01.addHistory.selector;
+
+        srrHistoryFeatureImpl = address(feature);
+        deployFeature(
+            admin,
+            featureRegistry_,
+            srrHistoryFeatureImpl,
+            selectors
+        );
+
+        return srrHistoryFeatureImpl;
+    }
+
     function createCollection(address creatorLU) internal returns (address) {
         vm.recordLogs();
 
@@ -324,7 +360,7 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
         (bool success, ) = address(collectionFactory).call(
             eip2771AppendSender(
                 abi.encodeWithSelector(
-                    CollectionFactory.createCollectionContract.selector,
+                    CollectionFactoryV01.createCollectionContract.selector,
                     COLLECTION_NAME,
                     COLLECTION_SYMBOL,
                     bytes32(keccak256("random salt"))

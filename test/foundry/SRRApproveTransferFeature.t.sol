@@ -4,8 +4,8 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 import "../../contracts/collection/features/erc721/ERC721Errors.sol";
 import "../../contracts/collection/features/erc721/LibERC721Events.sol";
-import {SRRApproveTransferFeature} from "../../contracts/collection/features/SRRApproveTransferFeature.sol";
-import "../../contracts/collection/features/interfaces/ISRRApproveTransferFeature.sol";
+import {SRRApproveTransferFeatureV01} from "../../contracts/collection/features/SRRApproveTransferFeatureV01.sol";
+import "../../contracts/collection/features/interfaces/ISRRApproveTransferFeatureV01.sol";
 import "../../contracts/collection/features/shared/LibFeatureCommon.sol";
 import "../../contracts/lib/IDGeneratorV3.sol";
 import "../../contracts/name/Contracts.sol";
@@ -18,7 +18,7 @@ bytes32 constant commitmentHash = keccak256(abi.encode(revealHash));
 string constant historyMetadataHash = "d83adb5e14eab9a082a8a9b40bcab2e80b191698886888e0691809052d11a379";
 
 contract SRRApproveTransferFeatureTest is StartrailTestBase {
-    SRRApproveTransferFeature internal feature;
+    SRRApproveTransferFeatureV01 internal feature;
 
     address internal collectionAddress;
     address internal collectionOwnerLU;
@@ -36,7 +36,7 @@ contract SRRApproveTransferFeatureTest is StartrailTestBase {
 
         collectionAddress = createCollection(collectionOwnerLU);
 
-        feature = SRRApproveTransferFeature(collectionAddress);
+        feature = SRRApproveTransferFeatureV01(collectionAddress);
 
         // Setup a shared SRR and approve it - a number of tests will use
         // this one below
@@ -138,11 +138,11 @@ contract SRRApproveTransferFeatureTest is StartrailTestBase {
             commitmentHash,
             historyMetadataHash,
             100, // custom history does not exist
-            ISRRApproveTransferFeature.CustomHistoryDoesNotExist.selector
+            ISRRApproveTransferFeatureV01.CustomHistoryDoesNotExist.selector
         );
     }
 
-    function testRevert_ApproveNotSRROwnerOrAdministrator() public {
+    function testRevert_ApproveNotSRROwner() public {
         approveSRRByCommitment(
             collectionAddress,
             trustedForwarder,
@@ -151,7 +151,7 @@ contract SRRApproveTransferFeatureTest is StartrailTestBase {
             commitmentHash,
             historyMetadataHash,
             CUSTOM_HISTORY_ID_EXHIBITION,
-            ISRRApproveTransferFeature.NotSRROwnerOrAdministrator.selector
+            ISRRApproveTransferFeatureV01.NotSRROwner.selector
         );
     }
 
@@ -180,7 +180,7 @@ contract SRRApproveTransferFeatureTest is StartrailTestBase {
 
     function testRevert_TransferWithIncorrectRevealHash() public {
         vm.expectRevert(
-            ISRRApproveTransferFeature.IncorrectRevealHash.selector
+            ISRRApproveTransferFeatureV01.IncorrectRevealHash.selector
         );
         feature.transferSRRByReveal(
             aNewOwner,
@@ -191,7 +191,7 @@ contract SRRApproveTransferFeatureTest is StartrailTestBase {
     }
 
     function testTransferSuccess() public {
-        ERC721Feature erc721 = ERC721Feature(collectionAddress);
+        ERC721FeatureV01 erc721 = ERC721FeatureV01(collectionAddress);
         address currentOwner = erc721.ownerOf(tokenIdShared);
 
         vm.expectEmit(true, true, true, false);
@@ -256,11 +256,9 @@ contract SRRApproveTransferFeatureTest is StartrailTestBase {
         assertEq(0, historyIdAfterCancel);
     }
 
-    function testRevert_CancelNotSRROwnerOrAdministrator() public {
+    function testRevert_CancelNotSRROwner() public {
         vm.prank(trustedForwarder);
-        vm.expectRevert(
-            ISRRApproveTransferFeature.NotSRROwnerOrAdministrator.selector
-        );
+        vm.expectRevert(ISRRApproveTransferFeatureV01.NotSRROwner.selector);
         (bool success, ) = collectionAddress.call(
             eip2771AppendSender(
                 abi.encodeWithSelector(

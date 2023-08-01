@@ -3,10 +3,10 @@ pragma solidity 0.8.13;
 import "forge-std/Vm.sol";
 import {Test} from "forge-std/Test.sol";
 
-import {IERC173} from "@solidstate/contracts/access/IERC173.sol";
-import {IERC165} from "@solidstate/contracts/introspection/IERC165.sol";
+import {IERC173} from "@solidstate/contracts/interfaces/IERC173.sol";
+import {IERC165} from "@solidstate/contracts/interfaces/IERC165.sol";
 import {IDiamondReadable} from "@solidstate/contracts/proxy/diamond/readable/IDiamondReadable.sol";
-import {IERC721} from "@solidstate/contracts/token/ERC721/IERC721.sol";
+import {IERC721} from "@solidstate/contracts/interfaces/IERC721.sol";
 import {IERC721Metadata} from "@solidstate/contracts/token/ERC721/metadata/IERC721Metadata.sol";
 
 import "../../contracts/collection/registry/StartrailCollectionFeatureRegistry.sol";
@@ -64,7 +64,8 @@ contract StartrailCollectionFeatureRegistryTest is StartrailTestLibrary {
         assertTrue(IERC173.owner.selector == selectors[0]);
         assertTrue(IERC173.transferOwnership.selector == selectors[1]);
         assertTrue(
-            OwnableFeature.__OwnableFeature_initialize.selector == selectors[2]
+            OwnableFeatureV01.__OwnableFeature_initialize.selector ==
+                selectors[2]
         );
     }
 
@@ -76,7 +77,7 @@ contract StartrailCollectionFeatureRegistryTest is StartrailTestLibrary {
         assertTrue(IERC173.owner.selector == actualSelectors[0]);
         assertTrue(IERC173.transferOwnership.selector == actualSelectors[1]);
         assertTrue(
-            OwnableFeature.__OwnableFeature_initialize.selector ==
+            OwnableFeatureV01.__OwnableFeature_initialize.selector ==
                 actualSelectors[2]
         );
     }

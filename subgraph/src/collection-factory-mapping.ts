@@ -1,30 +1,12 @@
 import { Address, BigInt, Bytes, log } from '@graphprotocol/graph-ts'
 
-import {
-  CollectionCreated as CollectionCreatedEvent,
-  CollectionCreated1 as CollectionCreatedEventLegacy,
-} from '../generated/CollectionFactory/CollectionFactory'
+import { CollectionCreated as CollectionCreatedEvent } from '../generated/CollectionFactory/CollectionFactory'
 import { Collection } from '../generated/schema'
 import { Collection as CollectionTemplate } from '../generated/templates'
 import { eventUTCMillis, logInvocation, toUTCString } from './lib/utils'
 
 export function handleCollectionCreated(event: CollectionCreatedEvent): void {
   logInvocation('handleCollectionCreated', event)
-  let params = event.params
-  handleCollectionCreatedInternal(
-    eventUTCMillis(event),
-    params.collectionAddress,
-    params.name,
-    params.symbol,
-    params.salt,
-    params.ownerAddress
-  )
-}
-
-export function handleCollectionCreatedLegacy(
-  event: CollectionCreatedEventLegacy
-): void {
-  logInvocation('handleCollectionCreatedLegacy', event)
   let params = event.params
   handleCollectionCreatedInternal(
     eventUTCMillis(event),

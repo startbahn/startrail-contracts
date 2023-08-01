@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.13;
 
-import "./interfaces/ISRRApproveTransferFeature.sol";
+import "./interfaces/ISRRApproveTransferFeatureV01.sol";
 import "./shared/LibFeatureCommon.sol";
 import "./shared/LibFeatureStartrailRegistry.sol";
 import "./shared/LibSRRApproveTransferFeatureEvents.sol";
@@ -20,25 +20,24 @@ import "./storage/LibSRRMetadataStorage.sol";
  * Later the reveal hash is given to a buyer / new owner or intermiediatary who
  * can execute transferByReveal to transfer ownership.
  */
-contract SRRApproveTransferFeature is ISRRApproveTransferFeature {
+contract SRRApproveTransferFeatureV01 is ISRRApproveTransferFeatureV01 {
     uint256 constant NO_CUSTOM_HISTORY = 0;
 
     /**
-     * Verify the caller is the owner of the token or the Administrator.
+     * Verify the caller is the owner of the token.
      */
-    function onlySRROwnerOrAdministrator(uint256 tokenId) private view {
+    function onlySRROwner(uint256 tokenId) private view {
         LibERC721Storage.onlyExistingToken(tokenId);
         if (
             LibERC721Storage.layout().ownerOf[tokenId] !=
-            LibFeatureCommon.msgSender() &&
-            msg.sender != LibFeatureCommon.getAdministrator()
+            LibFeatureCommon.msgSender()
         ) {
-            revert NotSRROwnerOrAdministrator();
+            revert NotSRROwner();
         }
     }
 
     /**
-     * @inheritdoc ISRRApproveTransferFeature
+     * @inheritdoc ISRRApproveTransferFeatureV01
      */
     function approveSRRByCommitment(
         uint256 tokenId,
@@ -46,7 +45,7 @@ contract SRRApproveTransferFeature is ISRRApproveTransferFeature {
         string memory historyMetadataHash,
         uint256 customHistoryId
     ) external override {
-        onlySRROwnerOrAdministrator(tokenId);
+        onlySRROwner(tokenId);
         _approveSRRByCommitment(
             tokenId,
             commitment,
@@ -56,14 +55,14 @@ contract SRRApproveTransferFeature is ISRRApproveTransferFeature {
     }
 
     /**
-     * @inheritdoc ISRRApproveTransferFeature
+     * @inheritdoc ISRRApproveTransferFeatureV01
      */
     function approveSRRByCommitment(
         uint256 tokenId,
         bytes32 commitment,
         string memory historyMetadataHash
     ) external override {
-        onlySRROwnerOrAdministrator(tokenId);
+        onlySRROwner(tokenId);
         _approveSRRByCommitment(
             tokenId,
             commitment,
@@ -73,7 +72,7 @@ contract SRRApproveTransferFeature is ISRRApproveTransferFeature {
     }
 
     /**
-     * @inheritdoc ISRRApproveTransferFeature
+     * @inheritdoc ISRRApproveTransferFeatureV01
      */
     function approveSRRByCommitmentFromBulk(
         uint256 tokenId,
@@ -91,16 +90,16 @@ contract SRRApproveTransferFeature is ISRRApproveTransferFeature {
     }
 
     /**
-     * @inheritdoc ISRRApproveTransferFeature
+     * @inheritdoc ISRRApproveTransferFeatureV01
      */
     function cancelSRRCommitment(uint256 tokenId) external override {
-        onlySRROwnerOrAdministrator(tokenId);
+        onlySRROwner(tokenId);
         _clearSRRCommitment(tokenId);
         emit LibSRRApproveTransferFeatureEvents.SRRCommitmentCancelled(tokenId);
     }
 
     /**
-     * @inheritdoc ISRRApproveTransferFeature
+     * @inheritdoc ISRRApproveTransferFeatureV01
      */
     function transferSRRByReveal(
         address to,
@@ -140,7 +139,7 @@ contract SRRApproveTransferFeature is ISRRApproveTransferFeature {
     }
 
     /**
-     * @inheritdoc ISRRApproveTransferFeature
+     * @inheritdoc ISRRApproveTransferFeatureV01
      */
     function getSRRCommitment(
         uint256 tokenId

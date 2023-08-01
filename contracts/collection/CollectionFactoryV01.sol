@@ -9,8 +9,8 @@ import "@openzeppelin/contracts/utils/Address.sol";
 
 import {MinimalProxyFactory} from "@solidstate/contracts/factory/MinimalProxyFactory.sol";
 
-import "./features/interfaces/IERC721Feature.sol";
-import "./features/interfaces/IOwnableFeature.sol";
+import "./features/interfaces/IERC721FeatureV01.sol";
+import "./features/interfaces/IOwnableFeatureV01.sol";
 import "./shared/LibEIP2771.sol";
 import "./CollectionFactoryStorage.sol";
 import "./CollectionProxy.sol";
@@ -23,7 +23,7 @@ import "./CollectionRegistry.sol";
  *          tests that use the hardhat oz upgrades plugin
  *      see `CollectionFactory.t.sol` for general behavior tests
  */
-contract CollectionFactory is
+contract CollectionFactoryV01 is
     OwnableUpgradeable,
     UUPSUpgradeable,
     ReentrancyGuardUpgradeable,
@@ -38,17 +38,6 @@ contract CollectionFactory is
         address indexed ownerAddress,
         string name,
         string symbol,
-        bytes32 salt
-    );
-
-    // Legacy event (qa only - not even in prod) so can be removed soon
-    // after gogh has integrated with the above new event
-    event CollectionCreated(
-        address indexed collectionAddress,
-        address indexed ownerAddress,
-        string name,
-        string symbol,
-        string metadataCID,
         bytes32 salt
     );
 
@@ -126,12 +115,12 @@ contract CollectionFactory is
 
         // Initialize ownership
         address collectionCreatorLU = LibEIP2771.msgSender(featureRegistry_);
-        IOwnableFeature(collectionAddress).__OwnableFeature_initialize(
+        IOwnableFeatureV01(collectionAddress).__OwnableFeature_initialize(
             collectionCreatorLU
         );
 
         // Initialize ERC721 properties
-        IERC721Feature(collectionAddress).__ERC721Feature_initialize(
+        IERC721FeatureV01(collectionAddress).__ERC721Feature_initialize(
             name,
             symbol
         );

@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.13;
 
-interface IERC721Feature {
+interface IERC721FeatureV02 {
     /**
      * @dev ERC721 initializer to set the name and symbol
      */

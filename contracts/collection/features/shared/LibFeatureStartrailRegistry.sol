@@ -14,6 +14,8 @@ interface IStartrailRegistrySubset {
     function getCustomHistoryNameById(
         uint256
     ) external view returns (string memory);
+
+    function maxCombinedHistoryRecords() external view returns (uint256);
 }
 
 // Copied this key value from Contracts.sol because it can't be imported and

@@ -45,7 +45,7 @@ const upgradeContract = async (
     await proxyContract.populateTransaction.upgradeTo(newImpl.address)
 
   const txReceipt = await administratorContract.execTransaction({
-    to: administratorContract.contract.address,
+    to: proxyContract.address,
     data: upgradeToCalldata,
     waitConfirmed: true,
   })
