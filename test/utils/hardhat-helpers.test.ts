@@ -8,9 +8,9 @@ import {
 
 describe('hardhat-helpers', () => {
   it('getContractNameLatest', () => {
-    expect(getContractNameLatest('Bulk')).to.equal('BulkV5')
+    expect(getContractNameLatest('Bulk')).to.equal('BulkV6')
     expect(getContractNameLatest('StartrailRegistry')).to.equal(
-      'StartrailRegistryV24'
+      'StartrailRegistryV25'
     )
     expect(getContractNameLatest('ERC721Feature')).to.equal('ERC721FeatureV03')
     expect(getContractNameLatest('LockExternalTransferFeature')).to.equal('LockExternalTransferFeatureV01')
@@ -19,7 +19,7 @@ describe('hardhat-helpers', () => {
     expect(getContractNameLatest('SRRMetadataFeature')).to.equal('SRRMetadataFeatureV01')
     expect(getContractNameLatest('SRRHistoryFeature')).to.equal('SRRHistoryFeatureV01')
     expect(getContractNameLatest('ERC2981RoyaltyFeature')).to.equal('ERC2981RoyaltyFeatureV01')
-    expect(getContractNameLatest('BulkFeature')).to.equal('BulkFeatureV01')
+    expect(getContractNameLatest('BulkFeature')).to.equal('BulkFeatureV02')
   })
 
   it('getContractNamesUnversioned', () => {

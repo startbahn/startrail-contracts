@@ -6,15 +6,15 @@ import "../proxy/utils/InitializableWithGap.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-import "../collection/features/interfaces/IBulkFeatureV01.sol";
+import "../collection/features/interfaces/IBulkFeatureV02.sol";
 import "../common/INameRegistry.sol";
 import "../metaTx/eip2771/EIP2771BaseRecipient.sol";
 import "../name/Contracts.sol";
 
-import "./interfaces/IBulkV5.sol";
+import "./interfaces/IBulkV6.sol";
 
-contract BulkV5 is
-    IBulkV5,
+contract BulkV6 is
+    IBulkV6,
     Contracts,
     InitializableWithGap,
     EIP2771BaseRecipient
@@ -68,7 +68,7 @@ contract BulkV5 is
      */
 
     /**
-     * @inheritdoc IBulkV5
+     * @inheritdoc IBulkV6
      */
     function initialize(
         address _nameRegistry,
@@ -85,7 +85,7 @@ contract BulkV5 is
     }
 
     /**
-     * @inheritdoc IBulkV5
+     * @inheritdoc IBulkV6
      */
     function prepareBatchFromLicensedUser(
         bytes32 merkleRoot
@@ -94,7 +94,7 @@ contract BulkV5 is
     }
 
     /**
-     * @inheritdoc IBulkV5
+     * @inheritdoc IBulkV6
      */
     function createSRRWithProofMulti(
         bytes32[][] memory merkleProofs,
@@ -126,6 +126,61 @@ contract BulkV5 is
                 artistAddresses[i],
                 metadataCIDs[i],
                 lockExternalTransfers[i],
+                address(0),
+                royaltyReceivers[i],
+                royaltyBasisPoints[i],
+                contractAddresses[i]
+            );
+
+            require(
+                verifyLeafHash(leafHashes[i], inputs, false),
+                "leafHash does not match the srr details"
+            );
+
+            tokenIds[i] = _createSRRWithProof(
+                merkleProofs[i],
+                merkleRoot,
+                leafHashes[i],
+                inputs
+            );
+        }
+    }
+
+    /**
+     * @inheritdoc IBulkV6
+     */
+    function createSRRWithProofMulti(
+        bytes32[][] memory merkleProofs,
+        bytes32 merkleRoot,
+        bytes32[] memory leafHashes,
+        bool[] memory isPrimaryIssuers,
+        address[] memory artistAddresses,
+        string[] memory metadataCIDs,
+        bool[] memory lockExternalTransfers,
+        address[] memory tos,
+        address[] memory royaltyReceivers,
+        uint16[] memory royaltyBasisPoints,
+        address[] memory contractAddresses
+    )
+        public
+        override
+        batchExists(merkleRoot)
+        returns (uint256[] memory tokenIds)
+    {
+        tokenIds = new uint256[](leafHashes.length);
+
+        for (uint256 i = 0; i < leafHashes.length; i++) {
+            require(
+                !batches[merkleRoot].processedLeaves[leafHashes[i]],
+                "SRR already processed."
+            );
+
+            CreateSRRInputs memory inputs = CreateSRRInputs(
+                isPrimaryIssuers[i],
+                artistAddresses[i],
+                metadataCIDs[i],
+                lockExternalTransfers[i],
+                tos[i],
                 royaltyReceivers[i],
                 royaltyBasisPoints[i],
                 contractAddresses[i]
@@ -146,84 +201,7 @@ contract BulkV5 is
     }
 
     /**
-     * @inheritdoc IBulkV5
-     */
-    function createSRRWithProofMulti(
-        bytes32[][] memory merkleProofs,
-        bytes32 merkleRoot,
-        bytes32[] memory leafHashes,
-        bool[] memory isPrimaryIssuers,
-        address[] memory artistAddresses,
-        bytes32[] memory metadataDigests,
-        string[] memory metadataCIDs,
-        bool[] memory lockExternalTransfers,
-        address[] memory royaltyReceivers,
-        uint16[] memory royaltyBasisPoints
-    )
-        public
-        override
-        batchExists(merkleRoot)
-        returns (uint256[] memory tokenIds)
-    {
-        tokenIds = new uint256[](leafHashes.length);
-
-        for (uint256 i = 0; i < leafHashes.length; i++) {
-            require(
-                !batches[merkleRoot].processedLeaves[leafHashes[i]],
-                "SRR already processed."
-            );
-
-            CreateSRRInputs memory inputs = CreateSRRInputs(
-                isPrimaryIssuers[i],
-                artistAddresses[i],
-                metadataCIDs[i],
-                lockExternalTransfers[i],
-                royaltyReceivers[i],
-                royaltyBasisPoints[i],
-                address(0)
-            );
-
-            // STARTRAIL-2320: royalty props not here but should be ...
-            require(
-                verifyLeafHash(leafHashes[i], inputs, false),
-                "leafHash does not match the srr details"
-            );
-
-            tokenIds[i] = _createSRRWithProof(
-                merkleProofs[i],
-                merkleRoot,
-                leafHashes[i],
-                inputs
-            );
-        }
-    }
-
-    /**
-     * @inheritdoc IBulkV5
-     */
-    function approveSRRByCommitmentWithProof(
-        bytes32[] memory merkleProof,
-        bytes32 merkleRoot,
-        bytes32 leafHash,
-        uint256 tokenId,
-        bytes32 commitment,
-        string memory historyMetadataHash,
-        uint256 customHistoryId
-    ) public override {
-        _approveSRRByCommitmentWithProof(
-            merkleProof,
-            merkleRoot,
-            leafHash,
-            tokenId,
-            commitment,
-            historyMetadataHash,
-            customHistoryId,
-            address(0)
-        );
-    }
-
-    /**
-     * @inheritdoc IBulkV5
+     * @inheritdoc IBulkV6
      */
     function approveSRRByCommitmentWithProof(
         bytes32[] memory merkleProof,
@@ -248,33 +226,7 @@ contract BulkV5 is
     }
 
     /**
-     * @inheritdoc IBulkV5
-     */
-    function transferFromWithProvenanceWithProof(
-        bytes32[] memory merkleProof,
-        bytes32 merkleRoot,
-        bytes32 leafHash,
-        address to,
-        uint256 tokenId,
-        string memory historyMetadataHash,
-        uint256 customHistoryId,
-        bool isIntermediary
-    ) public override {
-        _transferFromWithProvenanceWithProof(
-            merkleProof,
-            merkleRoot,
-            leafHash,
-            to,
-            tokenId,
-            historyMetadataHash,
-            customHistoryId,
-            isIntermediary,
-            address(0)
-        );
-    }
-
-    /**
-     * @inheritdoc IBulkV5
+     * @inheritdoc IBulkV6
      */
     function transferFromWithProvenanceWithProof(
         bytes32[] memory merkleProof,
@@ -431,7 +383,7 @@ contract BulkV5 is
                 isIntermediary
             );
         } else {
-            IBulkFeatureV01(contractAddress).transferFromWithProvenanceFromBulk(
+            IBulkFeatureV02(contractAddress).transferFromWithProvenanceFromBulk(
                 signer,
                 to,
                 tokenId,
@@ -494,7 +446,7 @@ contract BulkV5 is
                 customHistoryId
             );
         } else {
-            IBulkFeatureV01(contractAddress).approveSRRByCommitmentFromBulk(
+            IBulkFeatureV02(contractAddress).approveSRRByCommitmentFromBulk(
                 signer,
                 tokenId,
                 commitment,
@@ -516,13 +468,13 @@ contract BulkV5 is
      *
      * @param leafHash The hash to be verified against.
      * @param inputs The input parameters used to calculate the hash.
-     * @param isRoyaltyInLeafHash A boolean indicating whether royalty information is included in the leaf hash.
+     * @param isToInLeafHash A boolean indicating whether to address is included in the leaf hash.
      * @return hashMatches A boolean indicating whether the provided leaf hash matches the calculated hash.
      */
     function verifyLeafHash(
         bytes32 leafHash,
         CreateSRRInputs memory inputs,
-        bool isRoyaltyInLeafHash
+        bool isToInLeafHash
     ) private pure returns (bool hashMatches) {
         bytes memory hashInputs = abi.encodePacked(
             inputs.isPrimaryIssuer,
@@ -531,13 +483,15 @@ contract BulkV5 is
             inputs.lockExternalTransfer
         );
 
-        if (isRoyaltyInLeafHash) {
-            hashInputs = abi.encodePacked(
-                hashInputs,
-                inputs.royaltyReceiver,
-                inputs.royaltyBasisPoints
-            );
+        if (isToInLeafHash) {
+            hashInputs = abi.encodePacked(hashInputs, inputs.to);
         }
+
+        hashInputs = abi.encodePacked(
+            hashInputs,
+            inputs.royaltyReceiver,
+            inputs.royaltyBasisPoints
+        );
 
         if (inputs.contractAddress != address(0)) {
             hashInputs = abi.encodePacked(hashInputs, inputs.contractAddress);
@@ -569,16 +523,18 @@ contract BulkV5 is
                 inputs.metadataCID,
                 issuerAddress,
                 inputs.lockExternalTransfer,
+                inputs.to,
                 inputs.royaltyReceiver,
                 inputs.royaltyBasisPoints
             );
         } else {
-            tokenId = IBulkFeatureV01(inputs.contractAddress).createSRRFromBulk(
+            tokenId = IBulkFeatureV02(inputs.contractAddress).createSRRFromBulk(
                 inputs.isPrimaryIssuer,
                 inputs.artistAddress,
                 inputs.metadataCID,
                 issuerAddress,
                 inputs.lockExternalTransfer,
+                inputs.to,
                 inputs.royaltyReceiver,
                 inputs.royaltyBasisPoints
             );

@@ -3,7 +3,7 @@
 pragma solidity 0.8.21;
 
 import "../../name/Contracts.sol";
-import "./interfaces/IBulkFeatureV01.sol";
+import "./interfaces/IBulkFeatureV02.sol";
 import "./ERC721FeatureV03.sol";
 import "./erc721/LibERC721Storage.sol";
 
@@ -19,7 +19,7 @@ error OnlyBulkContract();
  * These handlers trust the Bulk contract and perform the action if the
  * call came from the bulk contract.
  */
-contract BulkFeatureV01 is IBulkFeatureV01, Contracts {
+contract BulkFeatureV02 is IBulkFeatureV02, Contracts {
     function onlyBulk() private view {
         if (
             msg.sender !=
@@ -43,7 +43,7 @@ contract BulkFeatureV01 is IBulkFeatureV01, Contracts {
     }
 
     /**
-     * @inheritdoc IBulkFeatureV01
+     * @inheritdoc IBulkFeatureV02
      */
     function createSRRFromBulk(
         bool isPrimaryIssuer,
@@ -51,26 +51,30 @@ contract BulkFeatureV01 is IBulkFeatureV01, Contracts {
         string memory metadataCID,
         address issuerAddress,
         bool lockExternalTransfer,
+        address to,
         address royaltyReceiver,
         uint16 royaltyBasisPoints
-    ) public override(IBulkFeatureV01) returns (uint256) {
+    ) public override(IBulkFeatureV02) returns (uint256) {
         onlyBulk();
         LibFeatureCommon.onlyCollectionOwner(issuerAddress);
-        return
-            LibSRRCreate.createSRR(
-                isPrimaryIssuer,
-                artistAddress,
-                metadataCID,
-                issuerAddress,
-                lockExternalTransfer,
-                royaltyReceiver,
-                royaltyBasisPoints,
-                true
-            );
+        uint256 tokenId = LibSRRCreate.createSRR(
+            isPrimaryIssuer,
+            artistAddress,
+            metadataCID,
+            issuerAddress,
+            lockExternalTransfer,
+            royaltyReceiver,
+            royaltyBasisPoints,
+            true
+        );
+        if (to != address(0)) {
+            LibERC721Storage._transferFrom(issuerAddress, to, tokenId);
+        }
+        return tokenId;
     }
 
     /**
-     * @inheritdoc IBulkFeatureV01
+     * @inheritdoc IBulkFeatureV02
      */
     function approveSRRByCommitmentFromBulk(
         address signer,
@@ -78,7 +82,7 @@ contract BulkFeatureV01 is IBulkFeatureV01, Contracts {
         bytes32 commitment,
         string memory historyMetadataHash,
         uint256 customHistoryId
-    ) public override(IBulkFeatureV01) {
+    ) public override(IBulkFeatureV02) {
         onlyBulk();
         onlySRROwner(signer, tokenId);
         LibSRRApproveTransfer.approveSRRByCommitment(
@@ -90,7 +94,7 @@ contract BulkFeatureV01 is IBulkFeatureV01, Contracts {
     }
 
     /**
-     * @inheritdoc IBulkFeatureV01
+     * @inheritdoc IBulkFeatureV02
      */
     function transferFromWithProvenanceFromBulk(
         address signer,
@@ -99,7 +103,7 @@ contract BulkFeatureV01 is IBulkFeatureV01, Contracts {
         string memory historyMetadataHash,
         uint256 customHistoryId,
         bool isIntermediary
-    ) external override(IBulkFeatureV01) {
+    ) external override(IBulkFeatureV02) {
         onlyBulk();
         onlySRROwner(signer, tokenId);
         LibTransferWithProvenance.transferFromWithProvenance(

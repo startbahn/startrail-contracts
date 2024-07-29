@@ -1,14 +1,19 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 import { StartrailCollectionFeatureRegistry } from '../../typechain-types'
-import { deployBulkFeature } from '../collection/deployment-actions'
+import {
+  deployFeatureContract,
+  upgradeFeatureContract,
+} from '../collection/deployment-actions'
 import { getContract } from '../hardhat-helpers'
 import { deployBulk } from './deploy-bulk'
-import { upgradeFeatureContract } from '../../scripts/deploy/upgrade-feature-util'
-import { registerRequestTypes, unregisterRequestTypesCallByAdmin } from '../register-request-types'
+import {
+  registerRequestTypes,
+  unregisterRequestTypesCallByAdmin,
+} from '../register-request-types'
 import { MetaTxRequestType } from '../../startrail-common-js/meta-tx/types'
-const { deployStartrailRegistry } = require("./deploy-startrail-registry");
-
+import { StartrailFeatureEnum } from '../types'
+const { deployStartrailRegistry } = require('./deploy-startrail-registry')
 
 /**
  * Deploy upgrades to support actions on collections from the bulk contract.
@@ -33,7 +38,7 @@ const deployBulkCollection = async (hre: HardhatRuntimeEnvironment) => {
   ])
 
   await registerRequestTypes(hre, [
-    MetaTxRequestType.StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyalty
+    MetaTxRequestType.StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyalty,
   ])
 
   const featureRegistry = (await getContract(
@@ -41,16 +46,78 @@ const deployBulkCollection = async (hre: HardhatRuntimeEnvironment) => {
     `StartrailCollectionFeatureRegistry`
   )) as StartrailCollectionFeatureRegistry
 
-  await upgradeFeatureContract(hre, 'ERC721Feature')
-  await upgradeFeatureContract(hre, 'SRRFeature')
-  await upgradeFeatureContract(hre, 'SRRApproveTransferFeature')
-  await upgradeFeatureContract(hre, 'ERC2981RoyaltyFeature')
-  await upgradeFeatureContract(hre, 'SRRMetadataFeature')
-  await upgradeFeatureContract(hre, 'LockExternalTransferFeature')
-  await upgradeFeatureContract(hre, 'SRRHistoryFeature')
+  await upgradeFeatureContract({
+    hre,
+    featureName: StartrailFeatureEnum.ERC721Feature,
+    upgradeVersion: {
+      from: 'V03',
+      to: 'V03',
+    },
+  })
+
+  await upgradeFeatureContract({
+    hre,
+    featureName: StartrailFeatureEnum.SRRFeature,
+    upgradeVersion: {
+      from: 'V02',
+      to: 'V02',
+    },
+  })
+
+  await upgradeFeatureContract({
+    hre,
+    featureName: StartrailFeatureEnum.SRRApproveTransferFeature,
+    upgradeVersion: {
+      from: 'V02',
+      to: 'V02',
+    },
+  })
+
+  await upgradeFeatureContract({
+    hre,
+    featureName: StartrailFeatureEnum.ERC2981RoyaltyFeature,
+    upgradeVersion: {
+      from: 'V01',
+      to: 'V01',
+    },
+  })
+
+  await upgradeFeatureContract({
+    hre,
+    featureName: StartrailFeatureEnum.SRRMetadataFeature,
+    upgradeVersion: {
+      from: 'V01',
+      to: 'V01',
+    },
+  })
+
+  await upgradeFeatureContract({
+    hre,
+    featureName: StartrailFeatureEnum.LockExternalTransferFeature,
+    upgradeVersion: {
+      from: 'V01',
+      to: 'V01',
+    },
+  })
+
+  await upgradeFeatureContract({
+    hre,
+    featureName: StartrailFeatureEnum.SRRHistoryFeature,
+    upgradeVersion: {
+      from: 'V01',
+      to: 'V01',
+    },
+  })
+
   await deployBulk(hre, `BulkV5`)
 
-  await deployBulkFeature(featureRegistry)
+  await deployFeatureContract({
+    featureRegistry,
+    feature: {
+      name: StartrailFeatureEnum.BulkFeature,
+      version: 'V01',
+    },
+  })
 }
 
 export { deployBulkCollection }

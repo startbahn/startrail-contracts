@@ -7,14 +7,15 @@ pragma solidity 0.8.21;
  * These handlers trust the Bulk contract and perform the action if the
  * call came from the bulk contract.
  */
-interface IBulkFeatureV01 {
+interface IBulkFeatureV02 {
     /**
      * @dev Issue an SRR where the caller is a Bulk contract
      * @param isPrimaryIssuer is issuer a primary issuer
      * @param artistAddress artist address
      * @param metadataCID ipfs cid of the metadata
      * @param issuerAddress issuer address
-     * @param lockExternalTransfer bool of the flag to disable standard ERC721 transfer methods
+     * @param lockExternalTransfer bool of
+     * @param to the address that the token will be transferred to after the creationbool of the flag to disable standard ERC721 transfer methods
      * @param royaltyReceiver royalty receiver
      * @param royaltyBasisPoints royalty basis points
      */
@@ -24,6 +25,7 @@ interface IBulkFeatureV01 {
         string memory metadataCID,
         address issuerAddress,
         bool lockExternalTransfer,
+        address to,
         address royaltyReceiver,
         uint16 royaltyBasisPoints
     ) external returns (uint256);

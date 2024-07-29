@@ -2,6 +2,7 @@ import fs from 'fs'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { lowerFirst } from 'lodash'
 import path from 'path'
+import { StartrailContractAddresses } from '../types'
 
 const DEPLOY_FILE_NAME = 'deploy.json'
 const CONTRACT_INIT_CODE_HASH_FILE_NAME = 'initCodeHash.json'
@@ -18,7 +19,7 @@ const loadJSON = (hre: HardhatRuntimeEnvironment, fileName: string) => {
 }
 
 const loadDeployJSON = (hre: HardhatRuntimeEnvironment) =>
-  loadJSON(hre, DEPLOY_FILE_NAME)
+  loadJSON(hre, DEPLOY_FILE_NAME) as StartrailContractAddresses
 
 const loadContractsInitCodeHashJSON = (hre: HardhatRuntimeEnvironment) =>
   loadJSON(hre, CONTRACT_INIT_CODE_HASH_FILE_NAME)

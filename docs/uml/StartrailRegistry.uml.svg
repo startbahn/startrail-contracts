@@ -169,9 +169,9 @@
 <path fill="none" stroke="black" stroke-dasharray="5,2" d="M2669.86,-2969.12C2669.99,-2978.31 2670.17,-2987.23 2670.39,-2995.67"/>
 <polygon fill="black" stroke="black" points="2666.89,-2995.84 2670.68,-3005.74 2673.89,-2995.64 2666.89,-2995.84"/>
 </g>
-<!-- 56 -->
+<!-- 58 -->
 <g id="node7" class="node">
-<title>56</title>
+<title>58</title>
 <polygon fill="#f2f2f2" stroke="black" points="2916.7,-2131.9 2916.7,-2231.9 3206.02,-2231.9 3206.02,-2131.9 2916.7,-2131.9"/>
 <text text-anchor="middle" x="3061.36" y="-2215.3" font-family="Times,serif" font-size="14.00">&lt;&lt;Interface&gt;&gt;</text>
 <text text-anchor="middle" x="3061.36" y="-2198.5" font-family="Times,serif" font-size="14.00">ILicensedUserManager</text>
@@ -180,9 +180,9 @@
 <text text-anchor="start" x="2924.7" y="-2156.9" font-family="Times,serif" font-size="14.00">External:</text>
 <text text-anchor="start" x="2924.7" y="-2140.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&#160;isActiveWallet(walletAddress: address): bool</text>
 </g>
-<!-- 57 -->
+<!-- 59 -->
 <g id="node8" class="node">
-<title>57</title>
+<title>59</title>
 <polygon fill="#f2f2f2" stroke="black" points="1183.24,-0.5 1183.24,-1738.1 2375.47,-1738.1 2375.47,-0.5 1183.24,-0.5"/>
 <text text-anchor="middle" x="1779.36" y="-1721.5" font-family="Times,serif" font-size="14.00">StartrailRegistryV9</text>
 <text text-anchor="middle" x="1779.36" y="-1704.7" font-family="Times,serif" font-size="14.00">contracts/startrailregistry/StartrailRegistryV9.sol</text>
@@ -289,45 +289,45 @@
 <text text-anchor="start" x="1191.24" y="-25.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;getDomainSeperator(): bytes32</text>
 <text text-anchor="start" x="1191.24" y="-8.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;getOpenSeaProxyAddress(): address</text>
 </g>
-<!-- 57&#45;&gt;0 -->
+<!-- 59&#45;&gt;0 -->
 <g id="edge8" class="edge">
-<title>57&#45;&gt;0</title>
+<title>59&#45;&gt;0</title>
 <path fill="none" stroke="black" d="M1182.86,-1252.24C980.18,-1396.27 758.98,-1570.11 568,-1762.96"/>
 <polygon fill="none" stroke="black" points="560.46,-1755.65 546.95,-1784.42 575.45,-1770.36 560.46,-1755.65"/>
 </g>
-<!-- 57&#45;&gt;1 -->
+<!-- 59&#45;&gt;1 -->
 <g id="edge5" class="edge">
-<title>57&#45;&gt;1</title>
+<title>59&#45;&gt;1</title>
 <path fill="none" stroke="black" stroke-dasharray="5,2" d="M1183.06,-1624.33C1145.76,-1674.8 1109.24,-1725.21 1074.36,-1774.6 997.46,-1883.5 915.93,-2014.27 865.34,-2097.48"/>
 <polygon fill="none" stroke="black" points="856.29,-2092.16 849.73,-2123.26 874.25,-2103.03 856.29,-2092.16"/>
 </g>
-<!-- 57&#45;&gt;5 -->
+<!-- 59&#45;&gt;5 -->
 <g id="edge6" class="edge">
-<title>57&#45;&gt;5</title>
+<title>59&#45;&gt;5</title>
 <path fill="none" stroke="black" stroke-dasharray="5,2" d="M1779.36,-1738.1C1779.36,-1843.68 1779.36,-1941.01 1779.36,-2017.37"/>
 <polygon fill="none" stroke="black" points="1768.86,-2017.43 1779.36,-2047.43 1789.86,-2017.43 1768.86,-2017.43"/>
 </g>
-<!-- 57&#45;&gt;7 -->
+<!-- 59&#45;&gt;7 -->
 <g id="edge10" class="edge">
-<title>57&#45;&gt;7</title>
+<title>59&#45;&gt;7</title>
 <path fill="none" stroke="black" d="M2375.6,-1608.6C2413.77,-1663.82 2450.44,-1719.51 2484.36,-1774.6 2556.77,-1892.23 2620.86,-2041.5 2653.5,-2122.37"/>
 <polygon fill="black" stroke="black" points="2650.35,-2123.91 2657.32,-2131.89 2656.84,-2121.31 2650.35,-2123.91"/>
 </g>
-<!-- 57&#45;&gt;6 -->
+<!-- 59&#45;&gt;6 -->
 <g id="edge9" class="edge">
-<title>57&#45;&gt;6</title>
+<title>59&#45;&gt;6</title>
 <path fill="none" stroke="black" d="M2375.61,-1214.3C2570.18,-1360.02 2763.32,-1548.85 2869.36,-1774.6 2907.84,-1856.52 2902.52,-2504.98 2869.36,-2589.2 2865.68,-2598.55 2861.36,-2607.72 2856.52,-2616.69"/>
 <polygon fill="black" stroke="black" points="2853.36,-2615.16 2851.51,-2625.59 2859.46,-2618.59 2853.36,-2615.16"/>
 </g>
-<!-- 57&#45;&gt;56 -->
+<!-- 59&#45;&gt;58 -->
 <g id="edge11" class="edge">
-<title>57&#45;&gt;56</title>
+<title>59&#45;&gt;58</title>
 <path fill="none" stroke="black" stroke-dasharray="5,2" d="M2375.73,-1257.77C2563.48,-1402.27 2759.01,-1579.2 2902.36,-1774.6 2982.44,-1883.76 3028.2,-2038.55 3048.53,-2122.04"/>
 <polygon fill="black" stroke="black" points="3045.15,-2122.95 3050.89,-2131.86 3051.96,-2121.32 3045.15,-2122.95"/>
 </g>
-<!-- 58 -->
+<!-- 60 -->
 <g id="node9" class="node">
-<title>58</title>
+<title>60</title>
 <polygon fill="#f2f2f2" stroke="black" points="3223.87,-2081.5 3223.87,-2282.3 3746.84,-2282.3 3746.84,-2081.5 3223.87,-2081.5"/>
 <text text-anchor="middle" x="3485.36" y="-2265.7" font-family="Times,serif" font-size="14.00">Storage</text>
 <text text-anchor="middle" x="3485.36" y="-2248.9" font-family="Times,serif" font-size="14.00">contracts/startrailregistry/Storage.sol</text>
@@ -342,9 +342,9 @@
 <text text-anchor="start" x="3231.87" y="-2106.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;_stringStorage: mapping(uint256=&gt;mapping(bytes32=&gt;mapping(bytes32=&gt;string)))</text>
 <text text-anchor="start" x="3231.87" y="-2089.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;_uint8Storage: mapping(uint256=&gt;mapping(bytes32=&gt;mapping(bytes32=&gt;uint8)))</text>
 </g>
-<!-- 57&#45;&gt;58 -->
+<!-- 59&#45;&gt;60 -->
 <g id="edge7" class="edge">
-<title>57&#45;&gt;58</title>
+<title>59&#45;&gt;60</title>
 <path fill="none" stroke="black" d="M2375.91,-1170.19C2650.92,-1326.53 2969.96,-1535.15 3215.36,-1774.6 3299.5,-1856.7 3371.78,-1969.22 3420.32,-2055.04"/>
 <polygon fill="none" stroke="black" points="3411.17,-2060.19 3434.92,-2081.32 3429.53,-2050 3411.17,-2060.19"/>
 </g>

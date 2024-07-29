@@ -848,11 +848,6 @@ test('metaTxRequestTypes', async () => {
         "typeString": "StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyalty(address from,uint256 nonce,bytes data,bool isPrimaryIssuer,address artistAddress,string metadataCID,bool lockExternalTransfer,address to,address royaltyReceiver,uint16 royaltyBasisPoints)",
       },
       {
-        "id": "0xbef83078847679e2da773c6b3be6b96d45b196fe69acdd04f4a54671d57ff4aa",
-        "typeHash": "0xbef83078847679e2da773c6b3be6b96d45b196fe69acdd04f4a54671d57ff4aa",
-        "typeString": "StartrailRegistryCreateSRRFromLicensedUserWithRoyalty(address from,uint256 nonce,bytes data,bool isPrimaryIssuer,address artistAddress,bytes32 metadataDigest,string metadataCID,bool lockExternalTransfer,address to,address royaltyReceiver,uint16 royaltyBasisPoints)",
-      },
-      {
         "id": "0x43b411a61269fac54b60a3a5c04241addcc8c4e9e4844916999593fd135aa9f6",
         "typeHash": "0x43b411a61269fac54b60a3a5c04241addcc8c4e9e4844916999593fd135aa9f6",
         "typeString": "StartrailRegistrySetLockExternalTransfer(address from,uint256 nonce,uint256 tokenId,bool flag)",

@@ -28,3 +28,4 @@ npx hardhat run --network localhost scripts/deploy/023-deploy-royalty-refactor.t
 npx hardhat run --network localhost scripts/deploy/024-deploy-collections.ts || exit $?
 npx hardhat run --network localhost scripts/deploy/025-deploy-fix-transfer-from-with-provenance.ts || exit $?
 npx hardhat run --network localhost scripts/deploy/026-deploy-bulk-collection.ts || exit $?
+npx hardhat run --network localhost scripts/deploy/027-deploy-bulk-issue-on-buyer.ts || exit $?

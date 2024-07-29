@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.21;
 
-interface IStartrailRegistryV24 {
+interface IStartrailRegistryV25 {
     /*
      * Events
      */
@@ -170,18 +170,6 @@ interface IStartrailRegistryV24 {
      * Functions
      */
 
-    // backward compatibility (deprecated form)
-    function createSRRFromLicensedUser(
-        bool isPrimaryIssuer,
-        address artistAddress,
-        bytes32 metadataDigest,
-        string memory metadataCID,
-        bool lockExternalTransfer,
-        address to,
-        address royaltyReceiver,
-        uint16 royaltyBasisPoints
-    ) external;
-
     function createSRRFromLicensedUser(
         bool isPrimaryIssuer,
         address artistAddress,
@@ -192,27 +180,17 @@ interface IStartrailRegistryV24 {
         uint16 royaltyBasisPoints
     ) external;
 
-    // backward compatibility (deprecated form)
     function createSRRFromBulk(
         bool isPrimaryIssuer,
         address artistAddress,
-        bytes32 metadataDigest,
         string memory metadataCID,
         address issuerAddress,
         bool lockExternalTransfer,
+        address to,
         address royaltyReceiver,
         uint16 royaltyBasisPoints
     ) external returns (uint256);
 
-    function createSRRFromBulk(
-        bool isPrimaryIssuer,
-        address artistAddress,
-        string memory metadataCID,
-        address issuerAddress,
-        bool lockExternalTransfer,
-        address royaltyReceiver,
-        uint16 royaltyBasisPoints
-    ) external returns (uint256);
 
     function updateSRR(
         uint256 tokenId,

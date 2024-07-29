@@ -7,5 +7,6 @@
   "tokenId": 481668863629,
   "commitment": "0xb6daf760d527218e79d27b55f12aae59dce9605cee0e3a7f74a1a7eb1a165071",
   "historyMetadataHash": "bafkreifgdh4gvgte2r2ex6ziek2v6fclk2mn4pa53afwxmsakrw53vvgiu",
-  "customHistoryId": 1
+  "customHistoryId": 1,
+  "contractAddress": "0x0000000000000000000000000000000000000000"
 }
