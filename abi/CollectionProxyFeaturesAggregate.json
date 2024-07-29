@@ -364,6 +364,11 @@
       },
       {
         "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
         "name": "royaltyReceiver",
         "type": "address"
       },

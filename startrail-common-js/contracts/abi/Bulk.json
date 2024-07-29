@@ -235,49 +235,6 @@
         "internalType": "uint256",
         "name": "customHistoryId",
         "type": "uint256"
-      }
-    ],
-    "name": "approveSRRByCommitmentWithProof",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32[]",
-        "name": "merkleProof",
-        "type": "bytes32[]"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "merkleRoot",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "leafHash",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "commitment",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "string",
-        "name": "historyMetadataHash",
-        "type": "string"
-      },
-      {
-        "internalType": "uint256",
-        "name": "customHistoryId",
-        "type": "uint256"
       },
       {
         "internalType": "address",
@@ -411,11 +368,6 @@
         "type": "address[]"
       },
       {
-        "internalType": "bytes32[]",
-        "name": "metadataDigests",
-        "type": "bytes32[]"
-      },
-      {
         "internalType": "string[]",
         "name": "metadataCIDs",
         "type": "string[]"
@@ -427,6 +379,11 @@
       },
       {
         "internalType": "address[]",
+        "name": "tos",
+        "type": "address[]"
+      },
+      {
+        "internalType": "address[]",
         "name": "royaltyReceivers",
         "type": "address[]"
       },
@@ -434,6 +391,11 @@
         "internalType": "uint16[]",
         "name": "royaltyBasisPoints",
         "type": "uint16[]"
+      },
+      {
+        "internalType": "address[]",
+        "name": "contractAddresses",
+        "type": "address[]"
       }
     ],
     "name": "createSRRWithProofMulti",
@@ -582,54 +544,6 @@
         "internalType": "address",
         "name": "contractAddress",
         "type": "address"
-      }
-    ],
-    "name": "transferFromWithProvenanceWithProof",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32[]",
-        "name": "merkleProof",
-        "type": "bytes32[]"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "merkleRoot",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "leafHash",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "historyMetadataHash",
-        "type": "string"
-      },
-      {
-        "internalType": "uint256",
-        "name": "customHistoryId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "isIntermediary",
-        "type": "bool"
       }
     ],
     "name": "transferFromWithProvenanceWithProof",

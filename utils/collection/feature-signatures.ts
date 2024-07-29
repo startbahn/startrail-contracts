@@ -1,4 +1,15 @@
-const erc721DefaultFuncSignatures = Object.freeze([
+enum CollectionFeatureEnum {
+  BulkFeature = 'BulkFeature',
+  ERC721Feature = 'ERC721Feature',
+  ERC2981RoyaltyFeature = 'ERC2981RoyaltyFeature',
+  LockExternalTransferFeature = 'LockExternalTransferFeature',
+  SRRFeature = 'SRRFeature',
+  SRRApproveTransferFeature = 'SRRApproveTransferFeature',
+  SRRMetadataFeature = 'SRRMetadataFeature',
+  SRRHistoryFeature = 'SRRHistoryFeature',
+}
+
+const erc721CommonFuncSignatures = Object.freeze([
   // feature
   `__ERC721Feature_initialize(string,string)`,
   `exists(uint256)`,
@@ -19,24 +30,24 @@ const erc721DefaultFuncSignatures = Object.freeze([
   // tokenURI() is added with the SRRMetadataFeature below
 ])
 
-const lockExternalTransferDefaultFuncSignatures = Object.freeze([
+const lockExternalTransferCommonFuncSignatures = Object.freeze([
   `setLockExternalTransfer(uint256,bool)`,
   `getLockExternalTransfer(uint256)`,
 ])
 
-const srrDefaultFuncSignatures = Object.freeze([
+const srrCommonFuncSignatures = Object.freeze([
   `createSRR(bool,address,string,bool,address,address,uint16)`,
   `getSRR(uint256)`,
   `updateSRR(uint256,bool,address)`,
 ])
 
-const srrMetadataDefaultFuncSignatures = Object.freeze([
+const srrMetadataCommonFuncSignatures = Object.freeze([
   `updateSRRMetadata(uint256,string)`,
   `getSRRMetadata(uint256)`,
   `tokenURI(uint256)`,
 ])
 
-const srrApproveTransferDefaultFuncSignatures = Object.freeze([
+const srrApproveTransferCommonFuncSignatures = Object.freeze([
   `approveSRRByCommitment(uint256,bytes32,string,uint256)`,
   `approveSRRByCommitment(uint256,bytes32,string)`,
   `cancelSRRCommitment(uint256)`,
@@ -44,55 +55,72 @@ const srrApproveTransferDefaultFuncSignatures = Object.freeze([
   `getSRRCommitment(uint256)`,
 ])
 
-const srrHistoryDefaultFuncSignatures = Object.freeze([
+const srrHistoryCommonFuncSignatures = Object.freeze([
   `addHistory(uint256[],uint256[])`,
 ])
 
-const erc2981RoyaltyDefaultFuncSignatures = Object.freeze([
+const erc2981RoyaltyCommonFuncSignatures = Object.freeze([
   `updateSRRRoyalty(uint256,address,uint16)`,
   `updateSRRRoyaltyReceiverMulti(uint256[],address)`,
   `getSRRRoyalty(uint256)`,
   `royaltyInfo(uint256,uint256)`,
 ])
 
-const bulkDefaultFuncSignatures = Object.freeze([
-  `createSRRFromBulk(bool,address,string,address,bool,address,uint16)`,
+const bulkCommonFuncSignatures = Object.freeze([
   `approveSRRByCommitmentFromBulk(address,uint256,bytes32,string,uint256)`,
   `transferFromWithProvenanceFromBulk(address,address,uint256,string,uint256,bool)`,
 ])
 
-const functionSignatures = Object.freeze({
-  erc721: {
-    v1: [...erc721DefaultFuncSignatures],
-    v2: [...erc721DefaultFuncSignatures],
-    v3: [...erc721DefaultFuncSignatures],
-  },
-  lockExternalTransfer: {
-    v1: [...lockExternalTransferDefaultFuncSignatures],
-  },
-  srr: {
-    v1: [...srrDefaultFuncSignatures],
-    v2: [...srrDefaultFuncSignatures],
-  },
-  srrApproveTransfer: {
-    v1: [
-      ...srrApproveTransferDefaultFuncSignatures,
-      `approveSRRByCommitmentFromBulk(uint256,bytes32,string,uint256)`,
-    ],
-    v2: [...srrApproveTransferDefaultFuncSignatures],
-  },
-  srrMetadata: {
-    v1: [...srrMetadataDefaultFuncSignatures],
-  },
-  srrHistory: {
-    v1: [...srrHistoryDefaultFuncSignatures],
-  },
-  erc2981Royalty: {
-    v1: [...erc2981RoyaltyDefaultFuncSignatures],
-  },
-  bulk: {
-    v1: [...bulkDefaultFuncSignatures],
-  },
-})
+type CollectionFunctionSignaturesType = {
+  [Key in CollectionFeatureEnum]: {
+    [version: string]: string[]
+  }
+}
 
-export default functionSignatures
+const CollectionFunctionSignatures: CollectionFunctionSignaturesType =
+  Object.freeze({
+    ERC721Feature: {
+      V01: [...erc721CommonFuncSignatures],
+      V02: [...erc721CommonFuncSignatures],
+      V03: [...erc721CommonFuncSignatures],
+    },
+    LockExternalTransferFeature: {
+      V01: [...lockExternalTransferCommonFuncSignatures],
+    },
+    SRRFeature: {
+      V01: [...srrCommonFuncSignatures],
+      V02: [...srrCommonFuncSignatures],
+    },
+    SRRApproveTransferFeature: {
+      V01: [
+        ...srrApproveTransferCommonFuncSignatures,
+        `approveSRRByCommitmentFromBulk(uint256,bytes32,string,uint256)`,
+      ],
+      V02: [...srrApproveTransferCommonFuncSignatures],
+    },
+    SRRMetadataFeature: {
+      V01: [...srrMetadataCommonFuncSignatures],
+    },
+    SRRHistoryFeature: {
+      V01: [...srrHistoryCommonFuncSignatures],
+    },
+    ERC2981RoyaltyFeature: {
+      V01: [...erc2981RoyaltyCommonFuncSignatures],
+    },
+    BulkFeature: {
+      V01: [
+        ...bulkCommonFuncSignatures,
+        `createSRRFromBulk(bool,address,string,address,bool,address,uint16)`,
+      ],
+      V02: [
+        ...bulkCommonFuncSignatures,
+        `createSRRFromBulk(bool,address,string,address,bool,address,address,uint16)`,
+      ],
+    },
+  })
+
+export {
+  CollectionFeatureEnum,
+  CollectionFunctionSignaturesType,
+  CollectionFunctionSignatures,
+}

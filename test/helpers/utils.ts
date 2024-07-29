@@ -260,12 +260,10 @@ const sendWithEIP2771 = (
   )
 
 const BULK_CONTRACT_METHOD_KEYS = Object.freeze({
-  create: `createSRRWithProofMulti(bytes32[][],bytes32,bytes32[],bool[],address[],string[],bool[],address[],uint16[],address[])`,
-  createStartrailRegistry: `createSRRWithProofMulti(bytes32[][],bytes32,bytes32[],bool[],address[],bytes32[],string[],bool[],address[],uint16[])`,
+  create: `createSRRWithProofMulti(bytes32[][],bytes32,bytes32[],bool[],address[],string[],bool[],address[],address[],uint16[],address[])`,
+  createLegacy: `createSRRWithProofMulti(bytes32[][],bytes32,bytes32[],bool[],address[],string[],bool[],address[],uint16[],address[])`,
   approve: `approveSRRByCommitmentWithProof(bytes32[],bytes32,bytes32,uint256,bytes32,string,uint256,address)`,
-  approveStartrailRegistry: `approveSRRByCommitmentWithProof(bytes32[],bytes32,bytes32,uint256,bytes32,string,uint256)`,
   transfer: `transferFromWithProvenanceWithProof(bytes32[],bytes32,bytes32,address,uint256,string,uint256,bool,address)`,
-  transferStartrailRegistry: `transferFromWithProvenanceWithProof(bytes32[],bytes32,bytes32,address,uint256,string,uint256,bool)`,
 })
 
 const BULK_CONTRACT_EVENT_KEYS = Object.freeze({

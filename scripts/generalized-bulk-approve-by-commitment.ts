@@ -22,35 +22,33 @@ generalized-bulk-approve-by-commitment.json example (see scripts/__data__ for fi
   "historyMetadataHash": "0xe515947139053d36f28e833667f77df096b1dd3ecdd0146bce6cc5fa38700615",
   "customHistoryId": 0
 }
-`);
-    process.exit(-1);
+`)
+    process.exit(-1)
   }
 
-  const deployJSON = loadDeployJSON(hre);
-  const bulk = await getContract(hre, "Bulk");
+  const deployJSON = loadDeployJSON(hre)
+  const bulk = await getContract(hre, 'Bulk')
 
-  const bulkInput = JSON.parse(
-    fs.readFileSync(process.argv[2]).toString()
-  );
+  const bulkInput = JSON.parse(fs.readFileSync(process.argv[2]).toString())
 
   const transferResult = await bulk[
-    "approveSRRByCommitmentWithProof(bytes32[],bytes32,bytes32,uint256,bytes32,string,uint256)"
-  ](...Object.values(bulkInput));
-  const txReceipt = await waitTxHH(hre, transferResult, 0);
+    'approveSRRByCommitmentWithProof(bytes32[],bytes32,bytes32,uint256,bytes32,string,uint256,address)'
+  ](...Object.values(bulkInput))
+  const txReceipt = await waitTxHH(hre, transferResult, 0)
   console.log(
     `\nlogs: ${JSON.stringify(
       await parseLogs(hre, deployJSON, txReceipt.logs),
       null,
       2
     )}`
-  );
+  )
 
-  console.log(`\nstatus: ${txReceipt.status}\n`);
+  console.log(`\nstatus: ${txReceipt.status}\n`)
 }
 
 main()
   .then(() => process.exit(0))
   .catch((error) => {
-    console.error(red(`\nFailure: ${error.toString()}\n`));
-    process.exit(1);
-  });
+    console.error(red(`\nFailure: ${error.toString()}\n`))
+    process.exit(1)
+  })

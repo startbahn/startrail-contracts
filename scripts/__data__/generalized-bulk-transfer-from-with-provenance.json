@@ -8,5 +8,6 @@
   "tokenId": "56100282337",
   "historyMetadataHash": "bafkreidd2cdz7telrdi554utn5xhezacqpvdrrrin6r6rmsmictdarlsu4",
   "customHistoryId": 1,
-  "isIntermediary": false
+  "isIntermediary": false,
+  "contractAddress": "0x0000000000000000000000000000000000000000"
 }

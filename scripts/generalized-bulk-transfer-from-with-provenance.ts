@@ -23,35 +23,33 @@ generalized-bulk-transfer-from-with-provenance.json example (see scripts/__data_
   "customHistoryId": 0,
   "isIntermediary": false
 }
-`);
-    process.exit(-1);
+`)
+    process.exit(-1)
   }
 
-  const deployJSON = loadDeployJSON(hre);
-  const bulk = await getContract(hre, "Bulk");
+  const deployJSON = loadDeployJSON(hre)
+  const bulk = await getContract(hre, 'Bulk')
 
-  const bulkInput = JSON.parse(
-    fs.readFileSync(process.argv[2]).toString()
-  );
+  const bulkInput = JSON.parse(fs.readFileSync(process.argv[2]).toString())
 
   const transferResult = await bulk[
-    "transferFromWithProvenanceWithProof(bytes32[],bytes32,bytes32,address,uint256,string,uint256,bool)"
-  ](...Object.values(bulkInput));
-  const txReceipt = await waitTxHH(hre, transferResult, 0);
+    'transferFromWithProvenanceWithProof(bytes32[],bytes32,bytes32,address,uint256,string,uint256,bool,address)'
+  ](...Object.values(bulkInput))
+  const txReceipt = await waitTxHH(hre, transferResult, 0)
   console.log(
     `\nlogs: ${JSON.stringify(
       await parseLogs(hre, deployJSON, txReceipt.logs),
       null,
       2
     )}`
-  );
+  )
 
-  console.log(`\nstatus: ${txReceipt.status}\n`);
+  console.log(`\nstatus: ${txReceipt.status}\n`)
 }
 
 main()
   .then(() => process.exit(0))
   .catch((error) => {
-    console.error(red(`\nFailure: ${error.toString()}\n`));
-    process.exit(1);
-  });
+    console.error(red(`\nFailure: ${error.toString()}\n`))
+    process.exit(1)
+  })

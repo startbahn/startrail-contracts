@@ -4,7 +4,6 @@ import { ethers } from 'ethers'
 import hre from 'hardhat'
 import { pick } from 'lodash'
 import { ContractKeys } from '../startrail-common-js/contracts/types'
-import { zeroBytes32 } from '../startrail-common-js/ethereum/utils'
 import {
   randomAddress,
   randomBoolean,
@@ -192,14 +191,11 @@ const hashWithContractAddress = (
   return ethers.utils.solidityKeccak256(inputTypes, inputValues)
 }
 
-describe('Bulk', () => {
+describe('Bulk (transfers)', () => {
   before(async () => {
     ;({ startrailRegistry, bulk, nameRegistry } = await loadFixture(
       fixtureDefault
     ))
-    console.log(
-      `bulk keys ${JSON.stringify(Object.keys(bulk.interface.events), null, 2)}`
-    )
     // For unit testing set the trusted forwarders and the administrator to
     // EOA wallets. This will allow transactions to be sent directly to the
     // BulkTransfer which is simpler for unit testing purposes.
@@ -371,7 +367,6 @@ describe('Bulk', () => {
           ],
           withCustomHistory
         )
-        // console.log(`bulkActions ${JSON.stringify(bulkActions, null, 2)}`)
 
         const merkleTree = createMerkleTreeFromBulkActions(bulkActions)
         tree = merkleTree.tree
@@ -379,7 +374,6 @@ describe('Bulk', () => {
 
         hashBuffers = merkleTree.hashBuffers
         hashStrings = merkleTree.hashStrings
-        // console.log(`hashStrings ${JSON.stringify(hashStrings, null, 2)}`)
 
         return prepareBatchFromLicensedUser(merkleRoot)
       })
@@ -585,11 +579,10 @@ describe('Bulk', () => {
     const createSRROnStartrailRegistry = async (senderAddress: string) => {
       const txReceipt = await sendWithEIP2771(
         startrailRegistry,
-        `createSRRFromLicensedUser(bool,address,bytes32,string,bool,address,address,uint16)`,
+        `createSRRFromLicensedUser(bool,address,string,bool,address,address,uint16)`,
         [
           randomBoolean(), // isPrimaryIssuer
           randomAddress(), // artistAddress
-          zeroBytes32, // metadataDigest
           await randomCID(), // metadataCID
           randomBoolean(), // lockExternalTransfer
           ZERO_ADDRESS, // to
@@ -686,14 +679,15 @@ describe('Bulk', () => {
 
         expect(srr.actionType).to.equal('approveSRRByCommitment')
 
-        return bulk[BULK_CONTRACT_METHOD_KEYS.approveStartrailRegistry](
+        return bulk[BULK_CONTRACT_METHOD_KEYS.approve](
           merkleProof,
           merkleRoot,
           srrLeafString,
           srr.data.tokenId,
           srr.data.commitment,
           srr.data.historyMetadataHash,
-          0
+          0,
+          ZERO_ADDRESS
         )
       }
 
@@ -706,14 +700,15 @@ describe('Bulk', () => {
 
         expect(srr.actionType).to.equal('approveSRRByCommitment')
 
-        return bulk[BULK_CONTRACT_METHOD_KEYS.approveStartrailRegistry](
+        return bulk[BULK_CONTRACT_METHOD_KEYS.approve](
           merkleProof,
           merkleRootWithCustomHistoryId,
           srrLeafString,
           srr.data.tokenId,
           srr.data.commitment,
           srr.data.historyMetadataHash,
-          srr.data.customHistoryId
+          srr.data.customHistoryId,
+          ZERO_ADDRESS
         )
       }
 
@@ -785,14 +780,15 @@ describe('Bulk', () => {
         merkleProof[0] = randomSha256()
 
         return expect(
-          bulk[BULK_CONTRACT_METHOD_KEYS.approveStartrailRegistry](
+          bulk[BULK_CONTRACT_METHOD_KEYS.approve](
             merkleProof,
             merkleRoot,
             srrLeafString,
             srr.data.tokenId,
             srr.data.commitment,
             srr.data.historyMetadataHash,
-            0
+            0,
+            ZERO_ADDRESS
           )
         ).to.eventually.be.rejectedWith(`Merkle proof verification failed`)
       })
@@ -810,14 +806,15 @@ describe('Bulk', () => {
         merkleProof[0] = randomSha256()
 
         return expect(
-          bulk[BULK_CONTRACT_METHOD_KEYS.approveStartrailRegistry](
+          bulk[BULK_CONTRACT_METHOD_KEYS.approve](
             merkleProof,
             merkleRootWithCustomHistoryId,
             srrLeafString,
             srr.data.tokenId,
             srr.data.commitment,
             srr.data.historyMetadataHash,
-            srr.data.customHistoryId
+            srr.data.customHistoryId,
+            ZERO_ADDRESS
           )
         ).to.eventually.be.rejectedWith(`Merkle proof verification failed`)
       })
@@ -832,14 +829,15 @@ describe('Bulk', () => {
         const invalidSRRLeafString = randomSha256()
 
         return expect(
-          bulk[BULK_CONTRACT_METHOD_KEYS.approveStartrailRegistry](
+          bulk[BULK_CONTRACT_METHOD_KEYS.approve](
             merkleProof,
             merkleRoot,
             invalidSRRLeafString,
             srr.data.tokenId,
             srr.data.commitment,
             srr.data.historyMetadataHash,
-            0
+            0,
+            ZERO_ADDRESS
           )
         ).to.eventually.be.rejectedWith(
           `leafHash does not match the approveSRRByCommitment details`
@@ -858,14 +856,15 @@ describe('Bulk', () => {
         const invalidSRRLeafString = randomSha256()
 
         return expect(
-          bulk[BULK_CONTRACT_METHOD_KEYS.approveStartrailRegistry](
+          bulk[BULK_CONTRACT_METHOD_KEYS.approve](
             merkleProof,
             merkleRootWithCustomHistoryId,
             invalidSRRLeafString,
             srr.data.tokenId,
             srr.data.commitment,
             srr.data.historyMetadataHash,
-            srr.data.customHistoryId
+            srr.data.customHistoryId,
+            ZERO_ADDRESS
           )
         ).to.eventually.be.rejectedWith(
           `leafHash does not match the approveSRRByCommitment details`
@@ -874,14 +873,15 @@ describe('Bulk', () => {
 
       it("rejects if batch doesn't exist", () =>
         expect(
-          bulk[BULK_CONTRACT_METHOD_KEYS.approveStartrailRegistry](
+          bulk[BULK_CONTRACT_METHOD_KEYS.approve](
             [],
             randomSha256(), // merkleRoot will not exist
             randomSha256(),
             randomTokenId().toNumber(),
             randomSha256(),
             randomSha256(),
-            0
+            0,
+            ZERO_ADDRESS
           )
         ).to.eventually.be.rejectedWith(
           `Batch doesn't exist for the given merkle root`
@@ -896,7 +896,7 @@ describe('Bulk', () => {
 
         expect(srr.actionType).to.equal('transferFromWithProvenance')
 
-        return bulk[BULK_CONTRACT_METHOD_KEYS.transferStartrailRegistry](
+        return bulk[BULK_CONTRACT_METHOD_KEYS.transfer](
           merkleProof,
           merkleRoot,
           srrLeafString,
@@ -904,7 +904,8 @@ describe('Bulk', () => {
           srr.data.tokenId,
           srr.data.historyMetadataHash,
           0,
-          srr.data.isIntermediary
+          srr.data.isIntermediary,
+          ZERO_ADDRESS
         )
       }
 
@@ -917,7 +918,7 @@ describe('Bulk', () => {
 
         expect(srr.actionType).to.equal('transferFromWithProvenance')
 
-        return bulk[BULK_CONTRACT_METHOD_KEYS.transferStartrailRegistry](
+        return bulk[BULK_CONTRACT_METHOD_KEYS.transfer](
           merkleProof,
           merkleRootWithCustomHistoryId,
           srrLeafString,
@@ -925,7 +926,8 @@ describe('Bulk', () => {
           srr.data.tokenId,
           srr.data.historyMetadataHash,
           srr.data.customHistoryId,
-          srr.data.isIntermediary
+          srr.data.isIntermediary,
+          ZERO_ADDRESS
         )
       }
 

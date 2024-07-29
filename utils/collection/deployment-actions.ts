@@ -20,8 +20,12 @@ import {
   getContractFactory,
 } from '../hardhat-helpers'
 import ercInterfaces from './erc-interfaces'
-import featureSelectors from './feature-selectors'
 import { deployFeature, upgradeFeature } from './utils'
+import {
+  StartrailUpgradeVersion,
+  StartrailFeatureEnum,
+  StartrailFeature,
+} from '../types'
 
 const loggingOn = true
 
@@ -48,9 +52,11 @@ const setCollectionRegistryOnCollectionFactory = async (
 }
 
 const deployERC721Feature = async (
-  featureRegistry: StartrailCollectionFeatureRegistry
+  featureRegistry: StartrailCollectionFeatureRegistry,
+  version: string
 ): Promise<Contract> => {
-  const featureFactory = await getContractFactory(hre, 'ERC721Feature')
+  const contractName = `${StartrailFeatureEnum.ERC721Feature}${version}`
+  const featureFactory = await getContractFactory(hre, contractName)
   const initData = featureFactory.interface.encodeFunctionData(
     featureFactory.interface.functions[
       `__ERC721Feature_initialize(string,string)`
@@ -59,30 +65,38 @@ const deployERC721Feature = async (
   )
   return deployFeature({
     featureRegistry,
-    featureName: `ERC721Feature`,
-    selectors: await featureSelectors.erc721(),
+    feature: {
+      name: StartrailFeatureEnum.ERC721Feature,
+      version,
+    },
     supportedInterfaceIds: [ercInterfaces.ERC721, ercInterfaces.ERC721Metadata],
     initData,
   })
 }
 
 const deployLockExternalTransferFeature = async (
-  featureRegistry: StartrailCollectionFeatureRegistry
+  featureRegistry: StartrailCollectionFeatureRegistry,
+  version: string
 ): Promise<Contract> =>
   deployFeature({
     featureRegistry,
-    featureName: `LockExternalTransferFeature`,
-    selectors: await featureSelectors.lockExternalTransfer(),
+    feature: {
+      name: StartrailFeatureEnum.LockExternalTransferFeature,
+      version,
+    },
   })
 
 const deploySRRFeature = async (
-  featureRegistry: StartrailCollectionFeatureRegistry
+  featureRegistry: StartrailCollectionFeatureRegistry,
+  version: string
 ): Promise<Contract> => {
   const { idGeneratorLibraryAddress } = loadDeployJSON(hre)
   return deployFeature({
     featureRegistry,
-    featureName: `SRRFeature`,
-    selectors: await featureSelectors.srr(),
+    feature: {
+      name: StartrailFeatureEnum.SRRFeature,
+      version,
+    },
     linkLibraries: {
       IDGeneratorV3: idGeneratorLibraryAddress,
     },
@@ -90,91 +104,95 @@ const deploySRRFeature = async (
 }
 
 const deploySRRApproveTransferFeature = async (
-  featureRegistry: StartrailCollectionFeatureRegistry
+  featureRegistry: StartrailCollectionFeatureRegistry,
+  version: string
 ): Promise<Contract> => {
   return deployFeature({
     featureRegistry,
-    featureName: `SRRApproveTransferFeature`,
-    selectors: await featureSelectors.srrApproveTransfer(),
+    feature: {
+      name: StartrailFeatureEnum.SRRApproveTransferFeature,
+      version,
+    },
   })
 }
 
 const deploySRRMetadataFeature = async (
-  featureRegistry: StartrailCollectionFeatureRegistry
+  featureRegistry: StartrailCollectionFeatureRegistry,
+  version: string
 ): Promise<Contract> => {
   return deployFeature({
     featureRegistry,
-    featureName: `SRRMetadataFeature`,
-    selectors: await featureSelectors.srrMetadata(),
+    feature: {
+      name: StartrailFeatureEnum.SRRMetadataFeature,
+      version,
+    },
   })
 }
 
 const deploySRRHistoryFeature = async (
-  featureRegistry: StartrailCollectionFeatureRegistry
+  featureRegistry: StartrailCollectionFeatureRegistry,
+  version: string
 ): Promise<Contract> => {
   return deployFeature({
     featureRegistry,
-    featureName: `SRRHistoryFeature`,
-    selectors: await featureSelectors.srrHistory(),
+    feature: {
+      name: StartrailFeatureEnum.SRRHistoryFeature,
+      version,
+    },
   })
 }
 
 const deployERC2981RoyaltyFeature = async (
-  featureRegistry: StartrailCollectionFeatureRegistry
+  featureRegistry: StartrailCollectionFeatureRegistry,
+  version: string
 ): Promise<Contract> => {
   return deployFeature({
     featureRegistry,
-    featureName: `ERC2981RoyaltyFeature`,
-    selectors: await featureSelectors.erc2981Royalty(),
+    feature: {
+      name: StartrailFeatureEnum.ERC2981RoyaltyFeature,
+      version,
+    },
     supportedInterfaceIds: [ercInterfaces.ERC2981],
   })
 }
 
 const deployBulkFeature = async (
-  featureRegistry: StartrailCollectionFeatureRegistry
+  featureRegistry: StartrailCollectionFeatureRegistry,
+  version: string
 ): Promise<Contract> => {
   const { idGeneratorLibraryAddress } = loadDeployJSON(hre)
   return deployFeature({
     featureRegistry,
-    featureName: `BulkFeature`,
-    selectors: await featureSelectors.bulk(),
+    feature: {
+      name: StartrailFeatureEnum.BulkFeature,
+      version,
+    },
     linkLibraries: {
       IDGeneratorV3: idGeneratorLibraryAddress,
     },
   })
 }
 
-/*
- * NOTE: temporary implementation for a manual upgrade in QA
- * Needs to be replaced by an implementation that takes a version parameter
- * and upgrades from for example V01 to V02.
- */
 const upgradeERC721Feature = async (
-  hre: HardhatRuntimeEnvironment
+  hre: HardhatRuntimeEnvironment,
+  upgradeVersion: StartrailUpgradeVersion
 ): Promise<Contract> => {
-  const featureRegistry = await getContract(
-    hre,
-    `StartrailCollectionFeatureRegistry`
-  )
   return upgradeFeature({
-    featureRegistry: featureRegistry as StartrailCollectionFeatureRegistry,
-    featureName: `ERC721Feature`,
-    selectors: await featureSelectors.erc721(),
+    hre,
+    featureName: StartrailFeatureEnum.ERC721Feature,
+    upgradeVersion,
   })
 }
 
 const upgradeSRRFeature = async (
-  hre: HardhatRuntimeEnvironment
+  hre: HardhatRuntimeEnvironment,
+  upgradeVersion: StartrailUpgradeVersion
 ): Promise<Contract> => {
-  const featureRegistry = await getContract(
-    hre,
-    `StartrailCollectionFeatureRegistry`
-  )
   const { idGeneratorLibraryAddress } = loadDeployJSON(hre)
   return upgradeFeature({
-    featureRegistry: featureRegistry as StartrailCollectionFeatureRegistry,
-    featureName: `SRRFeature`,
-    selectors: await featureSelectors.srr(),
+    hre,
+    featureName: StartrailFeatureEnum.SRRFeature,
+    upgradeVersion,
     linkLibraries: {
       IDGeneratorV3: idGeneratorLibraryAddress,
     },
@@ -182,93 +200,150 @@ const upgradeSRRFeature = async (
 }
 
 const upgradeERC2981RoyaltyFeature = async (
-  hre: HardhatRuntimeEnvironment
+  hre: HardhatRuntimeEnvironment,
+  upgradeVersion: StartrailUpgradeVersion
 ): Promise<Contract> => {
-  const featureRegistry = await getContract(
-    hre,
-    `StartrailCollectionFeatureRegistry`
-  )
-  const { idGeneratorLibraryAddress } = loadDeployJSON(hre)
   return upgradeFeature({
-    featureRegistry: featureRegistry as StartrailCollectionFeatureRegistry,
-    featureName: `ERC2981RoyaltyFeature`,
-    selectors: await featureSelectors.erc2981Royalty(),
+    hre,
+    featureName: StartrailFeatureEnum.ERC2981RoyaltyFeature,
+    upgradeVersion,
   })
 }
 
 const upgradeSRRMetadataFeature = async (
-  hre: HardhatRuntimeEnvironment
+  hre: HardhatRuntimeEnvironment,
+  upgradeVersion: StartrailUpgradeVersion
 ): Promise<Contract> => {
-  const featureRegistry = await getContract(
-    hre,
-    `StartrailCollectionFeatureRegistry`
-  )
   return upgradeFeature({
-    featureRegistry: featureRegistry as StartrailCollectionFeatureRegistry,
-    featureName: `SRRMetadataFeature`,
-    selectors: await featureSelectors.srrMetadata(),
+    hre,
+    featureName: StartrailFeatureEnum.SRRMetadataFeature,
+    upgradeVersion,
   })
 }
 
 const upgradeSRRApproveTransferFeature = async (
-  hre: HardhatRuntimeEnvironment
+  hre: HardhatRuntimeEnvironment,
+  upgradeVersion: StartrailUpgradeVersion
 ): Promise<Contract> => {
-  const featureRegistry = await getContract(
-    hre,
-    `StartrailCollectionFeatureRegistry`
-  )
   return upgradeFeature({
-    featureRegistry: featureRegistry as StartrailCollectionFeatureRegistry,
-    featureName: `SRRApproveTransferFeature`,
-    selectors: await featureSelectors.srrApproveTransfer(),
+    hre,
+    featureName: StartrailFeatureEnum.SRRApproveTransferFeature,
+    upgradeVersion,
   })
 }
 
 const upgradeLockExternalTransferFeature = async (
-  hre: HardhatRuntimeEnvironment
+  hre: HardhatRuntimeEnvironment,
+  upgradeVersion: StartrailUpgradeVersion
 ): Promise<Contract> => {
-  const featureRegistry = await getContract(
-    hre,
-    `StartrailCollectionFeatureRegistry`
-  )
   return upgradeFeature({
-    featureRegistry: featureRegistry as StartrailCollectionFeatureRegistry,
-    featureName: `LockExternalTransferFeature`,
-    selectors: await featureSelectors.lockExternalTransfer(),
+    hre,
+    featureName: StartrailFeatureEnum.LockExternalTransferFeature,
+    upgradeVersion,
   })
 }
 
 const upgradeSRRHistoryFeature = async (
-  hre: HardhatRuntimeEnvironment
+  hre: HardhatRuntimeEnvironment,
+  upgradeVersion: StartrailUpgradeVersion
 ): Promise<Contract> => {
-  const featureRegistry = await getContract(
-    hre,
-    `StartrailCollectionFeatureRegistry`
-  )
   return upgradeFeature({
-    featureRegistry: featureRegistry as StartrailCollectionFeatureRegistry,
-    featureName: `SRRHistoryFeature`,
-    selectors: await featureSelectors.srrHistory(),
+    hre,
+    featureName: StartrailFeatureEnum.SRRHistoryFeature,
+    upgradeVersion,
   })
 }
 
 const upgradeBulkFeature = async (
-  hre: HardhatRuntimeEnvironment
+  hre: HardhatRuntimeEnvironment,
+  upgradeVersion: StartrailUpgradeVersion
 ): Promise<Contract> => {
-  const featureRegistry = await getContract(
-    hre,
-    `StartrailCollectionFeatureRegistry`
-  )
   const { idGeneratorLibraryAddress } = loadDeployJSON(hre)
-  
   return upgradeFeature({
-    featureRegistry: featureRegistry as StartrailCollectionFeatureRegistry,
-    featureName: `BulkFeature`,
-    selectors: await featureSelectors.bulk(),
+    hre,
+    featureName: StartrailFeatureEnum.BulkFeature,
+    upgradeVersion,
     linkLibraries: {
       IDGeneratorV3: idGeneratorLibraryAddress,
     },
   })
+}
+
+/**
+ * Deploys a Startrail feature contract based on the specified feature information.
+ * @param params - An object containing the feature registry and feature details.
+ * @param params.featureRegistry - The Startrail feature registry contract instance.
+ * @param params.feature - The Startrail feature to be deployed.
+ * @returns A promise that resolves when the deployment is completed.
+ * @throws Will throw an error if the deployment function for the specified feature is not found.
+ */
+const deployFeatureContract = async (params: {
+  featureRegistry: StartrailCollectionFeatureRegistry
+  feature: StartrailFeature
+}) => {
+  const {
+    feature: { name, version },
+    featureRegistry,
+  } = params
+
+  switch (name) {
+    case StartrailFeatureEnum.BulkFeature:
+      return deployBulkFeature(featureRegistry, version)
+    case StartrailFeatureEnum.ERC2981RoyaltyFeature:
+      return deployERC2981RoyaltyFeature(featureRegistry, version)
+    case StartrailFeatureEnum.ERC721Feature:
+      return deployERC721Feature(featureRegistry, version)
+    case StartrailFeatureEnum.LockExternalTransferFeature:
+      return deployLockExternalTransferFeature(featureRegistry, version)
+    case StartrailFeatureEnum.SRRApproveTransferFeature:
+      return deploySRRApproveTransferFeature(featureRegistry, version)
+    case StartrailFeatureEnum.SRRFeature:
+      return deploySRRFeature(featureRegistry, version)
+    case StartrailFeatureEnum.SRRHistoryFeature:
+      return deploySRRHistoryFeature(featureRegistry, version)
+    case StartrailFeatureEnum.SRRMetadataFeature:
+      return deploySRRMetadataFeature(featureRegistry, version)
+    default:
+      throw new Error(`Deploy of ${name} not supported yet`)
+  }
+}
+
+/**
+ * Upgrades a Startrail feature contract to the specified version.
+ * @param params - An object containing the Hardhat runtime environment, feature name, and upgrade version.
+ * @param params.hre - The Hardhat runtime environment.
+ * @param params.featureName - The name of the Startrail feature to be upgraded.
+ * @param params.upgradeVersion - The version to upgrade the feature contract to.
+ * @returns - A promise that resolves when the upgrade is completed.
+ * @throws Will throw an error if the upgrade function for the specified feature is not found.
+ */
+const upgradeFeatureContract = async (params: {
+  hre: HardhatRuntimeEnvironment
+  featureName: StartrailFeatureEnum
+  upgradeVersion: StartrailUpgradeVersion
+}) => {
+  const { hre, featureName, upgradeVersion } = params
+
+  switch (featureName) {
+    case StartrailFeatureEnum.BulkFeature:
+      return upgradeBulkFeature(hre, upgradeVersion)
+    case StartrailFeatureEnum.ERC2981RoyaltyFeature:
+      return upgradeERC2981RoyaltyFeature(hre, upgradeVersion)
+    case StartrailFeatureEnum.ERC721Feature:
+      return upgradeERC721Feature(hre, upgradeVersion)
+    case StartrailFeatureEnum.LockExternalTransferFeature:
+      return upgradeLockExternalTransferFeature(hre, upgradeVersion)
+    case StartrailFeatureEnum.SRRApproveTransferFeature:
+      return upgradeSRRApproveTransferFeature(hre, upgradeVersion)
+    case StartrailFeatureEnum.SRRFeature:
+      return upgradeSRRFeature(hre, upgradeVersion)
+    case StartrailFeatureEnum.SRRHistoryFeature:
+      return upgradeSRRHistoryFeature(hre, upgradeVersion)
+    case StartrailFeatureEnum.SRRMetadataFeature:
+      return upgradeSRRMetadataFeature(hre, upgradeVersion)
+    default:
+      throw new Error(`Upgrade of ${featureName} not supported yet`)
+  }
 }
 
 /**
@@ -375,43 +450,85 @@ const deployCollectionsCore = async (
   //
   // Deploy Feature Contracts
   //
+  const erc721Feature = await deployFeatureContract({
+    featureRegistry,
+    feature: {
+      name: StartrailFeatureEnum.ERC721Feature,
+      version: 'V01',
+    },
+  })
 
-  const erc721Feature = await deployERC721Feature(featureRegistry)
   loggingOn &&
     console.log(`ERC721Feature deployed to: ${erc721Feature.address}`)
 
-  const lockExternalTransferFeature = await deployLockExternalTransferFeature(
-    featureRegistry
-  )
+  const lockExternalTransferFeature = await deployFeatureContract({
+    featureRegistry,
+    feature: {
+      name: StartrailFeatureEnum.LockExternalTransferFeature,
+      version: 'V01',
+    },
+  })
+
   loggingOn &&
     console.log(
       `LockExternalTransferFeature deployed to: ${lockExternalTransferFeature.address}`
     )
 
-  const srrFeature = await deploySRRFeature(featureRegistry)
+  const srrFeature = await deployFeatureContract({
+    featureRegistry,
+    feature: {
+      name: StartrailFeatureEnum.SRRFeature,
+      version: 'V01',
+    },
+  })
+
   loggingOn && console.log(`SRRFeature deployed to: ${srrFeature.address}`)
 
-  const srrApprovalFeature = await deploySRRApproveTransferFeature(
-    featureRegistry
-  )
+  const srrApprovalFeature = await deployFeatureContract({
+    featureRegistry,
+    feature: {
+      name: StartrailFeatureEnum.SRRApproveTransferFeature,
+      version: 'V01',
+    },
+  })
+
   loggingOn &&
     console.log(
       `SRRApproveTransferFeature deployed to: ${srrApprovalFeature.address}`
     )
 
-  const erc2981RoyaltyFeature = await deployERC2981RoyaltyFeature(
-    featureRegistry
-  )
+  const erc2981RoyaltyFeature = await deployFeatureContract({
+    featureRegistry,
+    feature: {
+      name: StartrailFeatureEnum.ERC2981RoyaltyFeature,
+      version: 'V01',
+    },
+  })
+
   loggingOn &&
     console.log(
       `ERC2981RoyaltyFeature deployed to: ${erc2981RoyaltyFeature.address}`
     )
 
-  const srrMetadataFeature = await deploySRRMetadataFeature(featureRegistry)
+  const srrMetadataFeature = await deployFeatureContract({
+    featureRegistry,
+    feature: {
+      name: StartrailFeatureEnum.SRRMetadataFeature,
+      version: 'V01',
+    },
+  })
+
   loggingOn &&
     console.log(`SRRMetadataFeature deployed to: ${srrMetadataFeature.address}`)
 
-  const srrHistoryFeature = await deploySRRHistoryFeature(featureRegistry)
+  const srrHistoryFeature = await deployFeatureContract({
+    featureRegistry,
+    feature: {
+      name: StartrailFeatureEnum.SRRHistoryFeature,
+      version: 'V01',
+    },
+  })
+
   loggingOn &&
     console.log(`SRRHistoryFeature deployed to: ${srrHistoryFeature.address}`)
 
@@ -428,15 +545,7 @@ const deployCollectionsCore = async (
 
 export {
   deployCollectionsCore,
-  deployBulkFeature,
-  deployERC721Feature,
   deployFeature,
-  upgradeERC721Feature,
-  upgradeSRRFeature,
-  upgradeERC2981RoyaltyFeature,
-  upgradeSRRMetadataFeature,
-  upgradeLockExternalTransferFeature,
-  upgradeSRRApproveTransferFeature,
-  upgradeSRRHistoryFeature,
-  upgradeBulkFeature,
+  deployFeatureContract,
+  upgradeFeatureContract,
 }

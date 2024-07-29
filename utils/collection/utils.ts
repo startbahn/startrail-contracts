@@ -1,11 +1,18 @@
 import { Contract } from 'ethers'
-import { BytesLike, Interface } from 'ethers/lib/utils'
+import { BytesLike, Interface, id } from 'ethers/lib/utils'
 import hre, { ethers } from 'hardhat'
-
 import { ZERO_ADDRESS } from '../../test/helpers/utils'
 import { StartrailCollectionFeatureRegistry } from '../../typechain-types'
-import { getContractFactory } from '../hardhat-helpers'
+import { getContract, getContractFactory } from '../hardhat-helpers'
+import {
+  StartrailFeature,
+  StartrailFeatureEnum,
+  StartrailUpgradeVersion,
+} from '../types'
 import { FacetCutAction, FacetCutDefinition } from './types'
+import _ from 'lodash'
+import { CollectionFeatureSelectors } from './feature-selectors'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 const registerSelectors = async (
   featureRegistry: StartrailCollectionFeatureRegistry,
@@ -18,7 +25,8 @@ const registerSelectors = async (
     action: FacetCutAction.Add,
     selectors: functionSelectors,
   }
-  // console.log('Register selectors input:', JSON.stringify(cut, null, 2))
+
+  console.log('Register selectors input:', JSON.stringify(cut, null, 2))
 
   const tx = await featureRegistry.diamondCut(
     [cut],
@@ -30,6 +38,8 @@ const registerSelectors = async (
   if (!receipt.status) {
     throw Error(`Register selectors tx failed: ${tx.hash}`)
   }
+
+  console.log('Registered selectors:', JSON.stringify(cut, null, 2))
 }
 
 const getSelectors = (contract: Contract): string[] => {
@@ -61,7 +71,7 @@ const replaceSelectors = async (
     action: FacetCutAction.Replace,
     selectors: functionSelectors,
   }
-  // console.log('Replace selectors input:', JSON.stringify(cut, null, 2))
+  console.log('Replace selectors input:', JSON.stringify(cut, null, 2))
 
   const tx = await featureRegistry.diamondCut(
     [cut],
@@ -73,6 +83,8 @@ const replaceSelectors = async (
   if (!receipt.status) {
     throw Error(`Replace selectors tx failed: ${tx.hash}`)
   }
+
+  console.log('Replaced selectors:', JSON.stringify(cut, null, 2))
 }
 
 /**
@@ -89,7 +101,7 @@ const removeSelectors = async (
     action: FacetCutAction.Remove,
     selectors: functionSelectors,
   }
-  // console.log('Remove selectors input:', JSON.stringify(cut, null, 2))
+  console.log('Remove selectors input:', JSON.stringify(cut, null, 2))
 
   const tx = await featureRegistry.diamondCut(
     [cut],
@@ -105,22 +117,33 @@ const removeSelectors = async (
   console.log('Removed selectors:', JSON.stringify(cut, null, 2))
 }
 
+/**
+ * Deploy a Collection feature contract.
+ *
+ * @param featureRegistry - The feature registry contract instance.
+ * @param feature - The type of feature to be deployed.
+ * @param supportedInterfaceIds - Optional list of supported interface IDs.
+ * @param initData - Optional initialization data for the feature contract.
+ * @param linkLibraries - Optional object specifying additional libraries to link during deployment.
+ * @returns A Promise resolving to the deployed feature contract instance.
+ */
 const deployFeature = async ({
   featureRegistry,
-  featureName,
-  selectors,
+  feature,
   supportedInterfaceIds = [],
   initData,
   linkLibraries = {},
 }: {
   featureRegistry: StartrailCollectionFeatureRegistry
-  featureName: string
-  selectors?: string[]
+  feature: StartrailFeature
   supportedInterfaceIds?: string[]
   initData?: BytesLike
   linkLibraries?: Record<string, string>
 }): Promise<Contract> => {
-  const featureFactory = await getContractFactory(hre, featureName, {
+  const contractName = `${feature.name}${feature.version}`
+  console.log(`Deploy ${contractName}`)
+
+  const featureFactory = await getContractFactory(hre, contractName, {
     libraries: linkLibraries,
   })
 
@@ -131,14 +154,14 @@ const deployFeature = async ({
         }
       : {}
 
-  const feature = await featureFactory.deploy(args)
-  await feature.deployed()
-  console.log(`${featureName} deployed: ${feature.address}`)
+  const featureContract = await featureFactory.deploy(args)
+  await featureContract.deployed()
+  console.log(`${contractName} deployed: ${featureContract.address}`)
 
   await registerSelectors(
     featureRegistry,
-    feature.address,
-    selectors || getSelectors(feature),
+    featureContract.address,
+    getSelectors(featureContract),
     initData
   )
 
@@ -146,37 +169,85 @@ const deployFeature = async ({
     await featureRegistry.setSupportedInterface(interfaceId, true)
   }
 
-  return feature
+  console.log(`Deployed ${contractName}`)
+
+  return featureContract
 }
 
+/**
+ * Upgrade a Collection feature to a specified version.
+ *
+ * @param params - An object containing the Hardhat runtime environment, feature name,
+ * upgrade version, and optional link libraries.
+ * @param params.hre - The Hardhat runtime environment.
+ * @param params.featureName - The name of the feature to be upgraded.
+ * @param params.upgradeVersion - The version to upgrade the feature to.
+ * @param params.linkLibraries - Optional object specifying additional libraries to link during deployment.
+ * @returns A Promise resolving to the upgraded feature contract instance.
+ */
 const upgradeFeature = async ({
-  featureRegistry,
+  hre,
   featureName,
-  selectors,
+  upgradeVersion,
   linkLibraries = {},
 }: {
-  featureRegistry: StartrailCollectionFeatureRegistry
-  featureName: string
-  selectors?: string[]
+  hre: HardhatRuntimeEnvironment
+  featureName: StartrailFeatureEnum
+  upgradeVersion: StartrailUpgradeVersion
   linkLibraries?: Record<string, string>
 }): Promise<Contract> => {
-  const featureFactory = await getContractFactory(hre, featureName, {
+  const toContractName = `${featureName}${upgradeVersion.to}`
+  const fromContractName = `${featureName}${upgradeVersion.from}`
+
+  const featureRegistry = (await getContract(
+    hre,
+    `StartrailCollectionFeatureRegistry`
+  )) as StartrailCollectionFeatureRegistry
+
+  console.log(`Upgrade ${toContractName} from ${fromContractName}`)
+
+  const featureFactory = await getContractFactory(hre, toContractName, {
     libraries: linkLibraries,
   })
+
   const feature = await featureFactory.deploy()
   await feature.deployed()
-  console.log(`${featureName} deployed: ${feature.address}`)
 
-  // NOTE: The following is a very simple version for this release.
-  //
-  // In future we'll need to add and remove individual functions
-  // and have separate lists for the previous and new versions of
-  // the feature contract.
-  await replaceSelectors(
-    featureRegistry,
-    feature.address,
-    selectors || getSelectors(feature)
+  console.log(`${toContractName} deployed: ${feature.address}`)
+
+  const fromSelectors = await CollectionFeatureSelectors[featureName](
+    upgradeVersion.from
   )
+  const toSelectors = getSelectors(feature)
+
+  const fromSelectorsSet = new Set(fromSelectors)
+  const toSelectorsSet = new Set(toSelectors)
+
+  const commonSelectors = Array.from(fromSelectorsSet).filter((item) =>
+    toSelectorsSet.has(item)
+  )
+
+  const legacySelectors = Array.from(fromSelectorsSet).filter(
+    (item) => !toSelectorsSet.has(item)
+  )
+
+  const newSelectors = Array.from(toSelectorsSet).filter(
+    (item) => !fromSelectorsSet.has(item)
+  )
+
+  if (!_.isEmpty(newSelectors)) {
+    await registerSelectors(featureRegistry, feature.address, newSelectors)
+  }
+
+  if (!_.isEmpty(commonSelectors)) {
+    await replaceSelectors(featureRegistry, feature.address, commonSelectors)
+  }
+
+  if (!_.isEmpty(legacySelectors)) {
+    await removeSelectors(featureRegistry, legacySelectors)
+  }
+
+  console.log(`Upgraded ${toContractName} from ${fromContractName}`)
 
   return feature
 }

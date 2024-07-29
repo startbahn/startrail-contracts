@@ -3,7 +3,6 @@ import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'ethers'
 import hre from 'hardhat'
 import { ContractKeys } from '../startrail-common-js/contracts/types'
-import { zeroBytes32 } from '../startrail-common-js/ethereum/utils'
 import { srrIdV3Compute } from '../startrail-common-js/srr/srr-id-compute'
 import {
   randomAddress,
@@ -32,7 +31,7 @@ import { toChecksumAddress } from './helpers/startrail-registry'
 
 use(chaiAsPromised)
 
-const TWENTY_MILLION = 20_000_000
+const TWELVE_MILLION = 12_000_000
 
 // Signing wallets
 const wallets = getWallets(hre)
@@ -50,6 +49,8 @@ let merkleRoot, srrs, tree, hashBuffers, hashStrings
 // Contract handle
 let bulk
 let nameRegistry
+let startrailRegistry
+let collection: CollectionProxyFeaturesAggregate
 
 const prepareBatchFromLicensedUser = (merkleRoot, sender = luwAddress) =>
   sendWithEIP2771(
@@ -60,42 +61,37 @@ const prepareBatchFromLicensedUser = (merkleRoot, sender = luwAddress) =>
     trustedForwarderWallet
   )
 
-const generateSRRs = async (n, collectionAddress?: string) => {
+const generateSRRs = async (
+  n,
+  options: {
+    collectionAddress?: string
+    to?: string
+  } = {}
+) => {
+  const { collectionAddress, to } = options
   const srrs = Promise.all(
     Array.apply(null, { length: n }).map(async (v, i) => {
       const metadataCID = await randomCID()
       return {
         isPrimaryIssuer: Math.round(Math.random()) === 1,
         artistAddress: randomAddress(),
-        metadataDigest: zeroBytes32,
         metadataCID,
         lockExternalTransfer: randomBoolean(),
+        to: to || ZERO_ADDRESS,
         royaltyReceiver: randomAddress(),
         royaltyBasisPoints: 500, // 5%
         contractAddress: collectionAddress
           ? toChecksumAddress(collectionAddress)
-          : undefined,
+          : ZERO_ADDRESS,
       }
     })
   )
   return srrs
 }
 
-const createMerkleTreeFromSRRs = (srrs, isEncodeRoyalty) => {
+const createMerkleTreeFromSRRs = (srrs, isToInLeafHash) => {
   const srrHashStrings = srrs.map((srr) => {
-    let inputs: Record<string, any> = {
-      isPrimaryIssuer: srr.isPrimaryIssuer,
-      artistAddress: srr.artistAddress,
-      metadataCID: srr.metadataCID,
-      metadataDigest: srr.metadataDigest,
-      lockExternalTransfer: srr.lockExternalTransfer,
-      royaltyReceiver: srr.royaltyReceiver,
-      royaltyBasisPoints: srr.royaltyBasisPoints,
-    }
-    if (srr.contractAddress) {
-      inputs = { ...inputs, contractAddress: srr.contractAddress }
-    }
-    return hashSRR(inputs, isEncodeRoyalty)
+    return hashSRR(srr, isToInLeafHash)
   })
   const srrHashBuffers = srrHashStrings.map((srr) =>
     Buffer.from(srr.substring(2), 'hex')
@@ -107,17 +103,20 @@ const createMerkleTreeFromSRRs = (srrs, isEncodeRoyalty) => {
   }
 }
 
-const hashSRR = (srr, isEncodeRoyalty) => {
+const hashSRR = (srr, isToInLeafHash) => {
   const baseTypes = ['bool', 'address', 'string', 'bool']
-  const omitKeys = ['metadataDigest']
+  const omitKeys = []
 
-  if (isEncodeRoyalty) {
-    baseTypes.push(...['address', 'uint16'])
+  if (isToInLeafHash) {
+    baseTypes.push('address')
   } else {
-    omitKeys.push(...['royaltyReceiver', 'royaltyBasisPoints'])
+    omitKeys.push('to')
   }
-  if (srr.contractAddress) {
-    baseTypes.push(...['address'])
+  baseTypes.push(...['address', 'uint16'])
+  if (srr.contractAddress !== ZERO_ADDRESS) {
+    baseTypes.push('address')
+  } else {
+    omitKeys.push('contractAddress')
   }
 
   return ethers.utils.solidityKeccak256(
@@ -134,8 +133,14 @@ interface CreateSRRWithProofSingleOverrides {
 
 const createSRRWithProofSingle = (
   srrIdx,
-  overrides: CreateSRRWithProofSingleOverrides = {}
+  overrides: CreateSRRWithProofSingleOverrides = {},
+  options: {
+    isLegacy: boolean
+  } = {
+    isLegacy: false,
+  }
 ) => {
+  const { isLegacy } = options
   const srr = srrs[srrIdx]
 
   const merkleProof = overrides.merkleProof
@@ -144,31 +149,35 @@ const createSRRWithProofSingle = (
   const merkleRoot_ = overrides.merkleRoot ? overrides.merkleRoot : merkleRoot
   const leafHash = overrides.leafHash ? overrides.leafHash : hashStrings[srrIdx]
 
-  return bulk[BULK_CONTRACT_METHOD_KEYS.create](
-    [merkleProof],
-    merkleRoot_,
-    [leafHash],
-    [srr.isPrimaryIssuer],
-    [srr.artistAddress],
-    [srr.metadataCID],
-    [srr.lockExternalTransfer],
-    [srr.royaltyReceiver],
-    [srr.royaltyBasisPoints],
-    [srr.contractAddress]
+  const fnName = isLegacy
+    ? BULK_CONTRACT_METHOD_KEYS.createLegacy
+    : BULK_CONTRACT_METHOD_KEYS.create
+  return bulk[fnName](
+    ..._.compact([
+      [merkleProof],
+      merkleRoot_,
+      [leafHash],
+      [srr.isPrimaryIssuer],
+      [srr.artistAddress],
+      [srr.metadataCID],
+      [srr.lockExternalTransfer],
+      isLegacy ? null : [srr.to],
+      [srr.royaltyReceiver],
+      [srr.royaltyBasisPoints],
+      [srr.contractAddress],
+    ])
   )
-}
-
-interface CreateSRRWithProofMultiOptions {
-  omitRoyalty?: boolean
-  callStartrailRegistry?: boolean
 }
 
 const createSRRWithProofMulti = async (
   numLeavesToSend: number,
-  options: CreateSRRWithProofMultiOptions = {
-    callStartrailRegistry: false,
+  options: {
+    isLegacy: boolean
+  } = {
+    isLegacy: false,
   }
 ) => {
+  const { isLegacy } = options
   const srrHashes = []
   const merkleProofs = []
   const srrDetailsList = []
@@ -185,49 +194,44 @@ const createSRRWithProofMulti = async (
     srrHashes,
     srrDetailsList.map((srr) => srr.isPrimaryIssuer),
     srrDetailsList.map((srr) => srr.artistAddress),
-    options.callStartrailRegistry
-      ? srrDetailsList.map((srr) => srr.metadataDigest)
-      : undefined,
     srrDetailsList.map((srr) => srr.metadataCID),
     srrDetailsList.map((srr) => srr.lockExternalTransfer),
-    options.omitRoyalty
-      ? _.times(_.size(srrDetailsList), () => ZERO_ADDRESS)
-      : srrDetailsList.map((srr) => srr.royaltyReceiver),
-    options.omitRoyalty
-      ? _.times(_.size(srrDetailsList), () => 0)
-      : srrDetailsList.map((srr) => srr.royaltyBasisPoints),
+    isLegacy ? null : srrDetailsList.map((srr) => srr.to),
+    srrDetailsList.map((srr) => srr.royaltyReceiver),
+    srrDetailsList.map((srr) => srr.royaltyBasisPoints),
   ])
 
-  if (!options.callStartrailRegistry) {
-    methodInputs.push(srrDetailsList.map((srr) => srr.contractAddress))
-  }
+  methodInputs.push(srrDetailsList.map((srr) => srr.contractAddress))
 
-  const txRsp = await bulk[
-    BULK_CONTRACT_METHOD_KEYS[
-      options.callStartrailRegistry ? `createStartrailRegistry` : `create`
-    ]
-  ](...methodInputs, {
-    gasLimit: TWENTY_MILLION,
+  const fnName = isLegacy
+    ? BULK_CONTRACT_METHOD_KEYS.createLegacy
+    : BULK_CONTRACT_METHOD_KEYS.create
+  const txRsp = await bulk[fnName](...methodInputs, {
+    gasLimit: TWELVE_MILLION,
   })
 
   const expectedTokenIds = srrDetailsList.map((srr) =>
     srrIdV3Compute(srr.artistAddress, srr.metadataCID)
   )
   for (let srrIdx = 0; srrIdx < numLeavesToSend; srrIdx++) {
+    const srr = srrs[srrIdx]
     await expect(txRsp)
       .to.emit(bulk, BULK_CONTRACT_EVENT_KEYS.create)
       .withArgs(
         merkleRoot,
-        options.callStartrailRegistry
-          ? ethers.constants.AddressZero
-          : srrDetailsList[srrIdx].contractAddress,
+        srrDetailsList[srrIdx].contractAddress,
         expectedTokenIds[srrIdx],
         srrHashes[srrIdx]
       )
+    // Confirm that the SRR has been successfully transferred to the address `to`
+    if (srr.to !== ZERO_ADDRESS) {
+      const owner =
+        srr.contractAddress !== ZERO_ADDRESS
+          ? await collection.ownerOf(expectedTokenIds[srrIdx])
+          : await startrailRegistry.ownerOf(expectedTokenIds[srrIdx])
+      expect(owner).equal(srrs[srrIdx].to)
+    }
   }
-  //   console.log(
-  //     `gasUsed: ${(await txRspPromise.then((rsp) => rsp.wait())).gasUsed}`
-  //   )
 
   const bulkRecord = await bulk.batches(merkleRoot)
   expect(bulkRecord[1]).to.equal(luwAddress) // issuer
@@ -236,7 +240,9 @@ const createSRRWithProofMulti = async (
 
 describe('Bulk (issuances)', () => {
   before(async () => {
-    ;({ bulk, nameRegistry } = await loadFixture(fixtureDefault))
+    ;({ bulk, nameRegistry, startrailRegistry } = await loadFixture(
+      fixtureDefault
+    ))
 
     // For unit testing set the trusted forwarders and the administrator to
     // EOA wallets. This will allow transactions to be sent directly to the
@@ -317,13 +323,20 @@ describe('Bulk (issuances)', () => {
   })
 
   describe('createSRRWithProofMulti (collection)', () => {
-    let collection: CollectionProxyFeaturesAggregate
-
     const createAndInitBatch = async (
       batchSize: number,
-      sender = luwAddress
+      options: {
+        sender: string
+        to?: string
+      } = {
+        sender: luwAddress,
+      }
     ) => {
-      srrs = await generateSRRs(batchSize, collection.address)
+      const { to } = options
+      srrs = await generateSRRs(batchSize, {
+        collectionAddress: collection.address,
+        to,
+      })
 
       const treeResult = createMerkleTreeFromSRRs(srrs, true)
       tree = treeResult.tree
@@ -332,7 +345,7 @@ describe('Bulk (issuances)', () => {
       hashBuffers = treeResult.hashBuffers
       hashStrings = treeResult.hashStrings
 
-      return prepareBatchFromLicensedUser(merkleRoot, sender)
+      return prepareBatchFromLicensedUser(merkleRoot, options.sender)
     }
 
     before(async () => {
@@ -346,14 +359,25 @@ describe('Bulk (issuances)', () => {
       ))
     })
 
-    it('success issuing 64 leaves with 20M gas', async () => {
-      await createAndInitBatch(65)
-      await createSRRWithProofMulti(64)
+    it('success issuing 30 leaves with 12M gas - without issuing on buyer', async () => {
+      await createAndInitBatch(30)
+      await createSRRWithProofMulti(30)
+    })
+
+    it('success issuing 30 leaves with 12M gas - with issuing on buyer', async () => {
+      const to = randomAddress()
+      await createAndInitBatch(30, {
+        sender: luwAddress,
+        to,
+      })
+      await createSRRWithProofMulti(30)
     })
 
     it('rejects if luw is not collection owner', async () => {
       const luwAddress2 = randomAddress()
-      await createAndInitBatch(4, luwAddress2)
+      await createAndInitBatch(4, {
+        sender: luwAddress2,
+      })
       return expect(createSRRWithProofSingle(1)).to.be.rejectedWith(
         `NotCollectionOwner()`
       )
@@ -398,11 +422,168 @@ describe('Bulk (issuances)', () => {
     })
   })
 
+  describe('createSRRWithProofMulti (collection) - legacy', () => {
+    const createAndInitBatch = async (
+      batchSize: number,
+      options: {
+        sender: string
+        to?: string
+      } = {
+        sender: luwAddress,
+      }
+    ) => {
+      const { to } = options
+      srrs = await generateSRRs(batchSize, {
+        collectionAddress: collection.address,
+        to,
+      })
+
+      const treeResult = createMerkleTreeFromSRRs(srrs, false)
+      tree = treeResult.tree
+      merkleRoot = tree.getHexRoot()
+
+      hashBuffers = treeResult.hashBuffers
+      hashStrings = treeResult.hashStrings
+
+      return prepareBatchFromLicensedUser(merkleRoot, options.sender)
+    }
+
+    before(async () => {
+      ;({ collection } = await setupCollection(
+        hre,
+        administratorWallet,
+        collectionOwnerWallet,
+        {
+          collectionOwnerLUWAddress: luwAddress,
+        }
+      ))
+    })
+
+    it('success issuing 30 leaves with 12M gas', async () => {
+      await createAndInitBatch(30)
+      await createSRRWithProofMulti(30, { isLegacy: true })
+    })
+
+    it('rejects if luw is not collection owner', async () => {
+      const luwAddress2 = randomAddress()
+      await createAndInitBatch(4, {
+        sender: luwAddress2,
+      })
+      return expect(
+        createSRRWithProofSingle(
+          1,
+          {},
+          {
+            isLegacy: true,
+          }
+        )
+      ).to.be.rejectedWith(`NotCollectionOwner()`)
+    })
+
+    it('rejects if merkle proof is wrong', async () => {
+      await createAndInitBatch(4)
+      const leafIdx = 2
+      const merkleProof = tree.getHexProof(hashBuffers[leafIdx])
+      merkleProof[0] = randomSha256()
+      return expect(
+        createSRRWithProofSingle(
+          leafIdx,
+          { merkleProof },
+          {
+            isLegacy: true,
+          }
+        )
+      ).to.be.rejectedWith(`Merkle proof verification failed`)
+    })
+
+    it('rejects if leaf already processed', async () => {
+      await createAndInitBatch(4)
+      const leafIdx = 1
+
+      // call create first time succeeds
+      await createSRRWithProofSingle(
+        leafIdx,
+        {},
+        {
+          isLegacy: true,
+        }
+      )
+
+      // now call create again for the same leaf
+      return expect(createSRRWithProofSingle(leafIdx)).to.be.rejectedWith(
+        `SRR already processed.`
+      )
+    })
+
+    it("rejects if srrHash doesn't match given details", async () => {
+      await createAndInitBatch(4)
+      const invalidSRRLeafHash = randomSha256()
+      return expect(
+        createSRRWithProofSingle(
+          1,
+          { leafHash: invalidSRRLeafHash },
+          {
+            isLegacy: true,
+          }
+        )
+      ).to.be.rejectedWith(`leafHash does not match the srr details`)
+    })
+
+    it("rejects if batch doesn't exist", async () => {
+      await createAndInitBatch(4)
+      expect(
+        createSRRWithProofSingle(
+          1,
+          { merkleRoot: randomSha256() },
+          {
+            isLegacy: true,
+          }
+        )
+      ).to.be.rejectedWith(`Batch doesn't exist for the given merkle root`)
+    })
+  })
+
   describe('createSRRWithProofMulti (Startrail Registry)', () => {
+    const createAndInitBatch = async (
+      batchSize: number,
+      options: {
+        isToInLeafHash: boolean
+        to?: string
+      } = {
+        isToInLeafHash: true,
+      }
+    ) => {
+      srrs = await generateSRRs(batchSize, options)
+
+      const treeResult = createMerkleTreeFromSRRs(srrs, true)
+      tree = treeResult.tree
+      merkleRoot = tree.getHexRoot()
+
+      hashBuffers = treeResult.hashBuffers
+      hashStrings = treeResult.hashStrings
+
+      return prepareBatchFromLicensedUser(merkleRoot)
+    }
+
+    it('success issuing 30 leaves with 12M gas - without issuing on buyer', async () => {
+      await createAndInitBatch(30)
+      await createSRRWithProofMulti(30)
+    })
+
+    it('success issuing 30 leaves with 12M gas - with issuing on buyer', async () => {
+      const to = randomAddress()
+      await createAndInitBatch(30, {
+        to,
+        isToInLeafHash: true,
+      })
+      await createSRRWithProofMulti(30)
+    })
+  })
+
+  describe('createSRRWithProofMulti (Startrail Registry) - legacy', () => {
     const createAndInitBatch = async (batchSize: number) => {
       srrs = await generateSRRs(batchSize)
 
-      // STARTRAIL-2320: royalty props not here but should be ...
       const treeResult = createMerkleTreeFromSRRs(srrs, false)
       tree = treeResult.tree
       merkleRoot = tree.getHexRoot()
@@ -413,16 +594,10 @@ describe('Bulk (issuances)', () => {
       return prepareBatchFromLicensedUser(merkleRoot)
     }
 
-    it('success issuing 64 leaves with 20M gas', async () => {
-      await createAndInitBatch(65)
-      await createSRRWithProofMulti(64, { callStartrailRegistry: true })
-    })
-
-    it('success issuing multiple leaves without royalty', async () => {
-      await createAndInitBatch(8)
-      await createSRRWithProofMulti(8, {
-        omitRoyalty: true,
-        callStartrailRegistry: true,
+    it('success issuing 30 leaves with 12M gas', async () => {
+      await createAndInitBatch(30)
+      await createSRRWithProofMulti(30, {
+        isLegacy: true,
       })
     })
   })
