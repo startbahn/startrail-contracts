@@ -1,4 +1,4 @@
-pragma solidity 0.8.13;
+pragma solidity 0.8.21;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
 import {DSTestPlus} from "solmate/test/utils/DSTestPlus.sol";
@@ -113,7 +113,7 @@ contract SRRHistoryFeatureTest is StartrailTestBase {
         uint256[] memory customHistoryIds = new uint256[](1);
         customHistoryIds[0] = CUSTOM_HISTORY_ID_EXHIBITION;
 
-        SRRFeatureV01 srr = SRRFeatureV01(collectionAddress);
+        SRRFeatureV02 srr = SRRFeatureV02(collectionAddress);
         (, address artist, address issuer) = srr.getSRR(tokenId1);
 
         ERC721FeatureV01 erc721 = ERC721FeatureV01(collectionAddress);

@@ -41,12 +41,11 @@ prod-tag-only: &prod_tag_only
 executors:
   default:
     docker:
-      - image: cimg/node:16.20
+      - image: cimg/node:18.15.0
   foundry:
     docker:
-      # foundry doesn't have a stable tag so lock at a specific commit here.
-      # periodically upgrade this:
-      - image: ghcr.io/foundry-rs/foundry:nightly-e15e33a07c0920189fc336391f538c3dad53da73
+      - image: startbahn/foundry:node-18.15.0
+
 commands:
   #
   # Shared Commands
@@ -81,12 +80,6 @@ commands:
   #
   # Startrail Commands
   #
-  install_dependencies_on_foundry_image:
-    steps:
-      - run:
-          name: Install Dependencies for NodeJs install on foundry image
-          command: |
-            apk add --update bash curl git nodejs openssh-client sudo yarn
   run_hardhat_compile:
     steps:
       - run:
@@ -125,6 +118,9 @@ commands:
           command: subgraph/bin/wait_for_subgraph
   run_startrail_deploy_and_seed:
     steps:
+      - run:
+          name: Compile Local
+          command: yarn compile
       - run:
           name: Deploy Local
           command: yarn deploy-local
@@ -211,7 +207,7 @@ commands:
   install_nodejs:
     steps:
       - node/install:
-          node-version: 16.20.0
+          node-version: 18.15.0
           install-yarn: false
 
   # Workaround because using 'install-yarn' from the node orb is failing
@@ -253,11 +249,6 @@ jobs:
   test_startrail_forge:
     executor: foundry
     steps:
-      - install_dependencies_on_foundry_image
-      # had problems using node/install orb to install node and yarn here so
-      # nstalled with apt in the previous command. unfortunately the nodejs
-      # minor version is different. for now it works fine but would be better
-      # to resolve this.
       - checkout
       - install_node_dependencies_startrail
       - install_forge_dependencies
@@ -265,7 +256,7 @@ jobs:
 
   test_subgraph:
     machine:
-      image: ubuntu-2004:2022.10.1
+      image: ubuntu-2204:2023.04.2
     resource_class: medium
     steps:
       - install_nodejs

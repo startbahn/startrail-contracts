@@ -72,7 +72,7 @@ describe('MetaTxForwarder', () => {
         wrongSigners: Wallet[]
         notEnoughSigners?: Wallet[]
         luAddress?: string
-        txRequestData?: Record<string, boolean | string>
+        txRequestData?: Record<string, number | boolean | string>
       }
 
       //
@@ -148,11 +148,11 @@ describe('MetaTxForwarder', () => {
       EXEC_TEST_CASES.forEach(async (testCase) => {
         describe(`${testCase.name} wallet`, () => {
           const requestType =
-            MetaTxRequestType.StartrailRegistryCreateSRRWithLockExternalTransfer
+            MetaTxRequestType.StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyalty
 
           beforeEach(async () => {
             // Execution request props
-            testCase.txRequestData = createSRRRequest()
+            testCase.txRequestData = await createSRRRequest()
           })
 
           it(`should execute transaction`, async () => {
@@ -204,10 +204,10 @@ describe('MetaTxForwarder', () => {
             },
             adminEOAWallet
           )
-        const issueRequest = createSRRRequest()
+        const issueRequest = await createSRRRequest()
         const tokenId = await encodeSignExecute({
           requestTypeKey:
-            MetaTxRequestType.StartrailRegistryCreateSRRWithLockExternalTransfer,
+            MetaTxRequestType.StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyalty,
           fromAddress,
           requestData: issueRequest,
           signerWallets: [handlerEOAWallet],
@@ -237,14 +237,14 @@ describe('MetaTxForwarder', () => {
     })
 
     describe('meta tx request types with destination passed in (collections)', () => {
-      let collectionOwnerLUAddress: string
+      let collectionOwnerLUWAddress: string
       let collectionOwnerSigner = handlerEOAWallet
       let collection: CollectionProxyFeaturesAggregate
 
       let tokenId: BigNumber
 
       before(async () => {
-        ;({ collectionOwnerLUAddress, collection, tokenId } =
+        ;({ collectionOwnerLUWAddress, collection, tokenId } =
           await setupCollection(hre, adminEOAWallet, handlerEOAWallet))
       })
 
@@ -259,7 +259,7 @@ describe('MetaTxForwarder', () => {
         }
         await encodeSignExecute({
           requestTypeKey: MetaTxRequestType.CollectionSetLockExternalTransfer,
-          fromAddress: collectionOwnerLUAddress,
+          fromAddress: collectionOwnerLUWAddress,
           requestData,
           signerWallets: [collectionOwnerSigner],
         }).then((txRsp) => txRsp.wait())
@@ -288,10 +288,10 @@ describe('MetaTxForwarder', () => {
         adminEOAWallet
       )
       fromAddress = walletAddress
-      const issueRequest = createSRRRequest()
+      const issueRequest = await createSRRRequest()
       tokenId = await encodeSignExecute({
         requestTypeKey:
-          MetaTxRequestType.StartrailRegistryCreateSRRWithLockExternalTransfer,
+          MetaTxRequestType.StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyalty,
         fromAddress: fromAddress,
         requestData: issueRequest,
         signerWallets: [handlerEOAWallet],
@@ -410,7 +410,7 @@ describe('MetaTxForwarder', () => {
       const aCommitment = ethers.utils.keccak256(aReveal)
       const aHistoryHash = ethers.utils.id('history_hash')
 
-      let collectionOwnerLUAddress: string
+      let collectionOwnerLUWAddress: string
       let collection: CollectionProxyFeaturesAggregate
       let collectionTokenId: BigNumber
 
@@ -420,7 +420,7 @@ describe('MetaTxForwarder', () => {
       before(async () => {
         ;({
           collection,
-          collectionOwnerLUAddress,
+          collectionOwnerLUWAddress,
           tokenId: collectionTokenId,
         } = await setupCollection(hre, adminEOAWallet, handlerEOAWallet))
 
@@ -428,7 +428,7 @@ describe('MetaTxForwarder', () => {
         // so we can use that new owner in the tests
         const approveTxRsp = await encodeSignExecute({
           requestTypeKey: MetaTxRequestType.CollectionApproveSRRByCommitmentV2,
-          fromAddress: collectionOwnerLUAddress,
+          fromAddress: collectionOwnerLUWAddress,
           requestData: {
             destination: collection.address,
             tokenId: collectionTokenId.toString(),

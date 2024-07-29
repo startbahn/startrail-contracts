@@ -87,47 +87,61 @@ const createSRR = async (
   })
     .then((tx) => tx.wait())
     .then((txReceipt) => BigNumber.from(txReceipt.logs[0].topics[3]))
+
 /**
- * Setup an LUW, Collection and single SRR on the Collection for testing.
+ * Sets up a Licensed User Wallet (LUW)
+ * Creates a Collection
+ * Issues a single SRR on the Collection for testing purposes.
+ *
  * @param hre HardhatRuntimeEnvironment
  * @param adminWallet An owner of the admin contract - required to create the LUW
- * @param collectionOwnerWallet EOA to be owner of the new LUW and thus signer for collection owner
- * @returns collectionOwnerLUAddress - address of the new LUW
- * @returns collection - contract handle of the newly created collection contract
- * @returns tokenId - id of newly issued SRR
+ * @param collectionOwnerWallet EOA to be the owner of the new LUW and the signer for the collection owner
+ * @param options Options for the setup
+ * @param options.collectionOwnerLUWAddress Optional: pre-existing LUW address for the collection owner
+ * @returns An object containing:
+ *   - `collectionOwnerLUWAddress`: The address of the new LUW or the pre-existing LUW, if provided.
+ *   - `collection`: Contract handle of the newly created collection contract.
+ *   - `tokenId`: Token Id.
  */
 const setupCollection = async (
   hre: HardhatRuntimeEnvironment,
   adminWallet: Wallet,
-  collectionOwnerWallet: Wallet
+  collectionOwnerWallet: Wallet,
+  options: {
+    collectionOwnerLUWAddress?: string
+  } = {
+    collectionOwnerLUWAddress: undefined,
+  }
 ): Promise<{
-  collectionOwnerLUAddress: string
+  collectionOwnerLUWAddress: string
   collection: CollectionProxyFeaturesAggregate
   tokenId: BigNumber
 }> => {
-  let collectionOwnerLUAddress: string
+  let { collectionOwnerLUWAddress } = options
   let collectionAddress: string
   let collection: CollectionProxyFeaturesAggregate
   let tokenId: BigNumber
 
+  if (!collectionOwnerLUWAddress) {
     // create an LU owned by the given wallet
-  ;({ walletAddress: collectionOwnerLUAddress } =
-    await createLicensedUserWalletDirect(
-      hre,
-      {
-        owners: [collectionOwnerWallet.address],
-      },
-      adminWallet
-    ))
+    ;({ walletAddress: collectionOwnerLUWAddress } =
+      await createLicensedUserWalletDirect(
+        hre,
+        {
+          owners: [collectionOwnerWallet.address],
+        },
+        adminWallet
+      ))
+  }
 
   collectionAddress = await createCollection(
-    collectionOwnerLUAddress,
+    collectionOwnerLUWAddress,
     collectionOwnerWallet,
     {}
   )
 
   tokenId = await createSRR(
-    collectionOwnerLUAddress,
+    collectionOwnerLUWAddress,
     collectionOwnerWallet,
     collectionAddress,
     {}
@@ -140,7 +154,7 @@ const setupCollection = async (
   )
 
   return {
-    collectionOwnerLUAddress,
+    collectionOwnerLUWAddress,
     collection,
     tokenId,
   }

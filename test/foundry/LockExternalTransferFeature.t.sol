@@ -1,4 +1,4 @@
-pragma solidity 0.8.13;
+pragma solidity 0.8.21;
 
 import "../../contracts/collection/features/erc721/ERC721Errors.sol";
 import {LockExternalTransferFeatureV01} from "../../contracts/collection/features/LockExternalTransferFeatureV01.sol";
@@ -52,7 +52,7 @@ contract LockExternalTransferFeatureTest is StartrailTestBase {
 
     function testRevert_SetLockExternalTransferForNonExistantToken() public {
         vm.prank(trustedForwarder);
-        vm.expectRevert(TokenNotExists.selector);
+        vm.expectRevert(SRRNotExists.selector);
         (bool success, ) = collectionAddress.call(
             eip2771AppendSender(
                 abi.encodeWithSelector(

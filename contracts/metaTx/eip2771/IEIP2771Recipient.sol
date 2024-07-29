@@ -1,5 +1,6 @@
 // SPDX-License-Identifier:MIT
-pragma solidity 0.8.13;
+
+pragma solidity 0.8.21;
 
 /**
  * @title A contract must implement this interface in order to support relayed

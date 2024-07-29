@@ -123,11 +123,17 @@ const deployFeature = async ({
   const featureFactory = await getContractFactory(hre, featureName, {
     libraries: linkLibraries,
   })
-	const feature = await featureFactory.deploy({
-	  gasLimit: 29_000_000, // its needed to deploy the contract into polygon mainnet
-	})
+
+  const args =
+    hre.network.name === 'polygon'
+      ? {
+          gasLimit: 29_000_000, // its needed to deploy the contract into polygon mainnet
+        }
+      : {}
+
+  const feature = await featureFactory.deploy(args)
   await feature.deployed()
-  // console.log(`${featureName} deployed: ${feature.address}`)
+  console.log(`${featureName} deployed: ${feature.address}`)
 
   await registerSelectors(
     featureRegistry,

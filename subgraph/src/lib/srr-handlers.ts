@@ -27,7 +27,9 @@ import {
   SRRCommitmentCancelled as SRRCommitmentCancelledEvent,
   Transfer as TransferEvent,
   UpdateSRR as UpdateSRRWithSenderEvent,
-  UpdateSRRMetadataDigest as UpdateSRRMetadataWithCIDEvent,
+  UpdateSRRMetadataCID,
+  UpdateSRRMetadataDigest as UpdateSRRMetadataWithDigestEventLegacy,
+  UpdateSRRMetadataDigest1 as UpdateSRRMetadataWithCIDEventLegacy,
 } from '../../generated/StartrailRegistry/StartrailRegistry'
 import {
   currentChainId,
@@ -104,13 +106,37 @@ export function handleUpdateSRRWithSender(
 }
 
 export function handleUpdateSRRMetadataWithCid(
-  event: UpdateSRRMetadataWithCIDEvent
+  event: UpdateSRRMetadataCID
 ): void {
-  logInvocation('handleUpdateSRRMetadataDigest', event)
-  handleUpdateSRRMetadataDigestInternal(
+  logInvocation('handleUpdateSRRMetadataWithCid', event)
+  handleUpdateSRRMetadataHashInternal(
     eventUTCMillis(event),
     srrEntityId(event.address, event.params.tokenId),
     event.params.metadataCID,
+    event
+  )
+}
+
+export function handleUpdateSRRMetadataWithCidLegacy(
+  event: UpdateSRRMetadataWithCIDEventLegacy
+): void {
+  logInvocation('handleUpdateSRRMetadataWithCidLegacy', event)
+  handleUpdateSRRMetadataHashInternal(
+    eventUTCMillis(event),
+    srrEntityId(event.address, event.params.tokenId),
+    event.params.metadataCID,
+    event
+  )
+}
+
+export function handleUpdateSRRMetadataWithDigestLegacy(
+  event: UpdateSRRMetadataWithDigestEventLegacy
+): void {
+  logInvocation('handleUpdateSRRMetadataWithDigestLegacy', event)
+  handleUpdateSRRMetadataHashInternal(
+    eventUTCMillis(event),
+    srrEntityId(event.address, event.params.tokenId),
+    event.params.metadataDigest.toHex(),
     event
   )
 }
@@ -431,7 +457,7 @@ export function handleUpdateSRRInternal(
   srr.save()
 }
 
-export function handleUpdateSRRMetadataDigestInternal(
+export function handleUpdateSRRMetadataHashInternal(
   eventTimestampMillis: BigInt,
   srrEntityId: string,
 

@@ -71,16 +71,16 @@ $NODE scripts/lum-remove-owner $LUW_ADDRESS $AN_OWNER
 $NODE scripts/admin-multi-send -b 2 -i scripts/__data__/admin-multi-send-update-srr.json || exit $?
 
 # approve and transfer for marketplaces
-$NODE scripts/sr-approve.js 3 4 762614211005 # approve Account #4 with signer Account #3
-$NODE scripts/sr-safe-transfer-from.js 4 3 4 762614211005 # transfer Account #3 -> Account #4 with signer Account #4
+$NODE scripts/sr-approve.js 3 4 775264672222 # approve Account #4 with signer Account #3
+$NODE scripts/sr-safe-transfer-from.js 4 3 4 775264672222 # transfer Account #3 -> Account #4 with signer Account #4
 
 # setApprovalForAll and transfer for marketplace
 $NODE scripts/sr-set-approval-for-all.js 4 3 true # setApprovalForAll Account #4 with signer Account #5
-$NODE scripts/sr-safe-transfer-from.js 3 4 5 762614211005 # transfer Account #5 -> Account #3 with signer Account #3
+$NODE scripts/sr-safe-transfer-from.js 3 4 5 775264672222 # transfer Account #5 -> Account #3 with signer Account #3
 
 # setLockExternalTransfer
-$NODE scripts/sr-set-lock-external-transfer.js 762614211005 true
-$NODE scripts/sr-set-lock-external-transfer.js 762614211005 false
+$NODE scripts/sr-set-lock-external-transfer.js 775264672222 true
+$NODE scripts/sr-set-lock-external-transfer.js 775264672222 false
 
 # transferFromWithProvenance
 sendMetaTx sr-issue3
@@ -90,9 +90,9 @@ sendMetaTx sr-transfer-from-with-provenance
 $NODE scripts/sr-transfer-ownership.js 0x6a36eb43496f23eed13636823a8288d28613a874
 
 # generalized bulk
-# 482308692111
+# 481668863629
 sendMetaTx sr-issue4
-# 129020582412
+# 56100282337
 sendMetaTx sr-issue5
 sendMetaTx generalized-bulk-prepare
 $NODE scripts/generalized-bulk-approve-by-commitment scripts/__data__/generalized-bulk-approve-by-commitment.json || exit $?

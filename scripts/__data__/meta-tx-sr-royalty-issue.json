@@ -1,9 +1,9 @@
 {
-  "requestTypeKey": "StartrailRegistryCreateSRRFromLicensedUserWithRoyalty",
+  "requestTypeKey": "StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyalty",
   "requestData": {
     "isPrimaryIssuer": false,
     "artistAddress": "0xeBA6851DB73174C0Bb847C0172721836b3ba267C",
-    "metadataDigest": "0x001c7d6fdb9885b02689d0d76b34fe73e7706b3e9e841c16a8f8264077d197ef",
+    "metadataCID": "bafybeigcg3w6ylldtfy7a6upmdcxjb6lv4hu3fy6gpxn5km3wknfvwokn4",
     "lockExternalTransfer": false,
     "royaltyReceiver": "0xC18fD8c2BA912C8687b005056121E87731612Cc9",
     "royaltyBasisPoints": 500

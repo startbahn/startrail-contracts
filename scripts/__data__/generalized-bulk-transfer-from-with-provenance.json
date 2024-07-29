@@ -1,12 +1,12 @@
 {
   "merkleProof": [
-    "0x572a5e293b80d0d03ebb52a89a00d93a37cd8e2ce8ccd4399de652e8c4c9f21a"
+    "0x7bc7efd5ae5498a61153e8ea61932046decc1895dfaefb60ee10220f25fdc43c"
   ],
-  "merkleRoot": "0x8e0b8272d369820938c65d682daf10215dd344804776231be35ceb0aecc92f31",
-  "leafHash": "0x60f10423380e31fac91fd1aa7eb830ed74d920a4b3e48d15c65012ab55b5593e",
+  "merkleRoot": "0x529a68df80b5e7216c30a2d655b48c7c2470d24d4d4a77f588bf73ec229cc7d7",
+  "leafHash": "0x32204bd385abf1ab8ee237c8c0510c4ad40d9bfeee64b031d54039db2da16540",
   "to": "0xdfb64492cdD303e86788Af19123CF9F1Bc65b084",
-  "tokenId": 129020582412,
-  "historyMetadataHash": "0x565aa707ce293c9e815871d6d0913f449283bf55f72c28a4222ef62698d246e1",
+  "tokenId": "56100282337",
+  "historyMetadataHash": "bafkreidd2cdz7telrdi554utn5xhezacqpvdrrrin6r6rmsmictdarlsu4",
   "customHistoryId": 1,
   "isIntermediary": false
 }

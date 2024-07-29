@@ -1,9 +1,9 @@
-version: "3.7"
+version: "3.8"
 
 services:
   startrail-hardhat:
     container_name: startrail-hardhat
-    image: node:16.13-alpine
+    image: node:18.15-alpine
     volumes:
       - type: bind
         source: ../
@@ -16,5 +16,5 @@ services:
 
 networks:
   default:
-    external:
       name: startrail
+      external: true

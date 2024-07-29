@@ -1,9 +1,12 @@
 {
-  "requestTypeKey": "StartrailRegistryCreateSRRWithLockExternalTransfer",
+  "requestTypeKey": "StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyalty",
   "requestData": {
     "isPrimaryIssuer": false,
     "artistAddress": "0x35902f4f4c94DCba48a71202b795E3Ad2f75c56F",
-    "metadataDigest": "0x001c7d6fdb9885b02689d0d76b34fe73e7706b3e9e841c16a8f8264077d197cd",
-    "lockExternalTransfer": false
+    "metadataCID": "bagaaierajzl3r2r5jf2zi22il7bjfphv6fzgcom77dhqu44nbkasol3lejda",
+    "lockExternalTransfer": false,
+    "to": "0x0000000000000000000000000000000000000000",
+    "royaltyReceiver": "0x0000000000000000000000000000000000000000",
+    "royaltyBasisPoints": 0
   }
 }

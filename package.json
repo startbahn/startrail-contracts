@@ -1,6 +1,6 @@
 {
   "name": "@startbahn/startrail",
-  "version": "1.16.1",
+  "version": "1.17.0",
   "description": "Startrail smart contracts",
   "repository": {
     "type": "git",
@@ -13,7 +13,7 @@
   },
   "homepage": "https://github.com/startbahn/startrail-contracts#readme",
   "engines": {
-    "node": "16"
+    "node": "18.15.0"
   },
   "scripts": {
     "accounts": "hardhat accounts 2> /dev/null",
@@ -44,7 +44,10 @@
     "seed-minimal": "bin/seed-minimal.sh",
     "seed-extended": "bin/seed-extended.sh",
     "test": "yarn hardhat-test",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "docker:hub:login": "docker login",
+    "docker:hub:build:foundry": "cd docker/foundry && docker build -t startbahn/foundry:node-18.15.0 .",
+    "docker:hub:push:foundry": "cd docker/foundry && docker push startbahn/foundry:node-18.15.0"
   },
   "keywords": [
     "ethereum",
@@ -70,7 +73,7 @@
     "@types/glob": "8.1.0",
     "@types/lodash": "4.14.194",
     "@types/mocha": "^10.0.1",
-    "@types/node": "18.16.3",
+    "@types/node": "18.15.13",
     "chai": "4.3.7",
     "chai-as-promised": "~7.1.1",
     "colors": "~1.4.0",
@@ -79,7 +82,7 @@
     "ganache-http-proxy": "^1.0.7",
     "glob": "^10.2.2",
     "graphviz": "^0.0.9",
-    "hardhat": "2.14.0",
+    "hardhat": "^2.17.4",
     "hardhat-contract-sizer": "^2.8.0",
     "hardhat-diamond-abi": "^3.0.1",
     "hardhat-gas-reporter": "1.0.9",

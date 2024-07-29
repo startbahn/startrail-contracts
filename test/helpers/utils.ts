@@ -1,18 +1,26 @@
-import hre, { ethers } from 'hardhat'
 import {
   constants as ethersConstants,
   Contract,
   utils as ethersUtils,
 } from 'ethers'
-import { Wallet } from '@ethersproject/wallet'
-import { TransactionResponse } from '@ethersproject/abstract-provider'
-import stripHexPrefix from 'strip-hex-prefix'
-
+import hre, { ethers } from 'hardhat'
+import { CID } from 'multiformats/cid'
+import { code, encode } from 'multiformats/codecs/json'
+import { sha256 as multiformatssha256 } from 'multiformats/hashes/sha2'
+import { MetaTxForwarder } from '../../startrail-common-js/contracts/meta-tx-forwarder'
 import { UserType } from '../../startrail-common-js/contracts/types'
 import { sha256 } from '../../startrail-common-js/digest/sha256'
 import { add0xPrefix } from '../../startrail-common-js/ethereum/utils'
-import { MetaTxForwarder } from '../../startrail-common-js/contracts/meta-tx-forwarder'
 import { getNonce } from '../../startrail-common-js/meta-tx/nonce'
+import { MetaTxRequestType } from '../../startrail-common-js/meta-tx/types'
+import {
+  randomAddress,
+  randomBoolean,
+} from '../../startrail-common-js/test-helpers/test-utils'
+import stripHexPrefix from 'strip-hex-prefix'
+
+import { TransactionResponse } from '@ethersproject/abstract-provider'
+import { Wallet } from '@ethersproject/wallet'
 
 import { loadDeployJSON } from '../../utils/deployment/deploy-json'
 import {
@@ -20,16 +28,11 @@ import {
   getAdministratorSigner,
   getContract,
 } from '../../utils/hardhat-helpers'
-import {
-  randomAddress,
-  randomBoolean,
-} from '../../startrail-common-js/test-helpers/test-utils'
-import { CID } from 'multiformats/cid'
-import { encode, code } from 'multiformats/codecs/json'
-import { sha256 as multiformatssha256 } from 'multiformats/hashes/sha2'
-import { MetaTxRequestType } from '../../startrail-common-js/meta-tx/types'
 
 const ZERO_ADDRESS = ethersConstants.AddressZero
+
+const ZERO_METADATA_DIGEST =
+  '0x0000000000000000000000000000000000000000000000000000000000000000'
 
 // see OwnerManager.sol SENTINAL_OWNERS
 const SENTINEL_ADDRESS = '0x0000000000000000000000000000000000000001'
@@ -65,7 +68,7 @@ const randomText = () =>
 
 const randomSha256 = () => add0xPrefix(sha256(String(Math.random())))
 
-const randomCID = async () => {
+const randomCID = async (): Promise<string> => {
   const data = Buffer.from(randomText())
   const bytes = encode(data)
   const hash = await multiformatssha256.digest(bytes)
@@ -116,18 +119,20 @@ const createLicensedUserWalletDirect = async (
 }
 
 /**
- * Create a StartrailRegistry.createSRR request
- * @param {string} overrides Contract handle for StartrailRegistry
- * @return {string} Encoded calldata string for createSRR call
+ * Create a StartrailRegistry.createSRR data request
+ * @param overrides An optional object for overriding the data request.
+ * @returns SRR creation data request
  */
-const createSRRRequest = (
+const createSRRRequest = async (
   overrides = {}
-): Record<string, boolean | string> => ({
+): Promise<Record<string, boolean | number | string>> => ({
   isPrimaryIssuer: true,
   artistAddress: randomAddress(),
-  metadataDigest: ethersUtils.id('any hash'),
+  metadataCID: await randomCID(),
   lockExternalTransfer: randomBoolean(),
-
+  to: ZERO_ADDRESS,
+  royaltyReceiver: randomAddress(),
+  royaltyBasisPoints: 500,
   ...overrides,
 })
 
@@ -254,6 +259,24 @@ const sendWithEIP2771 = (
     })
   )
 
+const BULK_CONTRACT_METHOD_KEYS = Object.freeze({
+  create: `createSRRWithProofMulti(bytes32[][],bytes32,bytes32[],bool[],address[],string[],bool[],address[],uint16[],address[])`,
+  createStartrailRegistry: `createSRRWithProofMulti(bytes32[][],bytes32,bytes32[],bool[],address[],bytes32[],string[],bool[],address[],uint16[])`,
+  approve: `approveSRRByCommitmentWithProof(bytes32[],bytes32,bytes32,uint256,bytes32,string,uint256,address)`,
+  approveStartrailRegistry: `approveSRRByCommitmentWithProof(bytes32[],bytes32,bytes32,uint256,bytes32,string,uint256)`,
+  transfer: `transferFromWithProvenanceWithProof(bytes32[],bytes32,bytes32,address,uint256,string,uint256,bool,address)`,
+  transferStartrailRegistry: `transferFromWithProvenanceWithProof(bytes32[],bytes32,bytes32,address,uint256,string,uint256,bool)`,
+})
+
+const BULK_CONTRACT_EVENT_KEYS = Object.freeze({
+  create: `CreateSRRWithProof(bytes32,address,uint256,bytes32)`,
+  createStartrailRegistry: `CreateSRRWithProof(bytes32,uint256,bytes32)`,
+  approve: `ApproveSRRByCommitmentWithProof(bytes32,address,uint256,bytes32)`,
+  approveStartrailRegistry: `ApproveSRRByCommitmentWithProof(bytes32,uint256,bytes32)`,
+  transfer: `TransferFromWithProvenanceWithProof(bytes32,address,uint256,bytes32)`,
+  transferStartrailRegistry: `TransferFromWithProvenanceWithProof(bytes32,uint256,bytes32)`,
+})
+
 export {
   generateLicensedUserCreate2Address,
   randomSalt,
@@ -275,4 +298,9 @@ export {
   // constant addresses
   ZERO_ADDRESS,
   SENTINEL_ADDRESS,
+  ZERO_METADATA_DIGEST,
+
+  // bulk contract keys
+  BULK_CONTRACT_METHOD_KEYS,
+  BULK_CONTRACT_EVENT_KEYS,
 }

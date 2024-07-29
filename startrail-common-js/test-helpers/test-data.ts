@@ -37,8 +37,7 @@ const orderedObject = {
   digitalComponents: [
     {
       category: 'artwork',
-      hash:
-        'sha256-335929a4e59b0860ec04c620c1284dace74c00f7eadaadce7a18d6deba6c544e',
+      hash: 'sha256-335929a4e59b0860ec04c620c1284dace74c00f7eadaadce7a18d6deba6c544e',
     },
   ],
   edition: {
@@ -114,8 +113,7 @@ const unorderedObject = {
   },
   digitalComponents: [
     {
-      hash:
-        'sha256-335929a4e59b0860ec04c620c1284dace74c00f7eadaadce7a18d6deba6c544e',
+      hash: 'sha256-335929a4e59b0860ec04c620c1284dace74c00f7eadaadce7a18d6deba6c544e',
       category: 'artwork',
     },
   ],

@@ -130,6 +130,20 @@ const deployERC2981RoyaltyFeature = async (
   })
 }
 
+const deployBulkFeature = async (
+  featureRegistry: StartrailCollectionFeatureRegistry
+): Promise<Contract> => {
+  const { idGeneratorLibraryAddress } = loadDeployJSON(hre)
+  return deployFeature({
+    featureRegistry,
+    featureName: `BulkFeature`,
+    selectors: await featureSelectors.bulk(),
+    linkLibraries: {
+      IDGeneratorV3: idGeneratorLibraryAddress,
+    },
+  })
+}
+
 /*
  * NOTE: temporary implementation for a manual upgrade in QA
  * Needs to be replaced by an implementation that takes a version parameter
@@ -221,6 +235,39 @@ const upgradeLockExternalTransferFeature = async (
     featureRegistry: featureRegistry as StartrailCollectionFeatureRegistry,
     featureName: `LockExternalTransferFeature`,
     selectors: await featureSelectors.lockExternalTransfer(),
+  })
+}
+
+const upgradeSRRHistoryFeature = async (
+  hre: HardhatRuntimeEnvironment
+): Promise<Contract> => {
+  const featureRegistry = await getContract(
+    hre,
+    `StartrailCollectionFeatureRegistry`
+  )
+  return upgradeFeature({
+    featureRegistry: featureRegistry as StartrailCollectionFeatureRegistry,
+    featureName: `SRRHistoryFeature`,
+    selectors: await featureSelectors.srrHistory(),
+  })
+}
+
+const upgradeBulkFeature = async (
+  hre: HardhatRuntimeEnvironment
+): Promise<Contract> => {
+  const featureRegistry = await getContract(
+    hre,
+    `StartrailCollectionFeatureRegistry`
+  )
+  const { idGeneratorLibraryAddress } = loadDeployJSON(hre)
+  
+  return upgradeFeature({
+    featureRegistry: featureRegistry as StartrailCollectionFeatureRegistry,
+    featureName: `BulkFeature`,
+    selectors: await featureSelectors.bulk(),
+    linkLibraries: {
+      IDGeneratorV3: idGeneratorLibraryAddress,
+    },
   })
 }
 
@@ -381,6 +428,7 @@ const deployCollectionsCore = async (
 
 export {
   deployCollectionsCore,
+  deployBulkFeature,
   deployERC721Feature,
   deployFeature,
   upgradeERC721Feature,
@@ -389,4 +437,6 @@ export {
   upgradeSRRMetadataFeature,
   upgradeLockExternalTransferFeature,
   upgradeSRRApproveTransferFeature,
+  upgradeSRRHistoryFeature,
+  upgradeBulkFeature,
 }

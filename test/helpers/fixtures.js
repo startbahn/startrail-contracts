@@ -74,6 +74,9 @@ const {
 const {
   deployFixTransferFromWithProvenance,
 } = require('../../utils/deployment/025-deploy-fix-transfer-from-with-provenance')
+const {
+  deployBulkCollection,
+} = require('../../utils/deployment/026-deploy-bulk-collection')
 
 /**
  * Deploys latest version of Startrail contracts plus some test data
@@ -105,6 +108,7 @@ async function fixtureDefault() {
   await deployRoyaltyRefactor(hre)
   await deployCollections(hre)
   await deployFixTransferFromWithProvenance(hre)
+  await deployBulkCollection(hre)
 
   const lum = await getContract(hre, 'LicensedUserManager')
   const metaTxForwarder = await getContract(hre, 'MetaTxForwarder')

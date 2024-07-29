@@ -1,4 +1,4 @@
-pragma solidity 0.8.13;
+pragma solidity 0.8.21;
 
 import "../../contracts/collection/features/erc721/ERC721Errors.sol";
 import {SRRFeatureV01} from "../../contracts/collection/features/SRRFeatureV01.sol";
@@ -187,7 +187,7 @@ contract SRRFeatureTest is StartrailTestBase {
             address(0),
             address(0),
             100,
-            ISRRFeatureV01.ZeroAddress.selector // expect revert with this error
+            ISRRFeatureV02.ZeroAddress.selector // expect revert with this error
         );
     }
 
@@ -207,7 +207,7 @@ contract SRRFeatureTest is StartrailTestBase {
         );
     }
 
-    function testRevert_CreateSRRTokenAlreadyExists() public {
+    function testRevert_CreateSRRSRRAlreadyExists() public {
         string memory metadataCID = A_CID;
         address artist = vm.addr(0x798be);
 
@@ -227,7 +227,7 @@ contract SRRFeatureTest is StartrailTestBase {
         );
 
         // attempt to create another SRR with the same given artist/metadata
-        // should REVERT with TokenAlreadyExists
+        // should REVERT with SRRAlreadyExists
         createSRR(
             collectionAddress,
             trustedForwarder,
@@ -239,7 +239,7 @@ contract SRRFeatureTest is StartrailTestBase {
             address(0),
             address(0),
             100,
-            TokenAlreadyExists.selector // Expected Revert Error
+            SRRAlreadyExists.selector // Expected Revert Error
         );
     }
 
@@ -351,7 +351,7 @@ contract SRRFeatureTest is StartrailTestBase {
 
     function testRevert_UpdateSRRZeroAddressArtist() public {
         vm.prank(trustedForwarder);
-        vm.expectRevert(ISRRFeatureV01.ZeroAddress.selector);
+        vm.expectRevert(ISRRFeatureV02.ZeroAddress.selector);
         (bool success, ) = collectionAddress.call(
             eip2771AppendSender(
                 abi.encodeWithSelector(
@@ -366,9 +366,9 @@ contract SRRFeatureTest is StartrailTestBase {
         assertTrue(success, "expectRevert: call did not revert");
     }
 
-    function testRevert_UpdateSRRTokenNotExists() public {
+    function testRevert_UpdateSRRSRRNotExists() public {
         vm.prank(trustedForwarder);
-        vm.expectRevert(TokenNotExists.selector);
+        vm.expectRevert(SRRNotExists.selector);
         srrFeature.updateSRR(12345, true, vm.addr(0xffff));
     }
 }

@@ -55,30 +55,93 @@ enum MetaTxRequestType {
   WalletSetOriginalName = 'WalletSetOriginalName',
 
   // StartrailRegistry
+  /**
+   * Deprecated StartrailRegistryCreateSRR type. Backward compatibility for deployment
+   */
   StartrailRegistryCreateSRRWithLockExternalTransfer = 'StartrailRegistryCreateSRRWithLockExternalTransfer',
+  /**
+   * Deprecated StartrailRegistryCreateSRR type. Backward compatibility for deployment
+   */
   StartrailRegistryCreateSRRFromLicensedUser = 'StartrailRegistryCreateSRRFromLicensedUser',
+  /**
+   * Deprecated StartrailRegistryCreateSRR type. Backward compatibility for deployment
+   */
   StartrailRegistryCreateSRRFromLicensedUserWithCid = 'StartrailRegistryCreateSRRFromLicensedUserWithCid',
+  /**
+   * Deprecated StartrailRegistryCreateSRR type. Backward compatibility for deployment
+   */
   StartrailRegistryCreateSRRFromLicensedUserWithRoyalty = 'StartrailRegistryCreateSRRFromLicensedUserWithRoyalty',
+  /**
+   * Latest StartrailRegistryCreateSRR type
+   */
+  StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyalty = 'StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyalty',
+  /**
+   * Latest StartrailRegistryUpdateSRR type
+   */
   StartrailRegistryUpdateSRR = 'StartrailRegistryUpdateSRR',
+  /**
+   * Deprecated StartrailRegistryUpdateSRRMetadata type. Backward compatibility for deployment
+   */
   StartrailRegistryUpdateSRRMetadata = 'StartrailRegistryUpdateSRRMetadata',
+  /**
+   * Latest StartrailRegistryUpdateSRRMetadata type
+   */
   StartrailRegistryUpdateSRRMetadataWithCid = 'StartrailRegistryUpdateSRRMetadataWithCid',
+  /**
+   * Latest StartrailRegistryUpdateSRRRoyalty type
+   */
   StartrailRegistryUpdateSRRRoyalty = 'StartrailRegistryUpdateSRRRoyalty',
+  /**
+   * Deprecated StartrailRegistryApproveSRRByCommitment type. Backward compatibility for deployment
+   */
   StartrailRegistryApproveSRRByCommitment = 'StartrailRegistryApproveSRRByCommitment',
+  /**
+   * Latest StartrailRegistryApproveSRRByCommitment type
+   */
   StartrailRegistryApproveSRRByCommitmentV2 = 'StartrailRegistryApproveSRRByCommitmentV2',
+  /**
+   * Deprecated StartrailRegistryApproveSRRByCommitmentWithCustomHistoryId type. Backward compatibility for deployment
+   */
   StartrailRegistryApproveSRRByCommitmentWithCustomHistoryId = 'StartrailRegistryApproveSRRByCommitmentWithCustomHistoryId',
+  /**
+   * Latest StartrailRegistryApproveSRRByCommitmentWithCustomHistoryId type
+   */
   StartrailRegistryApproveSRRByCommitmentWithCustomHistoryIdV2 = 'StartrailRegistryApproveSRRByCommitmentWithCustomHistoryIdV2',
-
+  /**
+   * Latest StartrailRegistryApproveSRRByCommitmentWithCustomHistoryId type
+   */
   StartrailRegistryCancelSRRCommitment = 'StartrailRegistryCancelSRRCommitment',
+  /**
+   * Latest StartrailRegistryApproveSRRByCommitmentWithCustomHistoryId type
+   */
   StartrailRegistryAddHistory = 'StartrailRegistryAddHistory',
+  /**
+   * Latest StartrailRegistrySetLockExternalTransfer type
+   */
   StartrailRegistrySetLockExternalTransfer = 'StartrailRegistrySetLockExternalTransfer',
+  /**
+   * Deprecated StartrailRegistryTransferFromWithProvenance type. Backward compatibility for deployment
+   */
   StartrailRegistryTransferFromWithProvenance = 'StartrailRegistryTransferFromWithProvenance',
+  /**
+   * Latest StartrailRegistryTransferFromWithProvenance type
+   */
   StartrailRegistryTransferFromWithProvenanceV2 = 'StartrailRegistryTransferFromWithProvenanceV2',
 
   // BulkIssue and BulkTransfer
   // backward compatibility for deployment
+  /**
+   * Deprecated BulkIssueSendBatch type. Backward compatibility for deployment
+   */
   BulkIssueSendBatch = 'BulkIssueSendBatch',
+  /**
+   * Deprecated BulkIssueSendBatch type. Backward compatibility for deployment
+   */
   BulkTransferSendBatch = 'BulkTransferSendBatch',
   // Generalized Bulk
+  /**
+   * Latest BulkSendBatch type
+   */
   BulkSendBatch = 'BulkSendBatch',
 
   // CollectionFactory

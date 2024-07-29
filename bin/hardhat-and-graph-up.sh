@@ -42,6 +42,8 @@ yarn seed-minimal >> $LOG 2>&1 || exitWithMsg
 
 echo "Deploying subgraph ...\n"
 cd $SUBGRAPH_DIR
+yarn codegen >> $LOG 2>&1 || exitWithMsg
+yarn build >> $LOG 2>&1 || exitWithMsg
 yarn create-local >> $LOG 2>&1 || exitWithMsg
 yarn deploy-local >> $LOG 2>&1 || exitWithMsg
 cd - > /dev/null

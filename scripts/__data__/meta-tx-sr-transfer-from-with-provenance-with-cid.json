@@ -2,7 +2,7 @@
   "requestTypeKey": "StartrailRegistryTransferFromWithProvenanceV2",
   "requestData": {
     "to": "0xf1dbd215d72d99422693ca61f7bbecfcd0edb16f",
-    "tokenId": 899260479738,
+    "tokenId": 481668863629,
     "historyMetadataHash": "bafkreibue6ax5qbviaq6rdcac3s3tjt7ihcgforfyf4wnl25tilcyoftsq",
     "customHistoryId": "1",
     "isIntermediary": false

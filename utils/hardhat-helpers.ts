@@ -192,6 +192,7 @@ const getCollectionFeatureContractPaths = (): ReadonlyArray<string> => {
     `contracts/collection/features/shared/LibERC2981RoyaltyEvents.sol`,
     `contracts/collection/features/erc721/LibERC721Events.sol`,
     `contracts/collection/features/shared/LibSRRApproveTransferFeatureEvents.sol`,
+    `contracts/collection/features/shared/LibSRRCreate.sol`,
     `contracts/collection/features/shared/LibSRRHistoryEvents.sol`,
     `contracts/collection/features/shared/LibSRRMetadataEvents.sol`,
     `contracts/collection/features/shared/LibSRRProvenanceEvents.sol`,

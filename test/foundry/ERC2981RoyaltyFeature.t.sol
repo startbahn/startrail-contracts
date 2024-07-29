@@ -1,4 +1,4 @@
-pragma solidity 0.8.13;
+pragma solidity 0.8.21;
 
 import "../../contracts/collection/features/erc721/ERC721Errors.sol";
 import "../../contracts/collection/features/storage/LibERC2981RoyaltyStorage.sol";
@@ -86,10 +86,10 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
         );
     }
 
-    function testRevertUpdateSRRRoyalty_TokenNotExists() public {
+    function testRevertUpdateSRRRoyalty_SRRNotExists() public {
         vm.prank(collectionOwnerLU);
 
-        vm.expectRevert(TokenNotExists.selector);
+        vm.expectRevert(SRRNotExists.selector);
 
         uint256 tokenId = 12345; // no token exists with this id
 
@@ -160,10 +160,10 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
         assertEq(royaltyBasisPoints2, basisPoints);
     }
 
-    function testRevertUpdateSRRRoyaltyReceiverMulti_TokenNotExists() public {
+    function testRevertUpdateSRRRoyaltyReceiverMulti_SRRNotExists() public {
         vm.prank(admin);
 
-        vm.expectRevert(TokenNotExists.selector);
+        vm.expectRevert(SRRNotExists.selector);
 
         uint256[] memory tokenIds = new uint256[](2);
         tokenIds[0] = 12345; // no token exists with this id
@@ -251,7 +251,7 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
         assertEq(expectedRoyaltyAmount, royaltyAmount);
     }
 
-    function testRoyaltyInfoTokenNotExists() public {
+    function testRoyaltyInfo_SRRNotExists() public {
         vm.prank(notAnOwner);
 
         //  The default receiver address 0x75194F40c5337d218A6798B02BbB34500a653A16 is what we use for OpenSea.

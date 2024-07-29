@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.13;
+
+pragma solidity 0.8.21;
 
 import {OwnableStorage} from "@solidstate/contracts/access/ownable/OwnableStorage.sol";
 
@@ -33,6 +34,17 @@ library LibFeatureCommon {
 
     function onlyCollectionOwner() internal view {
         if (msgSender() != OwnableStorage.layout().owner) {
+            revert NotCollectionOwner();
+        }
+    }
+
+    /**
+     * @dev Ensures that the address is the owner of the collection.
+     * @param toCheck The address to be checked against the collection owner.
+     * @dev Reverts with `NotCollectionOwner` error if the ownerAddress is not the owner.
+     */
+    function onlyCollectionOwner(address toCheck) internal view {
+        if (toCheck != OwnableStorage.layout().owner) {
             revert NotCollectionOwner();
         }
     }

@@ -1,4 +1,4 @@
-pragma solidity 0.8.13;
+pragma solidity 0.8.21;
 
 import {IERC173} from "@solidstate/contracts/interfaces/IERC173.sol";
 import {IERC165} from "@solidstate/contracts/interfaces/IERC165.sol";

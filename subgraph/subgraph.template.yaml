@@ -106,10 +106,12 @@ dataSources:
           handler: handleSRRCommitmentWithCustomHistory
         - event: SRRCommitmentCancelled(indexed uint256)
           handler: handleSRRCommitmentCancelled
-        - event: UpdateSRRMetadataDigest(indexed uint256,bytes32)
-          handler: handleUpdateSRRMetadataDigest
-        - event: UpdateSRRMetadataDigest(indexed uint256,string)
+        - event: UpdateSRRMetadataCID(indexed uint256,string)
           handler: handleUpdateSRRMetadataWithCid
+        - event: UpdateSRRMetadataDigest(indexed uint256,bytes32)
+          handler: handleUpdateSRRMetadataWithDigestLegacy
+        - event: UpdateSRRMetadataDigest(indexed uint256,string)
+          handler: handleUpdateSRRMetadataWithCidLegacy
         - event: CreateCustomHistoryType(indexed uint256,string)
           handler: handleCustomHistoryType
         - event: CreateCustomHistory(indexed uint256,string,uint256,bytes32)
@@ -221,12 +223,18 @@ dataSources:
       eventHandlers:
         - event: BatchPrepared(indexed bytes32,indexed address)
           handler: handleBatchPrepared
-        - event: CreateSRRWithProof(indexed bytes32,indexed uint256,bytes32)
+        - event: CreateSRRWithProof(indexed bytes32,indexed address,indexed uint256,bytes32)
           handler: handleCreateSRRWithProof
-        - event: ApproveSRRByCommitmentWithProof(indexed bytes32,indexed uint256,bytes32)
+        - event: CreateSRRWithProof(indexed bytes32,indexed uint256,bytes32)
+          handler: handleCreateSRRWithProofLegacy
+        - event: ApproveSRRByCommitmentWithProof(indexed bytes32,indexed address,indexed uint256,bytes32)
           handler: handleApproveSRRByCommitmentWithProof
-        - event: TransferFromWithProvenanceWithProof(indexed bytes32,indexed uint256,bytes32)
+        - event: ApproveSRRByCommitmentWithProof(indexed bytes32,indexed uint256,bytes32)
+          handler: handleApproveSRRByCommitmentWithProofLegacy
+        - event: TransferFromWithProvenanceWithProof(indexed bytes32,indexed address,indexed uint256,bytes32)
           handler: handleTransferFromWithProvenanceWithProof
+        - event: TransferFromWithProvenanceWithProof(indexed bytes32,indexed uint256,bytes32)
+          handler: handleTransferFromWithProvenanceWithProofLegacy
   - kind: ethereum/contract
     name: CollectionFactory
     network: ##AUTOFILL##

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.13;
+
+pragma solidity 0.8.21;
 
 import "hardhat/console.sol";
 import "forge-std/Vm.sol";
@@ -9,8 +10,8 @@ import {IDiamondWritable} from "@solidstate/contracts/proxy/diamond/writable/IDi
 import {IDiamondWritableInternal} from "@solidstate/contracts/proxy/diamond/writable/IDiamondWritableInternal.sol";
 
 import "../../contracts/collection/registry/StartrailCollectionFeatureRegistry.sol";
-import "../../contracts/collection/features/SRRFeatureV01.sol";
-import "../../contracts/collection/features/ERC721FeatureV01.sol";
+import "../../contracts/collection/features/SRRFeatureV02.sol";
+import "../../contracts/collection/features/ERC721FeatureV03.sol";
 
 contract StartrailTestLibrary is Test {
     // Shared test data
@@ -159,7 +160,7 @@ contract StartrailTestLibrary is Test {
         (bool success, ) = collectionAddress.call(
             eip2771AppendSender(
                 abi.encodeWithSelector(
-                    SRRFeatureV01.createSRR.selector,
+                    SRRFeatureV02.createSRR.selector,
                     isPrimaryIssuer,
                     artist,
                     metadataCID,

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.13;
+
+pragma solidity 0.8.21;
 
 import "../erc721/ERC721Errors.sol";
 import "../erc721/ERC721TokenReceiver.sol";
@@ -38,14 +39,34 @@ library LibERC721Storage {
 
     function onlyExistingToken(uint256 tokenId) internal view {
         if (!exists(tokenId)) {
-            revert TokenNotExists();
+            revert SRRNotExists();
         }
     }
 
     function onlyNonExistantToken(uint256 tokenId) internal view {
         if (exists(tokenId)) {
-            revert TokenAlreadyExists();
+            revert SRRAlreadyExists();
         }
+    }
+
+    function safeTransferFromReceivedCheck(
+        address sender,
+        address from,
+        address to,
+        uint256 id,
+        bytes memory data
+    ) internal {
+        require(
+            to.code.length == 0 ||
+                ERC721TokenReceiver(to).onERC721Received(
+                    sender,
+                    from,
+                    id,
+                    data
+                ) ==
+                ERC721TokenReceiver.onERC721Received.selector,
+            "UNSAFE_RECIPIENT"
+        );
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -95,33 +116,13 @@ library LibERC721Storage {
     function _safeMint(address to, uint256 id) internal {
         _mint(to, id);
 
-        require(
-            to.code.length == 0 ||
-                ERC721TokenReceiver(to).onERC721Received(
-                    msg.sender,
-                    address(0),
-                    id,
-                    ""
-                ) ==
-                ERC721TokenReceiver.onERC721Received.selector,
-            "UNSAFE_RECIPIENT"
-        );
+        safeTransferFromReceivedCheck(msg.sender, address(0), to, id, "");
     }
 
     function _safeMint(address to, uint256 id, bytes memory data) internal {
         _mint(to, id);
 
-        require(
-            to.code.length == 0 ||
-                ERC721TokenReceiver(to).onERC721Received(
-                    msg.sender,
-                    address(0),
-                    id,
-                    data
-                ) ==
-                ERC721TokenReceiver.onERC721Received.selector,
-            "UNSAFE_RECIPIENT"
-        );
+        safeTransferFromReceivedCheck(msg.sender, address(0), to, id, data);
     }
 
     /*//////////////////////////////////////////////////////////////

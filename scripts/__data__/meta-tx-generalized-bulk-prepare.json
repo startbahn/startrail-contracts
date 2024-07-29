@@ -1,6 +1,6 @@
 {
   "requestTypeKey": "BulkSendBatch",
   "requestData": {
-    "merkleRoot": "0x8e0b8272d369820938c65d682daf10215dd344804776231be35ceb0aecc92f31"
+    "merkleRoot": "0x529a68df80b5e7216c30a2d655b48c7c2470d24d4d4a77f588bf73ec229cc7d7"
   }
 }

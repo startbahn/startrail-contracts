@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.13;
+pragma solidity 0.8.21;
 
 import {IERC2981} from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import "./interfaces/IERC2981RoyaltyFeatureV01.sol";
