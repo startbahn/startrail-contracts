@@ -7,6 +7,7 @@ const pj = JSON.parse(fs.readFileSync(pjPath).toString());
 delete pj.dependencies;
 delete pj.devDependencies;
 delete pj.scripts;
+delete pj.engines;
 
 // backup package.json and write the minimal version
 const pjBackupPath = "package.json.backup";

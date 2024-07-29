@@ -26,3 +26,5 @@ npx hardhat run --network localhost scripts/deploy/021-deploy-change-ipfs-url.ts
 npx hardhat run --network localhost scripts/deploy/022-deploy-royalty-receiver-multi-update.ts || exit $?
 npx hardhat run --network localhost scripts/deploy/023-deploy-royalty-refactor.ts || exit $?
 npx hardhat run --network localhost scripts/deploy/024-deploy-collections.ts || exit $?
+npx hardhat run --network localhost scripts/deploy/025-deploy-fix-transfer-from-with-provenance.ts || exit $?
+npx hardhat run --network localhost scripts/deploy/026-deploy-bulk-collection.ts || exit $?

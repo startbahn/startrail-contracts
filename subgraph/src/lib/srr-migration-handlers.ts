@@ -22,7 +22,7 @@ import {
   handleSRRCommitmentInternal,
   handleSRRProvenanceInternal,
   handleUpdateSRRInternal,
-  handleUpdateSRRMetadataDigestInternal,
+  handleUpdateSRRMetadataHashInternal,
   saveCreateSRRInternal,
 } from './srr-handlers'
 import {
@@ -219,7 +219,7 @@ export function handleUpdateSRRMetadataDigestFromMigration(
   event: UpdateSRRMetadataDigestFromMigrationEvent
 ): void {
   logInvocation('handleUpdateSRRMetadataDigestFromMigration', event)
-  handleUpdateSRRMetadataDigestInternal(
+  handleUpdateSRRMetadataHashInternal(
     secondsToMillis(event.params.originTimestamp),
     srrEntityId(event.address, event.params.tokenId),
     event.params.metadataDigest.toHex(),

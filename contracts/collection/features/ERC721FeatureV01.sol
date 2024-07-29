@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.13;
+
+pragma solidity 0.8.21;
 
 import "./erc721/ERC721UpgradeableBase.sol";
 import "./erc721/LibERC721Storage.sol";
@@ -108,7 +109,7 @@ contract ERC721FeatureV01 is IERC721FeatureV01, ERC721UpgradeableBase {
             isIntermediary
         );
         LibERC721Storage._transferFrom(tokenOwner, to, tokenId);
-        ERC721UpgradeableBase.safeTransferFromReceivedCheck(
+        LibERC721Storage.safeTransferFromReceivedCheck(
             sender,
             tokenOwner,
             to,

@@ -69,6 +69,8 @@ import {
   StartrailRegistryCreateSRRFromLicensedUserTypes,
   StartrailRegistryCreateSRRFromLicensedUserWithCidRecord,
   StartrailRegistryCreateSRRFromLicensedUserWithCidTypes,
+  StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyaltyRecord,
+  StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyaltyTypes,
   StartrailRegistryCreateSRRFromLicensedUserWithRoyaltyRecord,
   StartrailRegistryCreateSRRFromLicensedUserWithRoyaltyTypes,
   StartrailRegistryCreateSRRWithLockExternalTransferRecord,
@@ -103,6 +105,7 @@ const MessageTypesRegistry: Record<string, ReadonlyArray<TypedDataField>> = {
   StartrailRegistryCreateSRRFromLicensedUserTypes,
   StartrailRegistryCreateSRRFromLicensedUserWithCidTypes,
   StartrailRegistryCreateSRRFromLicensedUserWithRoyaltyTypes,
+  StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyaltyTypes,
   StartrailRegistryCreateSRRWithLockExternalTransferTypes,
   StartrailRegistryUpdateSRRTypes,
   StartrailRegistryUpdateSRRMetadataTypes,
@@ -153,6 +156,7 @@ type MessageRecordType =
   | StartrailRegistryCreateSRRFromLicensedUserRecord
   | StartrailRegistryCreateSRRFromLicensedUserWithCidRecord
   | StartrailRegistryCreateSRRFromLicensedUserWithRoyaltyRecord
+  | StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyaltyRecord
   | StartrailRegistryCreateSRRWithLockExternalTransferRecord
   | StartrailRegistryUpdateSRRRecord
   | StartrailRegistryUpdateSRRMetadataRecord
@@ -209,6 +213,7 @@ export {
   StartrailRegistryCreateSRRFromLicensedUserRecord,
   StartrailRegistryCreateSRRFromLicensedUserWithCidRecord,
   StartrailRegistryCreateSRRFromLicensedUserWithRoyaltyRecord,
+  StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyaltyRecord,
   StartrailRegistryCreateSRRWithLockExternalTransferRecord,
   StartrailRegistryUpdateSRRRecord,
   StartrailRegistryUpdateSRRMetadataRecord,

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.13;
+pragma solidity 0.8.21;
 
 import "../../contracts/collection/features/ERC721FeatureV02.sol";
 import "../../contracts/collection/features/shared/LibFeatureCommon.sol";

@@ -286,11 +286,11 @@ describe('LicensedUserManager', () => {
     EXEC_TEST_CASES.forEach(async (testCase) => {
       describe(`${testCase.name} wallet`, () => {
         const requestType =
-          MetaTxRequestType.StartrailRegistryCreateSRRWithLockExternalTransfer
+          MetaTxRequestType.StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyalty
 
         beforeEach(async () => {
           // Execution request props
-          testCase.txRequestData = createSRRRequest()
+          testCase.txRequestData = await createSRRRequest()
         })
 
         it(`should execute transaction`, async () => {
@@ -342,10 +342,11 @@ describe('LicensedUserManager', () => {
           },
           adminEOAWallet
         )
-      const issueRequest = createSRRRequest()
+      const issueRequest = await createSRRRequest()
+
       const tokenId = await encodeSignExecute({
         requestTypeKey:
-          MetaTxRequestType.StartrailRegistryCreateSRRWithLockExternalTransfer,
+          MetaTxRequestType.StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyalty,
         fromAddress: fromAddress,
         requestData: issueRequest,
         signerWallets: [handlerEOAWallet],

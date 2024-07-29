@@ -14,16 +14,25 @@ The Startrail smart contracts repository.
 ├── bin                     // utility shell scripts
 ├── contracts
 │   ├── bulk
+│   ├── collection          // collection contracts
 │   ├── common
 │   ├── lib
 │   ├── licensedUser
 │   ├── metaTx
 │   ├── name
+│   ├── proxy
+│       ├── utils
 │   ├── proxyAdmin
 │   ├── startrailregistry
 │   └── test                // contracts used in tests only
 ├── deployments             // deployed addresses registry [eg. polygon/deploy.json]
+├── docker                  // docker files      
 ├── docs                    // documentation - diagrams, markdown, ...
+├── lib                     // libs (e.g foundry, solmate)
+├── scripts                 // deployment and contract interaction scripts
+├── subgraph                // subgraph
+├── test                    // mocha test scripts
+├── utils                   // shared logic - tests, scripts, deployment all use these
 ├── hardhat.config.js
 ├── package.json
 ├── README.md
@@ -62,13 +71,15 @@ Manages bulk processing of SRR transfers. The Bulk contract supercedes this cont
 :page_with_curl: [NameRegistry](./contracts/name)
 Registry of Startrail contract addresses.
 
+:page_with_curl: [CollectionRegistry](./contracts/collection/CollectionRegistry.sol)
+
 ## :minidisc: Setup local
 
 ### Prerequistites
 
 - Git
 - Yarn 1.22
-- Node 16 (see package.json for latest version)
+- Node 18 (see package.json for latest version)
 
 ### Live networks (optional)
 
@@ -98,3 +109,19 @@ You can check the address of each deployed contract in `deploy.json` under [depl
 [mumbai-release/deploy.json](./deployments/mumbai-release/deploy.json) [QA]
 
 [mumbai-develop/deploy.json](./deployments/mumbai-develop/deploy.json)
+
+## Docker hub - startbahn/foundry repo
+
+To upgrade Node.js to a version newer than 18.15.0 in the Docker hub repository "startbahn/foundry," follow these steps:
+
+* Update the Dockerfile located in docker/foundry.
+
+* Modify the version in the package.json file for both "docker:hub:build:foundry" and "docker:hub:push:foundry".
+
+* Log in to Docker Hub using the command "yarn docker:hub:login," storing the login credentials in LastPass under "Shared-dev-related" (docker hub).
+
+* Build the foundry image with the command "yarn docker:hub:build:foundry."
+
+* Push the foundry image to Docker Hub using the command "yarn docker:hub:push:foundry."
+
+* Update the image version in .circleci/config.yml to the newer version, replacing "startbahn/foundry:node-18.15.0."

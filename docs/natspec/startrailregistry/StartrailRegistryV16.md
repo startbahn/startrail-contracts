@@ -213,11 +213,7 @@ function contractURI() external view returns (string)
 ### createSRRFromBulk
 
 ```solidity
-<<<<<<< HEAD
-function createSRRFromBulk(bool isPrimaryIssuer, address artistAddress, bytes32 metadataDigest, address issuerAddress, bool lockExternalTransfer) external nonpayable returns (uint256)
-=======
 function createSRRFromBulk(bool isPrimaryIssuer, address artistAddress, bytes32 metadataDigest, address issuerAddress, bool lockExternalTransfer_) external nonpayable returns (uint256)
->>>>>>> 8d58caa09045456f2e7923dde3c0b4843195f246
 ```
 
 
@@ -232,11 +228,7 @@ function createSRRFromBulk(bool isPrimaryIssuer, address artistAddress, bytes32 
 | artistAddress | address | undefined |
 | metadataDigest | bytes32 | undefined |
 | issuerAddress | address | undefined |
-<<<<<<< HEAD
-| lockExternalTransfer | bool | undefined |
-=======
 | lockExternalTransfer_ | bool | undefined |
->>>>>>> 8d58caa09045456f2e7923dde3c0b4843195f246
 
 #### Returns
 
@@ -247,11 +239,7 @@ function createSRRFromBulk(bool isPrimaryIssuer, address artistAddress, bytes32 
 ### createSRRFromLicensedUser
 
 ```solidity
-<<<<<<< HEAD
-function createSRRFromLicensedUser(bool isPrimaryIssuer, address artistAddress, bytes32 metadataDigest, bool lockExternalTransfer) external nonpayable
-=======
 function createSRRFromLicensedUser(bool isPrimaryIssuer, address artistAddress, bytes32 metadataDigest, bool lockExternalTransfer_) external nonpayable
->>>>>>> 8d58caa09045456f2e7923dde3c0b4843195f246
 ```
 
 
@@ -265,20 +253,12 @@ function createSRRFromLicensedUser(bool isPrimaryIssuer, address artistAddress, 
 | isPrimaryIssuer | bool | address of the issuer user contract |
 | artistAddress | address | address of the artist contract |
 | metadataDigest | bytes32 | bytes32 of metadata hash |
-<<<<<<< HEAD
-| lockExternalTransfer | bool | bool of the flag to disable standard ERC721 transfer methods |
-=======
 | lockExternalTransfer_ | bool | bool of the flag to disable standard ERC721 transfer methods |
->>>>>>> 8d58caa09045456f2e7923dde3c0b4843195f246
 
 ### createSRRFromLicensedUser
 
 ```solidity
-<<<<<<< HEAD
-function createSRRFromLicensedUser(bool isPrimaryIssuer, address artistAddress, bytes32 metadataDigest, bool lockExternalTransfer, address to) external nonpayable
-=======
 function createSRRFromLicensedUser(bool isPrimaryIssuer, address artistAddress, bytes32 metadataDigest, bool lockExternalTransfer_, address to) external nonpayable
->>>>>>> 8d58caa09045456f2e7923dde3c0b4843195f246
 ```
 
 
@@ -292,11 +272,7 @@ function createSRRFromLicensedUser(bool isPrimaryIssuer, address artistAddress, 
 | isPrimaryIssuer | bool | address of the issuer user contract |
 | artistAddress | address | address of the artist contract |
 | metadataDigest | bytes32 | bytes32 of metadata hash |
-<<<<<<< HEAD
-| lockExternalTransfer | bool | bool of the flag to disable standard ERC721 transfer methods |
-=======
 | lockExternalTransfer_ | bool | bool of the flag to disable standard ERC721 transfer methods |
->>>>>>> 8d58caa09045456f2e7923dde3c0b4843195f246
 | to | address | the address this token will be transferred to after the creation |
 
 ### customHistoryTypeIdByName
@@ -394,11 +370,7 @@ function getApproved(uint256 tokenId) external view returns (address)
 ### getChainId
 
 ```solidity
-<<<<<<< HEAD
-function getChainId() external pure returns (uint256)
-=======
 function getChainId() external view returns (uint256)
->>>>>>> 8d58caa09045456f2e7923dde3c0b4843195f246
 ```
 
 
@@ -899,30 +871,18 @@ function setTrustedForwarder(address forwarder) external nonpayable
 ### supportsInterface
 
 ```solidity
-<<<<<<< HEAD
-function supportsInterface(bytes4 interfaceID) external view returns (bool)
-=======
 function supportsInterface(bytes4 interfaceId) external view returns (bool)
->>>>>>> 8d58caa09045456f2e7923dde3c0b4843195f246
 ```
 
 
 
-<<<<<<< HEAD
-
-=======
 *See {IERC165-supportsInterface}.*
->>>>>>> 8d58caa09045456f2e7923dde3c0b4843195f246
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-<<<<<<< HEAD
-| interfaceID | bytes4 | undefined |
-=======
 | interfaceId | bytes4 | undefined |
->>>>>>> 8d58caa09045456f2e7923dde3c0b4843195f246
 
 #### Returns
 
@@ -1307,8 +1267,6 @@ event History(uint256[] tokenIds, uint256[] customHistoryIds)
 | tokenIds  | uint256[] | undefined |
 | customHistoryIds  | uint256[] | undefined |
 
-<<<<<<< HEAD
-=======
 ### Initialized
 
 ```solidity
@@ -1325,7 +1283,6 @@ event Initialized(uint8 version)
 |---|---|---|
 | version  | uint8 | undefined |
 
->>>>>>> 8d58caa09045456f2e7923dde3c0b4843195f246
 ### LockExternalTransfer
 
 ```solidity

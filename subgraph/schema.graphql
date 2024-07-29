@@ -203,6 +203,7 @@ type Bulk @entity {
 type BulkSRR @entity {
   id: ID! # merkleRoot.toHex()
   hash: Bytes! # hash of function props
+  contractAddress: Bytes # Collection contract address
   tokenId: String # ERC721 token id
   bulk: Bulk! # Bulk this entity belongs too
   createdAt: BigInt! # block.timestamp when entity created

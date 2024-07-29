@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.13;
+pragma solidity 0.8.21;
 
 import "forge-std/Vm.sol";
 import {Test} from "forge-std/Test.sol";
@@ -11,10 +11,11 @@ import {IERC2981} from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 
 import "../../contracts/collection/CollectionFactoryV01.sol";
 import "../../contracts/collection/CollectionProxy.sol";
-import "../../contracts/collection/features/ERC721FeatureV02.sol";
+import "../../contracts/collection/features/BulkFeatureV01.sol";
+import "../../contracts/collection/features/ERC721FeatureV03.sol";
 import "../../contracts/collection/features/LockExternalTransferFeatureV01.sol";
-import "../../contracts/collection/features/SRRApproveTransferFeatureV01.sol";
-import "../../contracts/collection/features/SRRFeatureV01.sol";
+import "../../contracts/collection/features/SRRApproveTransferFeatureV02.sol";
+import "../../contracts/collection/features/SRRFeatureV02.sol";
 import "../../contracts/collection/features/ERC2981RoyaltyFeatureV01.sol";
 import "../../contracts/collection/features/SRRHistoryFeatureV01.sol";
 import "../../contracts/collection/features/SRRMetadataFeatureV01.sol";
@@ -58,6 +59,7 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     address internal erc2981RoyaltyFeatureImpl;
     address internal srrMetadataFeatureImpl;
     address internal srrHistoryFeatureImpl;
+    address internal bulkFeatureImpl;
 
     address internal collectionProxyImpl;
 
@@ -113,6 +115,7 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
         );
         srrMetadataFeatureImpl = deploySRRMetadataFeature(featureRegistry);
         srrHistoryFeatureImpl = deploySRRHistoryFeature(featureRegistry);
+        bulkFeatureImpl = deployBulkFeature(featureRegistry);
 
         // Mock LUM
         mockLicensedUserManager = new MockLicensedUserManager();
@@ -162,7 +165,7 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     function deployERC721Feature(
         StartrailCollectionFeatureRegistry featureRegistry_
     ) internal returns (address erc721ddress) {
-        ERC721FeatureV02 erc721Feature = new ERC721FeatureV02();
+        ERC721FeatureV03 erc721Feature = new ERC721FeatureV03();
 
         // Initialize the implementation contract for safety
         erc721Feature.__ERC721Feature_initialize("ImplOnly", "IMPLONLY");
@@ -172,14 +175,13 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
         uint8 selIdx = 0;
 
         // ERC721Feature
-        selectors[selIdx++] = ERC721FeatureV02
+        selectors[selIdx++] = ERC721FeatureV03
             .__ERC721Feature_initialize
             .selector;
-        selectors[selIdx++] = ERC721FeatureV02.exists.selector;
-        selectors[selIdx++] = ERC721FeatureV02
+        selectors[selIdx++] = ERC721FeatureV03.exists.selector;
+        selectors[selIdx++] = ERC721FeatureV03
             .transferFromWithProvenance
             .selector;
-
         // ERC721
         selectors[selIdx++] = ERC721UpgradeableBase.balanceOf.selector;
         selectors[selIdx++] = ERC721UpgradeableBase.ownerOf.selector;
@@ -236,12 +238,12 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     function deploySRRFeature(
         StartrailCollectionFeatureRegistry featureRegistry_
     ) internal returns (address) {
-        SRRFeatureV01 feature = new SRRFeatureV01();
+        SRRFeatureV02 feature = new SRRFeatureV02();
 
         bytes4[] memory selectors = new bytes4[](3);
-        selectors[0] = SRRFeatureV01.createSRR.selector;
-        selectors[1] = SRRFeatureV01.getSRR.selector;
-        selectors[2] = SRRFeatureV01.updateSRR.selector;
+        selectors[0] = SRRFeatureV02.createSRR.selector;
+        selectors[1] = SRRFeatureV02.getSRR.selector;
+        selectors[2] = SRRFeatureV02.updateSRR.selector;
 
         srrFeatureImpl = address(feature);
         deployFeature(admin, featureRegistry_, srrFeatureImpl, selectors);
@@ -252,22 +254,19 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     function deploySRRApproveTransferFeature(
         StartrailCollectionFeatureRegistry featureRegistry_
     ) internal returns (address) {
-        SRRApproveTransferFeatureV01 feature = new SRRApproveTransferFeatureV01();
+        SRRApproveTransferFeatureV02 feature = new SRRApproveTransferFeatureV02();
 
         bytes4[] memory selectors = new bytes4[](6);
 
         selectors[0] = 0xc0b00724; // approveSRRByCommitment(uint256,bytes32,string,uint256)
         selectors[1] = 0x81882bd0; // approveSRRByCommitment(uint256,bytes32,string)
-        selectors[2] = SRRApproveTransferFeatureV01
-            .approveSRRByCommitmentFromBulk
-            .selector;
-        selectors[3] = SRRApproveTransferFeatureV01
+        selectors[2] = SRRApproveTransferFeatureV02
             .cancelSRRCommitment
             .selector;
-        selectors[4] = SRRApproveTransferFeatureV01
+        selectors[3] = SRRApproveTransferFeatureV02
             .transferSRRByReveal
             .selector;
-        selectors[5] = SRRApproveTransferFeatureV01.getSRRCommitment.selector;
+        selectors[4] = SRRApproveTransferFeatureV02.getSRRCommitment.selector;
 
         srrApprovalFeatureImpl = address(feature);
         deployFeature(
@@ -329,6 +328,25 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
             srrMetadataFeatureImpl,
             selectors
         );
+
+        return srrMetadataFeatureImpl;
+    }
+
+    function deployBulkFeature(
+        StartrailCollectionFeatureRegistry featureRegistry_
+    ) internal returns (address) {
+        BulkFeatureV01 feature = new BulkFeatureV01();
+
+        bytes4[] memory selectors = new bytes4[](3);
+
+        selectors[0] = BulkFeatureV01.createSRRFromBulk.selector;
+        selectors[1] = BulkFeatureV01.approveSRRByCommitmentFromBulk.selector;
+        selectors[2] = BulkFeatureV01
+            .transferFromWithProvenanceFromBulk
+            .selector;
+
+        bulkFeatureImpl = address(feature);
+        deployFeature(admin, featureRegistry_, bulkFeatureImpl, selectors);
 
         return srrMetadataFeatureImpl;
     }

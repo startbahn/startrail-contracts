@@ -8,15 +8,20 @@ import { buildTypeList } from './helpers'
 // StartrailRegistry message types (see StartrailRegistry.sol)
 //
 
-const StartrailRegistryCreateSRRWithLockExternalTransferTypes: ReadonlyArray<TypedDataField> = buildTypeList(
-  {
+/**
+ * Deprecated form. Backward compatibility for deployment
+ */
+const StartrailRegistryCreateSRRWithLockExternalTransferTypes: ReadonlyArray<TypedDataField> =
+  buildTypeList({
     isPrimaryIssuer: 'bool',
     artistAddress: 'address',
     metadataDigest: 'bytes32',
     lockExternalTransfer: 'bool',
-  }
-)
+  })
 
+/**
+ * Deprecated form. Backward compatibility for deployment
+ */
 interface StartrailRegistryCreateSRRWithLockExternalTransferRecord {
   isPrimaryIssuer: boolean
   artistAddress: string
@@ -24,16 +29,21 @@ interface StartrailRegistryCreateSRRWithLockExternalTransferRecord {
   lockExternalTransfer: boolean
 }
 
-const StartrailRegistryCreateSRRFromLicensedUserTypes: ReadonlyArray<TypedDataField> = buildTypeList(
-  {
+/**
+ * Deprecated form. Backward compatibility for deployment
+ */
+const StartrailRegistryCreateSRRFromLicensedUserTypes: ReadonlyArray<TypedDataField> =
+  buildTypeList({
     isPrimaryIssuer: 'bool',
     artistAddress: 'address',
     metadataDigest: 'bytes32',
     lockExternalTransfer: 'bool',
     to: 'address',
-  }
-)
+  })
 
+/**
+ * Deprecated form. Backward compatibility for deployment
+ */
 interface StartrailRegistryCreateSRRFromLicensedUserRecord {
   isPrimaryIssuer: boolean
   artistAddress: string
@@ -42,17 +52,22 @@ interface StartrailRegistryCreateSRRFromLicensedUserRecord {
   to: string
 }
 
-const StartrailRegistryCreateSRRFromLicensedUserWithCidTypes: ReadonlyArray<TypedDataField> = buildTypeList(
-  {
+/**
+ * Deprecated form. Backward compatibility for deployment
+ */
+const StartrailRegistryCreateSRRFromLicensedUserWithCidTypes: ReadonlyArray<TypedDataField> =
+  buildTypeList({
     isPrimaryIssuer: 'bool',
     artistAddress: 'address',
     metadataDigest: 'bytes32',
     metadataCID: 'string',
     lockExternalTransfer: 'bool',
     to: 'address',
-  }
-)
+  })
 
+/**
+ * Deprecated form. Backward compatibility for deployment
+ */
 interface StartrailRegistryCreateSRRFromLicensedUserWithCidRecord {
   isPrimaryIssuer: boolean
   artistAddress: string
@@ -62,6 +77,9 @@ interface StartrailRegistryCreateSRRFromLicensedUserWithCidRecord {
   to: string
 }
 
+/**
+ * Deprecated form. Backward compatibility for deployment
+ */
 interface StartrailRegistryCreateSRRFromLicensedUserWithRoyaltyRecord {
   isPrimaryIssuer: boolean
   artistAddress: string
@@ -73,8 +91,11 @@ interface StartrailRegistryCreateSRRFromLicensedUserWithRoyaltyRecord {
   royaltyBasisPoints: number
 }
 
-const StartrailRegistryCreateSRRFromLicensedUserWithRoyaltyTypes: ReadonlyArray<TypedDataField> = buildTypeList(
-  {
+/**
+ * Deprecated form. Backward compatibility for deployment
+ */
+const StartrailRegistryCreateSRRFromLicensedUserWithRoyaltyTypes: ReadonlyArray<TypedDataField> =
+  buildTypeList({
     isPrimaryIssuer: 'bool',
     artistAddress: 'address',
     metadataDigest: 'bytes32',
@@ -83,16 +104,35 @@ const StartrailRegistryCreateSRRFromLicensedUserWithRoyaltyTypes: ReadonlyArray<
     to: 'address',
     royaltyReceiver: 'address',
     royaltyBasisPoints: 'uint16',
-  }
-)
+  })
 
-const StartrailRegistryUpdateSRRTypes: ReadonlyArray<TypedDataField> = buildTypeList(
-  {
+interface StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyaltyRecord {
+  isPrimaryIssuer: boolean
+  artistAddress: string
+  metadataCID: Buffer | string
+  lockExternalTransfer: boolean
+  to: string
+  royaltyReceiver: string
+  royaltyBasisPoints: number
+}
+
+const StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyaltyTypes: ReadonlyArray<TypedDataField> =
+  buildTypeList({
+    isPrimaryIssuer: 'bool',
+    artistAddress: 'address',
+    metadataCID: 'string',
+    lockExternalTransfer: 'bool',
+    to: 'address',
+    royaltyReceiver: 'address',
+    royaltyBasisPoints: 'uint16',
+  })
+
+const StartrailRegistryUpdateSRRTypes: ReadonlyArray<TypedDataField> =
+  buildTypeList({
     tokenId: 'uint256',
     isPrimaryIssuer: 'bool',
     artistAddress: 'address',
-  }
-)
+  })
 
 interface StartrailRegistryUpdateSRRRecord {
   tokenId: BigNumber | string
@@ -100,37 +140,40 @@ interface StartrailRegistryUpdateSRRRecord {
   artistAddress: string
 }
 
-const StartrailRegistryUpdateSRRMetadataWithCidTypes: ReadonlyArray<TypedDataField> = buildTypeList(
-  {
+const StartrailRegistryUpdateSRRMetadataWithCidTypes: ReadonlyArray<TypedDataField> =
+  buildTypeList({
     tokenId: 'uint256',
     metadataCID: 'string',
-  }
-)
+  })
 
 interface StartrailRegistryUpdateSRRMetadataWithCidRecord {
   tokenId: BigNumber | string
   metadataCID: string
 }
 
-const StartrailRegistryUpdateSRRMetadataTypes: ReadonlyArray<TypedDataField> = buildTypeList(
-  {
+const StartrailRegistryUpdateSRRRoyaltyTypes: ReadonlyArray<TypedDataField> =
+  buildTypeList({
+    tokenId: 'uint256',
+    royaltyReceiver: 'address',
+    royaltyBasisPoints: 'uint16',
+  })
+
+/**
+ * Deprecated form. Backward compatibility for deployment
+ */
+const StartrailRegistryUpdateSRRMetadataTypes: ReadonlyArray<TypedDataField> =
+  buildTypeList({
     tokenId: 'uint256',
     metadataDigest: 'bytes32',
-  }
-)
+  })
 
+/**
+ * Deprecated form. Backward compatibility for deployment
+ */
 interface StartrailRegistryUpdateSRRMetadataRecord {
   tokenId: BigNumber | string
   metadataDigest: string
 }
-
-const StartrailRegistryUpdateSRRRoyaltyTypes: ReadonlyArray<TypedDataField> = buildTypeList(
-  {
-    tokenId: 'uint256',
-    royaltyReceiver: 'address',
-    royaltyBasisPoints: 'uint16',
-  }
-)
 
 interface StartrailRegistryUpdateSRRRoyaltyRecord {
   tokenId: BigNumber | string
@@ -139,13 +182,12 @@ interface StartrailRegistryUpdateSRRRoyaltyRecord {
 }
 
 // v1: using historyMetadataDigest
-const StartrailRegistryApproveSRRByCommitmentTypes: ReadonlyArray<TypedDataField> = buildTypeList(
-  {
+const StartrailRegistryApproveSRRByCommitmentTypes: ReadonlyArray<TypedDataField> =
+  buildTypeList({
     tokenId: 'uint256',
     commitment: 'bytes32',
     historyMetadataDigest: 'string',
-  }
-)
+  })
 
 // v1: using historyMetadataDigest
 interface StartrailRegistryApproveSRRByCommitmentRecord {
@@ -155,14 +197,13 @@ interface StartrailRegistryApproveSRRByCommitmentRecord {
 }
 
 // v1: using historyMetadataDigest
-const StartrailRegistryApproveSRRByCommitmentWithCustomHistoryIdTypes: ReadonlyArray<TypedDataField> = buildTypeList(
-  {
+const StartrailRegistryApproveSRRByCommitmentWithCustomHistoryIdTypes: ReadonlyArray<TypedDataField> =
+  buildTypeList({
     tokenId: 'uint256',
     commitment: 'bytes32',
     historyMetadataDigest: 'string',
     customHistoryId: 'uint256',
-  }
-)
+  })
 
 // v1: using historyMetadataDigest
 interface StartrailRegistryApproveSRRByCommitmentWithCustomHistoryIdRecord
@@ -171,13 +212,12 @@ interface StartrailRegistryApproveSRRByCommitmentWithCustomHistoryIdRecord
 }
 
 // v2: using historyMetadataHash
-const StartrailRegistryApproveSRRByCommitmentV2Types: ReadonlyArray<TypedDataField> = buildTypeList(
-  {
+const StartrailRegistryApproveSRRByCommitmentV2Types: ReadonlyArray<TypedDataField> =
+  buildTypeList({
     tokenId: 'uint256',
     commitment: 'bytes32',
     historyMetadataHash: 'string',
-  }
-)
+  })
 
 // v2: using historyMetadataHash
 interface StartrailRegistryApproveSRRByCommitmentV2Record {
@@ -187,46 +227,42 @@ interface StartrailRegistryApproveSRRByCommitmentV2Record {
 }
 
 // v2: using historyMetadataHash
-const StartrailRegistryApproveSRRByCommitmentWithCustomHistoryIdV2Types: ReadonlyArray<TypedDataField> = buildTypeList(
-  {
+const StartrailRegistryApproveSRRByCommitmentWithCustomHistoryIdV2Types: ReadonlyArray<TypedDataField> =
+  buildTypeList({
     tokenId: 'uint256',
     commitment: 'bytes32',
     historyMetadataHash: 'string',
     customHistoryId: 'uint256',
-  }
-)
+  })
 
 // v2: using historyMetadataHash
 interface StartrailRegistryApproveSRRByCommitmentWithCustomHistoryIdV2Record
   extends StartrailRegistryApproveSRRByCommitmentV2Record {
-  customHistoryId: BigNumber | string
+  customHistoryId: number | BigNumber | string
 }
 
-const StartrailRegistryCancelSRRCommitmentTypes: ReadonlyArray<TypedDataField> = buildTypeList(
-  {
+const StartrailRegistryCancelSRRCommitmentTypes: ReadonlyArray<TypedDataField> =
+  buildTypeList({
     tokenId: 'uint256',
-  }
-)
+  })
 
 interface StartrailRegistryCancelSRRCommitmentRecord {
   tokenId: BigNumber | string
 }
 
-const StartrailRegistryAddHistoryTypes: ReadonlyArray<TypedDataField> = buildTypeList(
-  {
+const StartrailRegistryAddHistoryTypes: ReadonlyArray<TypedDataField> =
+  buildTypeList({
     tokenIds: 'uint256[]',
     customHistoryIds: 'uint256[]',
-  }
-)
+  })
 
 interface StartrailRegistryAddHistoryRecord {
   tokenIds: BigNumber[] | string[]
-  customHistoryIds: BigNumber[] | string[]
+  customHistoryIds: number[] | BigNumber[] | string[]
 }
 
-const StartrailRegistrySetLockExternalTransferTypes: ReadonlyArray<TypedDataField> = buildTypeList(
-  { tokenId: 'uint256', flag: 'bool' }
-)
+const StartrailRegistrySetLockExternalTransferTypes: ReadonlyArray<TypedDataField> =
+  buildTypeList({ tokenId: 'uint256', flag: 'bool' })
 
 interface StartrailRegistrySetLockExternalTransferRecord {
   tokenId: BigNumber | string
@@ -234,15 +270,14 @@ interface StartrailRegistrySetLockExternalTransferRecord {
 }
 
 // v1: using historyMetadataDigest
-const StartrailRegistryTransferFromWithProvenanceTypes: ReadonlyArray<TypedDataField> = buildTypeList(
-  {
+const StartrailRegistryTransferFromWithProvenanceTypes: ReadonlyArray<TypedDataField> =
+  buildTypeList({
     to: 'address',
     tokenId: 'uint256',
     historyMetadataDigest: 'string',
     customHistoryId: 'uint256',
     isIntermediary: 'bool',
-  }
-)
+  })
 
 // v1: using historyMetadataDigest
 interface StartrailRegistryTransferFromWithProvenanceRecord {
@@ -254,22 +289,21 @@ interface StartrailRegistryTransferFromWithProvenanceRecord {
 }
 
 // v2: using historyMetadataHash
-const StartrailRegistryTransferFromWithProvenanceV2Types: ReadonlyArray<TypedDataField> = buildTypeList(
-  {
+const StartrailRegistryTransferFromWithProvenanceV2Types: ReadonlyArray<TypedDataField> =
+  buildTypeList({
     to: 'address',
     tokenId: 'uint256',
     historyMetadataHash: 'string',
     customHistoryId: 'uint256',
     isIntermediary: 'bool',
-  }
-)
+  })
 
 // v2: using historyMetadataHash
 interface StartrailRegistryTransferFromWithProvenanceV2Record {
   to: string
   tokenId: BigNumber | string
   historyMetadataHash: Buffer | string
-  customHistoryId: BigNumber | string
+  customHistoryId: number | BigNumber | string
   isIntermediary: boolean
 }
 
@@ -292,6 +326,8 @@ export {
   StartrailRegistryCreateSRRFromLicensedUserWithCidTypes,
   StartrailRegistryCreateSRRFromLicensedUserWithRoyaltyRecord,
   StartrailRegistryCreateSRRFromLicensedUserWithRoyaltyTypes,
+  StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyaltyRecord,
+  StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyaltyTypes,
   StartrailRegistryCreateSRRWithLockExternalTransferRecord,
   StartrailRegistryCreateSRRWithLockExternalTransferTypes,
   StartrailRegistrySetLockExternalTransferRecord,

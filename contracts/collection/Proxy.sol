@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.13;
+
+pragma solidity 0.8.21;
 
 import {IProxy} from "@solidstate/contracts/proxy/IProxy.sol";
 import {AddressUtils} from "@solidstate/contracts/utils/AddressUtils.sol";

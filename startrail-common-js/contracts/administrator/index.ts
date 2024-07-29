@@ -253,9 +253,8 @@ class Administrator {
     } else {
       operation = Operation.DELEGATECALL
       destinationAddr = this.multiSendContract.address
-      const {
-        data,
-      } = await this.multiSendContract.populateTransaction.multiSend(calldata)
+      const { data } =
+        await this.multiSendContract.populateTransaction.multiSend(calldata)
       txCalldata = data as string
     }
 

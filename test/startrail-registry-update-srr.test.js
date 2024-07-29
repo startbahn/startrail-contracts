@@ -14,7 +14,7 @@ const {
   getAdministratorInstance,
   getWallets,
 } = require('../utils/hardhat-helpers')
-const { randomSha256, randomCID, ZERO_ADDRESS } = require('./helpers/utils')
+const { randomSha256, randomCID, ZERO_ADDRESS, ZERO_METADATA_DIGEST } = require('./helpers/utils')
 const { metaTxSend } = require('../utils/meta-tx-send')
 
 use(chaiAsPromised)
@@ -78,15 +78,14 @@ describe('StartrailRegistry SRR updates', () => {
     metadataDigest = randomSha256()
   })
 
-  const createSRRMetaTx = async (metadataHash = null, royaltyReceiver = ZERO_ADDRESS, royaltyBasisPoints = 0, recipient = ZERO_ADDRESS, metadataCID = '') => {
+  const createSRRMetaTx = async (royaltyReceiver = ZERO_ADDRESS, royaltyBasisPoints = 0, recipient = ZERO_ADDRESS, metadataCID = null) => {
     const createSRRTxReceipt = await metaTxSend({
       requestTypeKey:
-        MetaTxRequestType.StartrailRegistryCreateSRRFromLicensedUserWithRoyalty,
+        MetaTxRequestType.StartrailRegistryCreateSRRFromLicensedUserWithIPFSAndRoyalty,
       requestData: {
         isPrimaryIssuer,
         artistAddress: luwArtist,
-        metadataDigest: metadataHash || metadataDigest,
-        metadataCID,
+        metadataCID: metadataCID || await randomCID(),
         lockExternalTransfer: false,
         to: recipient,
         royaltyReceiver,
@@ -99,7 +98,7 @@ describe('StartrailRegistry SRR updates', () => {
     // return tokenId
     return decodeEventLog(
       startrailRegistry,
-      'CreateSRR(uint256,(bool,address,address),bytes32,bool)',
+      'CreateSRR(uint256,(bool,address,address),string,bool)',
       createSRRTxReceipt.logs[1]
     )[0].toNumber()
   }
@@ -228,143 +227,6 @@ describe('StartrailRegistry SRR updates', () => {
     })
   })
 
-  describe('updateSRRMetadata', () => {
-    it('called by an Issuer', async () => {
-      // Create SRR first
-      const tokenId = await createSRRMetaTx()
-
-      // Update SRR metadata tx
-      const newMetadataDigest = randomSha256()
-      const updateSRRMetadataTxReceipt = await metaTxSend({
-        requestTypeKey: MetaTxRequestType.StartrailRegistryUpdateSRRMetadata,
-        requestData: {
-          tokenId,
-          metadataDigest: newMetadataDigest,
-        },
-        fromAddress: luwHandler,
-        signerWallet: ownerWallet,
-      })
-
-      const srrUpdateData = await startrailRegistry.getSRR(tokenId)
-      expect(srrUpdateData[1]).to.equal(newMetadataDigest)
-
-      const updateEventArgs = decodeEventLog(
-        startrailRegistry,
-        'UpdateSRRMetadataDigest(uint256,bytes32)',
-        updateSRRMetadataTxReceipt.logs[0]
-      )
-      expect(updateEventArgs[0]).to.equal(tokenId)
-      expect(updateEventArgs[1]).to.equal(newMetadataDigest)
-    })
-
-    it('called by an Artist', async () => {
-      // Create SRR first
-      const tokenId = await createSRRMetaTx()
-
-      // Update SRR metadata tx
-      const newMetadataDigest = randomSha256()
-      const updateSRRMetadataTxReceipt = await metaTxSend({
-        requestTypeKey: MetaTxRequestType.StartrailRegistryUpdateSRRMetadata,
-        requestData: {
-          tokenId,
-          metadataDigest: newMetadataDigest,
-        },
-        fromAddress: luwArtist,
-        signerWallet: ownerWallet,
-      })
-
-      const srrUpdateData = await startrailRegistry.getSRR(tokenId)
-      expect(srrUpdateData[1]).to.equal(newMetadataDigest)
-
-      const updateEventArgs = decodeEventLog(
-        startrailRegistry,
-        'UpdateSRRMetadataDigest(uint256,bytes32)',
-        updateSRRMetadataTxReceipt.logs[0]
-      )
-      expect(updateEventArgs[0]).to.equal(tokenId)
-      expect(updateEventArgs[1]).to.equal(newMetadataDigest)
-    })
-
-    it('called from the Administrator contract', async () => {
-      // Create SRR first
-      const tokenId = await createSRRMetaTx()
-
-      // Update SRR metadata tx
-      const newMetadataDigest = randomSha256()
-      const { data: updateEncoded } =
-        await startrailRegistry.populateTransaction[
-          `updateSRRMetadata(uint256,bytes32)`
-        ](tokenId, newMetadataDigest)
-
-      const admin = await getAdministratorInstance(hre)
-      const updateSRRMetadataTxReceipt = await admin.execTransaction({
-        to: startrailRegistry.address,
-        data: updateEncoded,
-        waitConfirmed: true,
-      })
-
-      const srrUpdateData = await startrailRegistry.getSRR(tokenId)
-      expect(srrUpdateData[1]).to.equal(newMetadataDigest)
-
-      const updateEventArgs = decodeEventLog(
-        startrailRegistry,
-        'UpdateSRRMetadataDigest(uint256,bytes32)',
-        updateSRRMetadataTxReceipt.logs[0]
-      )
-      expect(updateEventArgs[0]).to.equal(tokenId)
-      expect(updateEventArgs[1]).to.equal(newMetadataDigest)
-    })
-
-    it('rejects if tokenId does not exist', () =>
-      assertRevert(
-        metaTxSend({
-          requestTypeKey: MetaTxRequestType.StartrailRegistryUpdateSRRMetadata,
-          requestData: {
-            tokenId: 123456,
-            metadataDigest: randomSha256(),
-          },
-          fromAddress: luwHandler,
-          signerWallet: ownerWallet,
-        }),
-        `The tokenId does not exist`
-      ))
-
-    it('rejects if msg.sender is not an Issuer (via forwarder) or An Artist or the Admin contract', async () => {
-      const startrailRegistryNotTrusted =
-        startrailRegistry.connect(noAuthWallet)
-
-      const tokenId = await createSRRMetaTx()
-
-      return assertRevert(
-        startrailRegistryNotTrusted[`updateSRRMetadata(uint256,bytes32)`](
-          tokenId,
-          metadataDigest
-        ),
-        `Caller is not the Startrail Administrator or an Issuer or an Artist`
-      )
-    })
-
-    it('rejects if the meta tx signer is not the Issuer or the Artist or the Startrail Administrator', async () => {
-      // Create SRR first
-      const tokenId = await createSRRMetaTx()
-
-      const newMetadataDigest = randomSha256()
-
-      return assertRevert(
-        metaTxSend({
-          requestTypeKey: MetaTxRequestType.StartrailRegistryUpdateSRRMetadata,
-          requestData: {
-            tokenId,
-            metadataDigest: newMetadataDigest,
-          },
-          fromAddress: anotherArtist,
-          signerWallet: ownerWallet,
-        }),
-        `Caller is not the Startrail Administrator or an Issuer or an Artist`
-      )
-    })
-  })
-
   describe('updateSRRMetadataWithCid', () => {
     it('called by an Issuer', async () => {
       // Create SRR first
@@ -383,13 +245,13 @@ describe('StartrailRegistry SRR updates', () => {
         signerWallet: ownerWallet,
       })
 
-      // getSRR can't return cid. it's related to I don't want to update the return types
-      // const srrUpdateData = await startrailRegistry.getSRR(tokenId)
-      // expect(srrUpdateData[1]).to.equal(newCid)
+      const srrUpdateData = await startrailRegistry.getSRR(tokenId)
+      expect(srrUpdateData[1]).to.equal(ZERO_METADATA_DIGEST) // metadata digest
+      expect(srrUpdateData[2]).to.equal(newCid) // metadata cid
 
       const updateEventArgs = decodeEventLog(
         startrailRegistry,
-        'UpdateSRRMetadataDigest(uint256,string)',
+        'UpdateSRRMetadataCID(uint256,string)',
         updateSRRMetadataTxReceipt.logs[0]
       )
       expect(updateEventArgs[0]).to.equal(tokenId)
@@ -415,7 +277,7 @@ describe('StartrailRegistry SRR updates', () => {
 
       const updateEventArgs = decodeEventLog(
         startrailRegistry,
-        'UpdateSRRMetadataDigest(uint256,string)',
+        'UpdateSRRMetadataCID(uint256,string)',
         updateSRRMetadataTxReceipt.logs[0]
       )
       expect(updateEventArgs[0]).to.equal(tokenId)
@@ -442,7 +304,7 @@ describe('StartrailRegistry SRR updates', () => {
 
       const updateEventArgs = decodeEventLog(
         startrailRegistry,
-        'UpdateSRRMetadataDigest(uint256,string)',
+        'UpdateSRRMetadataCID(uint256,string)',
         updateSRRMetadataTxReceipt.logs[0]
       )
       expect(updateEventArgs[0]).to.equal(tokenId)
@@ -468,7 +330,7 @@ describe('StartrailRegistry SRR updates', () => {
 
       const updateEventArgs = decodeEventLog(
         startrailRegistry,
-        'UpdateSRRMetadataDigest(uint256,string)',
+        'UpdateSRRMetadataCID(uint256,string)',
         updateSRRMetadataTxReceipt.logs[0]
       )
       expect(updateEventArgs[0]).to.equal(tokenId)
@@ -532,7 +394,7 @@ describe('StartrailRegistry SRR updates', () => {
   describe('updateSRRRoyalty', () => {
     it('called by an Issuer', async () => {
       // Create SRR first
-      const tokenId = await createSRRMetaTx(metadataDigest, defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
+      const tokenId = await createSRRMetaTx(defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
 
       // Update SRR royalty tx
       const royaltyReceiver = randomAddress()
@@ -560,7 +422,7 @@ describe('StartrailRegistry SRR updates', () => {
 
     it('called by an Artist', async () => {
       // Create SRR first
-      const tokenId = await createSRRMetaTx(metadataDigest, defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
+      const tokenId = await createSRRMetaTx(defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
 
       // Update SRR royalty tx
       const royaltyReceiver = randomAddress()
@@ -588,7 +450,7 @@ describe('StartrailRegistry SRR updates', () => {
 
     it('called from the Administrator contract', async () => {
       // Create SRR first
-      const tokenId = await createSRRMetaTx(metadataDigest, defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
+      const tokenId = await createSRRMetaTx(defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
 
       // Update SRR metadata tx
       const royaltyReceiver = randomAddress()
@@ -651,7 +513,7 @@ describe('StartrailRegistry SRR updates', () => {
 
     it('rejects if the meta tx signer is not the Issuer or the Artist or the Startrail Administrator', async () => {
       // Create SRR first
-      const tokenId = await createSRRMetaTx(metadataDigest, defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
+      const tokenId = await createSRRMetaTx(defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
       const royaltyReceiver = randomAddress()
       const royaltyBasisPoints = 500 // 5%
       return assertRevert(
@@ -671,7 +533,7 @@ describe('StartrailRegistry SRR updates', () => {
 
     it('rejects if royalty basis points is greater than 10000 (100%)', async () => {
       // Create SRR first
-      const tokenId = await createSRRMetaTx(metadataDigest, defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
+      const tokenId = await createSRRMetaTx(defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
       const royaltyReceiver = randomAddress()
       const royaltyBasisPoints = 11000 // 110%
       await assertRevert(
@@ -691,7 +553,7 @@ describe('StartrailRegistry SRR updates', () => {
 
     it('rejects if royalty receiver address is zero address', async () => {
       // Create SRR first
-      const tokenId = await createSRRMetaTx(metadataDigest, defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
+      const tokenId = await createSRRMetaTx(defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
       const royaltyReceiver = ZERO_ADDRESS
       const royaltyBasisPoints = 500 // 5%
       await assertRevert(
@@ -713,8 +575,8 @@ describe('StartrailRegistry SRR updates', () => {
   describe('updateSRRRoyaltyReceiverMulti', () => {
     it('called from the Administrator contract', async () => {
       // Create SRR first
-      const tokenId1 = await createSRRMetaTx(randomSha256(), defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
-      const tokenId2 = await createSRRMetaTx(randomSha256(), defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
+      const tokenId1 = await createSRRMetaTx(defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
+      const tokenId2 = await createSRRMetaTx(defaultRoyaltyReceiver, defaultRoyaltyBasisPoints)
 
       const royaltyReceiver = randomAddress()
 

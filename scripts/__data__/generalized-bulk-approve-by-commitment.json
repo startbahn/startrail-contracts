@@ -1,11 +1,11 @@
 {
   "merkleProof": [
-    "0x60f10423380e31fac91fd1aa7eb830ed74d920a4b3e48d15c65012ab55b5593e"
+    "0x32204bd385abf1ab8ee237c8c0510c4ad40d9bfeee64b031d54039db2da16540"
   ],
-  "merkleRoot": "0x8e0b8272d369820938c65d682daf10215dd344804776231be35ceb0aecc92f31",
-  "leafHash": "0x572a5e293b80d0d03ebb52a89a00d93a37cd8e2ce8ccd4399de652e8c4c9f21a",
-  "tokenId": 482308692111,
-  "commitment": "0xc4f14afe6b607470ab21c7b60c09270a73c2ed19a520bee05ccc58f62df7b99e",
-  "historyMetadataHash": "0x565aa707ce293c9e815871d6d0913f449283bf55f72c28a4222ef62698d246e1",
+  "merkleRoot": "0x529a68df80b5e7216c30a2d655b48c7c2470d24d4d4a77f588bf73ec229cc7d7",
+  "leafHash": "0x7bc7efd5ae5498a61153e8ea61932046decc1895dfaefb60ee10220f25fdc43c",
+  "tokenId": 481668863629,
+  "commitment": "0xb6daf760d527218e79d27b55f12aae59dce9605cee0e3a7f74a1a7eb1a165071",
+  "historyMetadataHash": "bafkreifgdh4gvgte2r2ex6ziek2v6fclk2mn4pa53afwxmsakrw53vvgiu",
   "customHistoryId": 1
 }

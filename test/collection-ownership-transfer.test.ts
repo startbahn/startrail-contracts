@@ -22,7 +22,7 @@ const handlerEOAWallet = wallets[1]
 const newOwnerWallet = wallets[2]
 
 describe('Collection transferOwnership', () => {
-  let collectionOwnerLUAddress: string
+  let collectionOwnerLUWAddress: string
   let collectionOwnerSigner = handlerEOAWallet
   let collection: CollectionProxyFeaturesAggregate
 
@@ -39,7 +39,7 @@ describe('Collection transferOwnership', () => {
     )
 
     // create a collection
-    ;({ collectionOwnerLUAddress, collection } = await setupCollection(
+    ;({ collectionOwnerLUWAddress, collection } = await setupCollection(
       hre,
       adminEOAWallet,
       collectionOwnerSigner
@@ -47,12 +47,12 @@ describe('Collection transferOwnership', () => {
   })
 
   it('transfer from LUW to EOA and back to LUW again', async () => {
-    expect(await collection.owner()).to.equal(collectionOwnerLUAddress)
+    expect(await collection.owner()).to.equal(collectionOwnerLUWAddress)
 
     // LUW owner to EOA owner
     await encodeSignExecute({
       requestTypeKey: MetaTxRequestType.CollectionTransferOwnership,
-      fromAddress: collectionOwnerLUAddress,
+      fromAddress: collectionOwnerLUWAddress,
       requestData: {
         destination: collection.address,
         newOwner: newOwnerWallet.address,
@@ -69,11 +69,11 @@ describe('Collection transferOwnership', () => {
       fromEOA: true,
       requestData: {
         destination: collection.address,
-        newOwner: collectionOwnerLUAddress,
+        newOwner: collectionOwnerLUWAddress,
       },
       signerWallets: [newOwnerWallet],
     }).then((txRsp) => txRsp.wait())
 
-    expect(await collection.owner()).to.equal(collectionOwnerLUAddress)
+    expect(await collection.owner()).to.equal(collectionOwnerLUWAddress)
   })
 })

@@ -1,8 +1,8 @@
-import { TypedDataUtils } from 'eth-sig-util'
 import { ethers } from 'ethers'
 import _ from 'lodash'
 
 import { TypedDataField } from '@ethersproject/abstract-signer'
+import { MessageTypeProperty, TypedDataUtils } from '@metamask/eth-sig-util'
 
 import { getFunctionSelector as getFunctionSelector } from '../contracts/utils'
 import MessageTypesRegistry, { GenericParamTypes } from './eip712-message-types'
@@ -48,11 +48,11 @@ import { DestinationContract, MetaTxRequest, MetaTxRequestType } from './types'
  */
 const buildTypeHash = (
   name: MetaTxRequestType,
-  types: ReadonlyArray<TypedDataField>
+  types: ReadonlyArray<MessageTypeProperty>
 ): string =>
   ethers.utils.hexlify(
     TypedDataUtils.hashType(name as string, {
-      [name]: types,
+      [name]: types.concat(),
     })
   )
 
@@ -144,6 +144,8 @@ const STARTRAIL_REGISTRY_TYPE_KEY_TO_FUNCTION_SIGNATURE = Object.freeze({
     'createSRRFromLicensedUser(bool,address,bytes32,string,bool,address)',
   CreateSRRFromLicensedUserWithRoyalty:
     'createSRRFromLicensedUser(bool,address,bytes32,string,bool,address,address,uint16)',
+  CreateSRRFromLicensedUserWithIPFSAndRoyalty:
+    'createSRRFromLicensedUser(bool,address,string,bool,address,address,uint16)',
   UpdateSRR: 'updateSRR(uint256,bool,address)',
   UpdateSRRMetadata: 'updateSRRMetadata(uint256,bytes32)',
   UpdateSRRMetadataWithCid: 'updateSRRMetadata(uint256,string)',

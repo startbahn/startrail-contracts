@@ -29,15 +29,15 @@ const getSelectors = async (
 }
 
 const erc721FunctionSelectors = () =>
-  getSelectors(`ERC721Feature`, funcSigs.erc721.v1)
+  getSelectors(`ERC721Feature`, funcSigs.erc721.v3)
 
 const lockExternalTransferFunctionSelectors = () =>
   getSelectors(`LockExternalTransferFeature`, funcSigs.lockExternalTransfer.v1)
 
-const srrFunctionSelectors = () => getSelectors(`SRRFeature`, funcSigs.srr.v1)
+const srrFunctionSelectors = () => getSelectors(`SRRFeature`, funcSigs.srr.v2)
 
 const srrApproveTransferFunctionSelectors = () =>
-  getSelectors(`SRRApproveTransferFeature`, funcSigs.srrApproveTransfer.v1)
+  getSelectors(`SRRApproveTransferFeature`, funcSigs.srrApproveTransfer.v2)
 
 const srrMetadataFunctionSelectors = () =>
   getSelectors(`SRRMetadataFeature`, funcSigs.srrMetadata.v1)
@@ -48,7 +48,11 @@ const srrHistoryFunctionSelectors = () =>
 const erc2981RoyaltyFunctionSelectors = () =>
   getSelectors(`ERC2981RoyaltyFeature`, funcSigs.erc2981Royalty.v1)
 
+const bulkFunctionSelectors = () =>
+  getSelectors(`BulkFeature`, funcSigs.bulk.v1)
+
 const featureSelectors = {
+  bulk: bulkFunctionSelectors,
   erc721: erc721FunctionSelectors,
   lockExternalTransfer: lockExternalTransferFunctionSelectors,
   srr: srrFunctionSelectors,

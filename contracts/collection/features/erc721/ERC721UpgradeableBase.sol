@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-pragma solidity 0.8.13;
+
+pragma solidity 0.8.21;
 
 import "./ERC721TokenReceiver.sol";
 import "./LibERC721Events.sol";
@@ -115,7 +116,7 @@ abstract contract ERC721UpgradeableBase {
         uint256 id
     ) public virtual {
         transferFrom(from, to, id);
-        safeTransferFromReceivedCheck(msg.sender, from, to, id, "");
+        LibERC721Storage.safeTransferFromReceivedCheck(msg.sender, from, to, id, "");
     }
 
     function safeTransferFrom(
@@ -125,27 +126,7 @@ abstract contract ERC721UpgradeableBase {
         bytes calldata data
     ) public virtual {
         transferFrom(from, to, id);
-        safeTransferFromReceivedCheck(msg.sender, from, to, id, data);
-    }
-
-    function safeTransferFromReceivedCheck(
-        address operator,
-        address from,
-        address to,
-        uint256 id,
-        bytes memory data
-    ) internal {
-        require(
-            to.code.length == 0 ||
-                ERC721TokenReceiver(to).onERC721Received(
-                    operator,
-                    from,
-                    id,
-                    data
-                ) ==
-                ERC721TokenReceiver.onERC721Received.selector,
-            "UNSAFE_RECIPIENT"
-        );
+        LibERC721Storage.safeTransferFromReceivedCheck(msg.sender, from, to, id, data);
     }
 
     /*//////////////////////////////////////////////////////////////

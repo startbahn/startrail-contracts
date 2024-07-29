@@ -272,7 +272,7 @@ export default {
   solidity: {
     compilers: [
       {
-        version: '0.8.13', // Current Startrail contracts
+        version: '0.8.21', // Current Startrail contracts
         settings: {
           optimizer: {
             enabled: true,

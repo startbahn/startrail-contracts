@@ -207,7 +207,7 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct IStartrailRegistryV23.SRR",
+        "internalType": "struct IStartrailRegistryV24.SRR",
         "name": "registryRecord",
         "type": "tuple"
       },
@@ -255,7 +255,7 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct IStartrailRegistryV23.SRR",
+        "internalType": "struct IStartrailRegistryV24.SRR",
         "name": "registryRecord",
         "type": "tuple"
       },
@@ -297,7 +297,7 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct IStartrailRegistryV23.SRR",
+        "internalType": "struct IStartrailRegistryV24.SRR",
         "name": "registryRecord",
         "type": "tuple"
       },
@@ -790,7 +790,7 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct IStartrailRegistryV23.RoyaltyInfo",
+        "internalType": "struct IStartrailRegistryV24.RoyaltyInfo",
         "name": "royalty",
         "type": "tuple"
       }
@@ -1143,7 +1143,7 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct IStartrailRegistryV23.SRR",
+        "internalType": "struct IStartrailRegistryV24.SRR",
         "name": "registryRecord",
         "type": "tuple"
       }
@@ -1215,7 +1215,7 @@
         "type": "string"
       }
     ],
-    "name": "UpdateSRRMetadataDigest",
+    "name": "UpdateSRRMetadataCID",
     "type": "event"
   },
   {
@@ -1232,6 +1232,25 @@
         "internalType": "bytes32",
         "name": "metadataDigest",
         "type": "bytes32"
+      }
+    ],
+    "name": "UpdateSRRMetadataDigest",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "metadataCID",
+        "type": "string"
       }
     ],
     "name": "UpdateSRRMetadataDigest",
@@ -1390,6 +1409,11 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "signer",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
@@ -1486,9 +1510,9 @@
         "type": "address"
       },
       {
-        "internalType": "bytes32",
-        "name": "metadataDigest",
-        "type": "bytes32"
+        "internalType": "string",
+        "name": "metadataCID",
+        "type": "string"
       },
       {
         "internalType": "address",
@@ -1499,6 +1523,16 @@
         "internalType": "bool",
         "name": "lockExternalTransfer_",
         "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "royaltyReceiver",
+        "type": "address"
+      },
+      {
+        "internalType": "uint16",
+        "name": "royaltyBasisPoints",
+        "type": "uint16"
       }
     ],
     "name": "createSRRFromBulk",
@@ -1579,37 +1613,9 @@
         "type": "address"
       },
       {
-        "internalType": "bytes32",
-        "name": "metadataDigest",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "bool",
-        "name": "lockExternalTransfer_",
-        "type": "bool"
-      }
-    ],
-    "name": "createSRRFromLicensedUser",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bool",
-        "name": "isPrimaryIssuer",
-        "type": "bool"
-      },
-      {
-        "internalType": "address",
-        "name": "artistAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "metadataDigest",
-        "type": "bytes32"
+        "internalType": "string",
+        "name": "metadataCID",
+        "type": "string"
       },
       {
         "internalType": "bool",
@@ -1620,6 +1626,16 @@
         "internalType": "address",
         "name": "to",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "royaltyReceiver",
+        "type": "address"
+      },
+      {
+        "internalType": "uint16",
+        "name": "royaltyBasisPoints",
+        "type": "uint16"
       }
     ],
     "name": "createSRRFromLicensedUser",
@@ -1876,7 +1892,7 @@
             "type": "address"
           }
         ],
-        "internalType": "struct IStartrailRegistryV23.SRR",
+        "internalType": "struct IStartrailRegistryV24.SRR",
         "name": "registryRecord",
         "type": "tuple"
       },
@@ -1884,6 +1900,11 @@
         "internalType": "bytes32",
         "name": "metadataDigest",
         "type": "bytes32"
+      },
+      {
+        "internalType": "string",
+        "name": "metadataCID",
+        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -2435,6 +2456,11 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "signer",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
         "name": "to",
         "type": "address"
       },
@@ -2585,24 +2611,6 @@
         "internalType": "string",
         "name": "metadataCID",
         "type": "string"
-      }
-    ],
-    "name": "updateSRRMetadata",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "metadataDigest",
-        "type": "bytes32"
       }
     ],
     "name": "updateSRRMetadata",

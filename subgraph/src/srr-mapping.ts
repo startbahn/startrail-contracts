@@ -13,7 +13,6 @@ import {
   UpdateCustomHistory as CustomHistoryUpdatedWithCIDEvent,
   UpdateCustomHistory1 as CustomHistoryUpdatedEvent,
   UpdateSRR1 as UpdateSRREvent,
-  UpdateSRRMetadataDigest1 as UpdateSRRMetadataDigestEvent,
 } from '../generated/StartrailRegistry/StartrailRegistry'
 import {
   handleCreateCustomHistoryInternal,
@@ -28,8 +27,9 @@ import {
   handleTransfer,
   handleUpdateCustomHistoryInternal,
   handleUpdateSRRInternal,
-  handleUpdateSRRMetadataDigestInternal,
   handleUpdateSRRMetadataWithCid,
+  handleUpdateSRRMetadataWithCidLegacy,
+  handleUpdateSRRMetadataWithDigestLegacy,
   handleUpdateSRRWithSender,
   saveCreateSRRInternal,
 } from './lib/srr-handlers'
@@ -64,6 +64,8 @@ export {
   handleRoyaltiesSet,
   handleTransfer,
   handleUpdateSRRMetadataWithCid,
+  handleUpdateSRRMetadataWithCidLegacy,
+  handleUpdateSRRMetadataWithDigestLegacy,
   handleUpdateSRRWithSender,
   handleSRRHistory,
 
@@ -275,17 +277,5 @@ export function handleUpdateSRR(event: UpdateSRREvent): void {
     event.params.registryRecord.isPrimaryIssuer,
     event.params.registryRecord.artistAddress,
     srrEntityId(event.address, event.params.tokenId)
-  )
-}
-
-export function handleUpdateSRRMetadataDigest(
-  event: UpdateSRRMetadataDigestEvent
-): void {
-  logInvocation('handleUpdateSRRMetadataDigest', event)
-  handleUpdateSRRMetadataDigestInternal(
-    eventUTCMillis(event),
-    srrEntityId(event.address, event.params.tokenId),
-    event.params.metadataDigest.toHex(),
-    event
   )
 }

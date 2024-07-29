@@ -2,7 +2,7 @@
   "requestTypeKey": "StartrailRegistryApproveSRRByCommitmentV2",
   "_comment": "commitment is [keccak256(keccak256('asecret'))] reveal is 0x5b3fe7fd204d1f0e7f502179c202a66dc74652e561135f569f063c86e04bc4a4:",
   "requestData": {
-    "tokenId": 762614211005,
+    "tokenId": 775264672222,
     "commitment": "0xa7041e7fe8641abc61b773a90752f09b6491d71543987c921fb5de03a960928b",
     "historyMetadataHash": "0xba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70"
   }

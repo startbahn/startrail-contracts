@@ -62,14 +62,14 @@ const mtfInfo = async () => {
   const mtrKeyChunks = chunk(Object.keys(metaTxRequests), 5)
   for (const mtrKeys of mtrKeyChunks) {
     const results = await Promise.all(
-      mtrKeys.map((key) =>
+      mtrKeys.map((key: string) =>
         mtf
           .requestTypes(metaTxRequests[key].eip712TypeHash)
-          .then((details) => ({ key, details }))
+          .then((details: Record<string, any>) => ({ key, details }))
           .catch(() => console.warn(`lookup failed for ${key}`))
       )
     ).then((rArr) => rArr.filter((r) => r !== undefined))
-    results.forEach((result) =>
+    results.forEach((result: { key: string; details: Record<string, any> }) =>
       console.log(
         `\t${result.key}: ${
           result.details[1] !== `0x00000000`

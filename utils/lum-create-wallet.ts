@@ -17,7 +17,7 @@ const lumCreateWallet = async ({
   englishName,
   originalName,
   salt,
-}): Promise<string> => {
+}, isLog = false): Promise<string> => {
   const licensedUserManager: ethers.Contract = await getContract(
     hre,
     "LicensedUserManager"
@@ -51,13 +51,15 @@ const lumCreateWallet = async ({
 
   const luAddress = eventDecoded[0];
 
-  console.log(
-    `\nCreated new licensedUser with address [${luAddress}] and details: ${JSON.stringify(
-      await licensedUserManager.getLicensedUser(luAddress),
-      null,
-      2
-    )}\n`
-  );
+  if (isLog) {
+    console.log(
+      `\nCreated new licensedUser with address [${luAddress}] and details: ${JSON.stringify(
+        await licensedUserManager.getLicensedUser(luAddress),
+        null,
+        2
+      )}\n`
+    );
+  }
 
   return luAddress;
 };

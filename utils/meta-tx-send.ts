@@ -52,7 +52,6 @@ const metaTxSend = async ({
     nonce,
     requestData,
   }
-  console.log(`\nRequest: ${JSON.stringify(metaTxRequest, null, 2)}`)
 
   const signatures = await forwarder.signRequestTypedData(metaTxRequest, [
     signerWallet,

@@ -1,4 +1,4 @@
-pragma solidity 0.8.13;
+pragma solidity 0.8.21;
 
 import {SRRMetadataFeatureV01} from "../../contracts/collection/features/SRRMetadataFeatureV01.sol";
 import "../../contracts/collection/features/storage/LibSRRMetadataStorage.sol";
@@ -44,10 +44,10 @@ contract SRRMetadataFeatureTest is StartrailTestBase {
         );
     }
 
-    function testRevertUpdateSRRMetadata_TokenNotExists() public {
+    function testRevertUpdateSRRMetadata_SRRNotExists() public {
         vm.prank(collectionOwnerLU);
 
-        vm.expectRevert(TokenNotExists.selector);
+        vm.expectRevert(SRRNotExists.selector);
 
         uint256 tokenId = 12345; // no token exists with this id
 
@@ -100,10 +100,10 @@ contract SRRMetadataFeatureTest is StartrailTestBase {
         assertEq(updatedMetadataCID, cid);
     }
 
-    function testRevertGetSRRMetadata_TokenNotExists() public {
+    function testRevertGetSRRMetadata_SRRNotExists() public {
         vm.prank(notAnOwner);
 
-        vm.expectRevert(TokenNotExists.selector);
+        vm.expectRevert(SRRNotExists.selector);
 
         uint256 tokenId = 12345; // no token exists with this id
 
@@ -117,10 +117,10 @@ contract SRRMetadataFeatureTest is StartrailTestBase {
         assertEq(A_CID, cid);
     }
 
-    function testRevertTokenURI_TokenNotExists() public {
+    function testRevertTokenURI_SRRNotExists() public {
         vm.prank(notAnOwner);
 
-        vm.expectRevert(TokenNotExists.selector);
+        vm.expectRevert(SRRNotExists.selector);
 
         uint256 tokenId = 12345; // no token exists with this id
 

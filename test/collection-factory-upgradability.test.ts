@@ -3,8 +3,8 @@ import chaiAsPromised from 'chai-as-promised'
 import hre, { ethers, upgrades } from 'hardhat'
 import { randomAddress } from '../startrail-common-js/test-helpers/test-utils'
 
-import { CollectionFactory } from '../typechain-types'
 import { getContractFactory, getWallets } from '../utils/hardhat-helpers'
+import { CollectionFactoryV01 } from '../typechain-types'
 
 use(chaiAsPromised)
 
@@ -15,7 +15,7 @@ const noAuthWallet = wallets[1]
 describe('CollectionFactory upgradability', () => {
   let featureRegistryAddress: string
   let collectionProxyImplAddress: string
-  let cf: CollectionFactory
+  let cf: CollectionFactoryV01
 
   before(async () => {
     const scfrFactory = await hre.ethers.getContractFactory(
@@ -32,14 +32,14 @@ describe('CollectionFactory upgradability', () => {
   })
 
   beforeEach(async () => {
-    const cfFactory = await getContractFactory(hre, 'CollectionFactory')
+    const cfFactory = await getContractFactory(hre, 'CollectionFactoryV01')
     cf = (await upgrades.deployProxy(
       cfFactory,
       [featureRegistryAddress, collectionProxyImplAddress],
       {
         kind: 'uups',
       }
-    )) as CollectionFactory
+    )) as CollectionFactoryV01
     await cf.deployed()
   })
 
