@@ -154,7 +154,8 @@ export function handleSRRProvenance(event: SRRProvenanceEventLegacy): void {
     null,
     params.historyMetadataHash,
     params.historyMetadataURI,
-    false
+    false,
+    null
   )
 }
 
@@ -171,7 +172,8 @@ export function handleSRRProvenanceWithCustomHistory(
     params.customHistoryId,
     params.historyMetadataHash,
     params.historyMetadataURI,
-    false
+    false,
+    null
   )
 }
 
@@ -253,6 +255,7 @@ export function handleSRRCommitment(event: SRRCommitmentEvent): void {
     eventUTCMillis(event),
     params.commitment,
     srrEntityId(event.address, params.tokenId),
+    null,
     null
   )
 }
@@ -266,7 +269,8 @@ export function handleSRRCommitmentWithCustomHistory(
     eventUTCMillis(event),
     params.commitment,
     srrEntityId(event.address, params.tokenId),
-    params.customHistoryId
+    params.customHistoryId,
+    null
   )
 }
 

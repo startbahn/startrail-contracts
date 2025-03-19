@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import {OwnableFeatureV01, OwnableFeatureAlreadyInitialized} from "../../contracts/collection/features/OwnableFeatureV01.sol";
-import "../../contracts/collection/features/shared/LibFeatureCommon.sol";
+import "../../contracts/collection/features/shared/LibFeatureCommonV02.sol";
 
 import "./StartrailTestBase.sol";
 
@@ -21,7 +21,7 @@ contract OwnableFeatureTest is StartrailTestBase {
         newOwner = vm.addr(0x888);
         notOwner = vm.addr(0x999);
 
-        collectionOwnerLU = licensedUser1;
+        collectionOwnerLU = licensedUser1Address;
         collectionAddress = createCollection(collectionOwnerLU);
         ownableFeature = OwnableFeatureV01(collectionAddress);
     }
@@ -49,7 +49,7 @@ contract OwnableFeatureTest is StartrailTestBase {
         expectRevertTransferOwnership(
             notOwner,
             newOwner,
-            LibFeatureCommon.NotCollectionOwner.selector
+            LibFeatureCommonV02.NotCollectionOwner.selector
         );
     }
 

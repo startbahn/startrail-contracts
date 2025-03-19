@@ -116,6 +116,7 @@ type SRRProvenance @entity {
   metadataURI: String! # event Provenance.metadataURI
   customHistory: CustomHistory # event Provenance.customHistoryId (in overloaded event only)
   isIntermediary: Boolean # event Provenance.isIntermediary
+  sender: Bytes # the sender
   # NOTE: this is redundant because we have timestamp above but it's included
   #       for consistency as all entities have createdAt
   createdAt: BigInt! # block.timestamp when entity created
@@ -150,6 +151,7 @@ type SRRTransferCommit @entity {
   commitment: Bytes # event Provenance.from - ownership transferred from
   customHistory: CustomHistory
   lastAction: TransferCommitLastAction!
+  sender: Bytes # the sender
   createdAt: BigInt! # block.timestamp when entity created
   updatedAt: BigInt! # block.timestamp when entity last updated
   createdAtStr: String! # createdAt in UTC string
@@ -231,6 +233,7 @@ type Collection @entity {
   symbol: String! # ERC721Metadata
   salt: Bytes! # CREATE2 salt
   ownerAddress: Bytes! # Collection owner address
+  creatorAddress: Bytes! # Collection creator address
   srrs: [SRR!]! @derivedFrom(field: "collection")
 
   createdAt: BigInt! # block.timestamp when entity created

@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable no-console */
+/* eslint-disable no-console, @typescript-eslint/no-require-imports */
+
 /**
  * Generates a subgraph.yaml file specificly for a network deployment.
  *
@@ -39,8 +39,8 @@ if (['local', 'mainnet'].indexOf(deploymentName) !== -1) {
   network = deploymentName
 } else if (deploymentName === 'polygon') {
   network = 'matic'
-} else if (deploymentName.startsWith('mumbai')) {
-  network = 'mumbai'
+} else if (deploymentName.startsWith('amoy')) {
+  network = 'polygon-amoy'
 } else {
   throw new Error(`network unknown for deployment [${deploymentName}]`)
 }
@@ -94,7 +94,7 @@ if (!isStartrailPackageDeployment) {
 const subgraphDeployments = JSON.parse(
   fs.readFileSync(rootPath('deployments.json')).toString()
 )
-const subgraphYamlTemplate = yaml.safeLoad(
+const subgraphYamlTemplate = yaml.load(
   fs.readFileSync(rootPath('subgraph.template.yaml'), 'utf8')
 )
 
@@ -192,5 +192,5 @@ subgraphYamlTemplate.dataSources = _.filter(
 
 fs.writeFileSync(
   rootPath(`subgraph.${deploymentName}.yaml`),
-  yaml.safeDump(subgraphYamlTemplate)
+  yaml.dump(subgraphYamlTemplate)
 )

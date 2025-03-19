@@ -764,7 +764,7 @@ Royalties marked `public` to provide direct read access to the percentages. requ
 function royaltyInfo(uint256 _tokenId, uint256 _salePrice) external view returns (address, uint256)
 ```
 
-Called with the sale price to determine how much royalty         is owed and to whom.  The default receiver address 0x75194F40c5337d218A6798B02BbB34500a653A16 is what we use for OpenSea.  For all environments like QA, STG and production. As we set the default royalty to 0, this shouldn’t matter.
+Called with the sale price to determine how much royalty         is owed and to whom.
 
 
 
@@ -1239,7 +1239,7 @@ function updateSRRRoyalty(uint256 tokenId, address royaltyReceiver, uint16 royal
 
 
 
-*Updates the SRR Royalty Only apply to srrs created with royalty info*
+*Updates the SRR Royalty*
 
 #### Parameters
 
@@ -1248,23 +1248,6 @@ function updateSRRRoyalty(uint256 tokenId, address royaltyReceiver, uint16 royal
 | tokenId | uint256 | uint256 of StartrailRegistryRecordID |
 | royaltyReceiver | address | royalty receiver |
 | royaltyPercentage | uint16 | royalty percentage |
-
-### updateSRRRoyaltyReceiverMulti
-
-```solidity
-function updateSRRRoyaltyReceiverMulti(uint256[] tokenIds, address royaltyReceiver) external nonpayable
-```
-
-
-
-*Updates the SRR Royalty Receiver from multi token ids Only apply to srrs created with royalty info*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenIds | uint256[] | token ids |
-| royaltyReceiver | address | royalty receiver |
 
 ### writeCustomHistory
 
@@ -1314,7 +1297,7 @@ event Approval(address indexed owner, address indexed approved, uint256 indexed 
 
 
 
-
+*Emitted when `owner` enables `approved` to manage the `tokenId` token.*
 
 #### Parameters
 
@@ -1332,7 +1315,7 @@ event ApprovalForAll(address indexed owner, address indexed operator, bool appro
 
 
 
-
+*Emitted when `owner` enables or disables (`approved`) `operator` to manage all of its assets.*
 
 #### Parameters
 
@@ -1464,7 +1447,7 @@ event Initialized(uint8 version)
 
 
 
-
+*Triggered when the contract has been initialized or reinitialized.*
 
 #### Parameters
 
@@ -1684,7 +1667,7 @@ event Transfer(address indexed from, address indexed to, uint256 indexed tokenId
 
 
 
-
+*Emitted when `tokenId` token is transferred from `from` to `to`.*
 
 #### Parameters
 

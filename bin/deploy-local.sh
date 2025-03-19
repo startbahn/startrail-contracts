@@ -29,3 +29,6 @@ npx hardhat run --network localhost scripts/deploy/024-deploy-collections.ts || 
 npx hardhat run --network localhost scripts/deploy/025-deploy-fix-transfer-from-with-provenance.ts || exit $?
 npx hardhat run --network localhost scripts/deploy/026-deploy-bulk-collection.ts || exit $?
 npx hardhat run --network localhost scripts/deploy/027-deploy-bulk-issue-on-buyer.ts || exit $?
+npx hardhat run --network localhost scripts/deploy/028-deploy-luw-manager-v2.ts || exit $?
+npx hardhat run --network localhost scripts/deploy/029-deploy-collection-srr-transfer-privileges-update.ts || exit $?
+npx hardhat run --network localhost scripts/deploy/030-deploy-fix-collection-log-provenance.ts || exit $?

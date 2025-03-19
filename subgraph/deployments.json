@@ -1,80 +1,80 @@
 {
-  "mumbai-develop": {
+  "amoy-develop": {
     "StartrailRegistry": {
-      "startBlock": 13142583
+      "startBlock": 16109906
     },
     "LicensedUserManager": {
-      "startBlock": 13142583
+      "startBlock": 16109906
     },
     "MetaTxForwarder": {
-      "startBlock": 13142583
+      "startBlock": 16109906
     },
     "BulkIssue": {
-      "startBlock": 13142583
+      "startBlock": 16109906
     },
     "BulkTransfer": {
-      "startBlock": 13142583
+      "startBlock": 16109906
     },
     "Bulk": {
-      "startBlock": 13142583
+      "startBlock": 16109906
     },
     "CollectionFactory": {
-      "startBlock": 30000000
+      "startBlock": 16109906
     },
     "Collection": {
-      "startBlock": 30000000
+      "startBlock": 16109906
     }
   },
-  "mumbai-release": {
+  "amoy-release": {
     "StartrailRegistry": {
-      "startBlock": 12378987
+      "startBlock": 5516645
     },
     "LicensedUserManager": {
-      "startBlock": 12378987
+      "startBlock": 5516645
     },
     "MetaTxForwarder": {
-      "startBlock": 12378987
+      "startBlock": 5516645
     },
     "BulkIssue": {
-      "startBlock": 12378987
+      "startBlock": 5516645
     },
     "BulkTransfer": {
-      "startBlock": 12378987
+      "startBlock": 5516645
     },
     "Bulk": {
-      "startBlock": 12378987
+      "startBlock": 5516645
     },
     "CollectionFactory": {
-      "startBlock": 30000000
+      "startBlock": 5516645
     },
     "Collection": {
-      "startBlock": 30000000
+      "startBlock": 5516645
     }
   },
-  "mumbai-staging": {
+  "amoy-staging": {
     "StartrailRegistry": {
-      "startBlock": 15984927
+      "startBlock": 5671940
     },
     "LicensedUserManager": {
-      "startBlock": 15984927
+      "startBlock": 5671940
     },
     "MetaTxForwarder": {
-      "startBlock": 15984927
+      "startBlock": 5671940
     },
     "BulkIssue": {
-      "startBlock": 15984927
+      "startBlock": 5671940
     },
     "BulkTransfer": {
-      "startBlock": 15984927
+      "startBlock": 5671940
     },
     "Bulk": {
-      "startBlock": 15984927
+      "startBlock": 5671940
     },
     "CollectionFactory": {
-      "startBlock": 30000000
+      "startBlock": 5671940
     },
     "Collection": {
-      "startBlock": 30000000
+      "startBlock": 5671940
     }
   },
   "polygon": {

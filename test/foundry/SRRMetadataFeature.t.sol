@@ -1,8 +1,8 @@
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import {SRRMetadataFeatureV01} from "../../contracts/collection/features/SRRMetadataFeatureV01.sol";
 import "../../contracts/collection/features/storage/LibSRRMetadataStorage.sol";
-import "../../contracts/collection/features/shared/LibFeatureCommon.sol";
+import "../../contracts/collection/features/shared/LibFeatureCommonV02.sol";
 import "./StartrailTestBase.sol";
 
 string constant updatedMetadataCID = "bafkreidsepqar4dhoupza7xvrkmiy56knyn5ckoacdoxmhxu5u37mozc7y";
@@ -19,7 +19,7 @@ contract SRRMetadataFeatureTest is StartrailTestBase {
     function setUp() public override {
         super.setUp();
 
-        collectionOwnerLU = licensedUser1;
+        collectionOwnerLU = licensedUser1Address;
         notAnOwner = vm.addr(0x7788);
 
         address royaltyReceiver = vm.addr(0x9911);
@@ -72,7 +72,7 @@ contract SRRMetadataFeatureTest is StartrailTestBase {
         vm.prank(notAnOwner);
 
         vm.expectRevert(
-            LibFeatureCommon.OnlyIssuerOrArtistOrCollectionOwner.selector
+            LibFeatureCommonV02.OnlyIssuerOrArtistOrCollectionOwner.selector
         );
 
         string memory metadataCID = A_CID;

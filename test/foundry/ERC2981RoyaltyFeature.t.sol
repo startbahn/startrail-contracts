@@ -1,9 +1,9 @@
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import "../../contracts/collection/features/erc721/ERC721Errors.sol";
 import "../../contracts/collection/features/storage/LibERC2981RoyaltyStorage.sol";
 import {ERC2981RoyaltyFeatureV01} from "../../contracts/collection/features/ERC2981RoyaltyFeatureV01.sol";
-import "../../contracts/collection/features/shared/LibFeatureCommon.sol";
+import "../../contracts/collection/features/shared/LibFeatureCommonV02.sol";
 import "./StartrailTestBase.sol";
 
 contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
@@ -26,7 +26,7 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
     function setUp() public override {
         super.setUp();
 
-        collectionOwnerLU = licensedUser1;
+        collectionOwnerLU = licensedUser1Address;
         notAnOwner = vm.addr(0x7788);
 
         royaltyReceiver1 = vm.addr(0x9911);
@@ -77,7 +77,7 @@ contract ERC2981RoyaltyFeatureTest is StartrailTestBase {
     function testRevertUpdateSRRRoyalty_OnlyAdmin() public {
         vm.prank(notAnOwner);
 
-        vm.expectRevert(LibFeatureCommon.NotAdministrator.selector);
+        vm.expectRevert(LibFeatureCommonV02.NotAdministrator.selector);
 
         feature.updateSRRRoyalty(
             tokenId1Shared,

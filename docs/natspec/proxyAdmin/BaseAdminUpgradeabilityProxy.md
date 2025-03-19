@@ -122,13 +122,13 @@ event Upgraded(address indexed implementation)
 
 
 
-
+*Emitted when the implementation is upgraded.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| implementation `indexed` | address | undefined |
+| implementation `indexed` | address | Address of the new implementation. |
 
 
 

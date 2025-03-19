@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import "@openzeppelin/contracts/utils/Address.sol";
 
@@ -59,7 +59,7 @@ contract UpgradeableProxiable {
      */
     function _setImplementation(address newImplementation) internal {
         require(
-            Address.isContract(newImplementation),
+            newImplementation.code.length > 0,
             "Cannot set a proxy implementation to a non-contract address"
         );
 

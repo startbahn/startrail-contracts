@@ -34,9 +34,9 @@ import {
   randomSha256,
   sendWithEIP2771,
   ZERO_ADDRESS,
+  BULK_FEATURE_CONTRACT_EVENT_SIG_KEYS,
   createLicensedUserWalletDirect,
 } from './helpers/utils'
-import { aCID } from '../startrail-common-js/test-helpers/test-data'
 
 use(chaiAsPromised)
 
@@ -57,6 +57,23 @@ let bulk: ethers.Contract
 let nameRegistry: ethers.Contract
 let startrailRegistry: ethers.Contract
 let customHistoryTypeId: number
+
+const verifyCollectionBulkFeatureEvent = (args: { event; expectedArgs }) => {
+  const { event, expectedArgs } = args
+  const contract = new ethers.utils.Interface(
+    Object.values(BULK_FEATURE_CONTRACT_EVENT_SIG_KEYS)
+  )
+  const log = contract.parseLog({
+    topics: event.topics,
+    data: event.data,
+  })
+
+  Object.entries(expectedArgs).forEach(([key, expectedValue]) => {
+    if(expectedArgs[key] !== undefined) {
+      expect(log.args[key]).equal(expectedArgs[key])
+    }
+  })
+}
 
 const prepareBatchFromLicensedUser = (merkleRoot) =>
   sendWithEIP2771(
@@ -193,9 +210,8 @@ const hashWithContractAddress = (
 
 describe('Bulk (transfers)', () => {
   before(async () => {
-    ;({ startrailRegistry, bulk, nameRegistry } = await loadFixture(
-      fixtureDefault
-    ))
+    ;({ startrailRegistry, bulk, nameRegistry } =
+      await loadFixture(fixtureDefault))
     // For unit testing set the trusted forwarders and the administrator to
     // EOA wallets. This will allow transactions to be sent directly to the
     // BulkTransfer which is simpler for unit testing purposes.
@@ -295,16 +311,25 @@ describe('Bulk (transfers)', () => {
   })
 
   describe('generalized bulk (collections)', () => {
-    let collection, collectionOwnerLUWAddress
+    let collection1
+    let collection2
     let merkleRoot, bulkActions, tree, hashBuffers, hashStrings
 
     before(async () => {
-      ;({ collection, collectionOwnerLUWAddress } = await setupCollection(
+      ;({ collection: collection1 } = await setupCollection(
         hre,
         administratorWallet,
         collectionOwnerWallet,
         {
-          collectionOwnerLUWAddress: luw1, // luw is collection owner
+          collectionOwnerLUWAddress: luw1,
+        }
+      ))
+      ;({ collection: collection2 } = await setupCollection(
+        hre,
+        administratorWallet,
+        collectionOwnerWallet,
+        {
+          collectionOwnerLUWAddress: luw2,
         }
       ))
     })
@@ -312,13 +337,14 @@ describe('Bulk (transfers)', () => {
       beforeEach(async () => {
         const collectionCreateSRR = (params: {
           fromAddress: string
+          collectionAddress: string
           issueOnAddress?: string
         }) => {
-          const { fromAddress, issueOnAddress } = params
+          const { fromAddress, issueOnAddress, collectionAddress } = params
           return createSRROnCollection(
             fromAddress,
             collectionOwnerWallet,
-            toChecksumAddress(collection.address),
+            toChecksumAddress(collectionAddress),
             {
               to: issueOnAddress,
             }
@@ -327,18 +353,30 @@ describe('Bulk (transfers)', () => {
 
         const luw1TokenId1 = await collectionCreateSRR({
           fromAddress: luw1,
+          collectionAddress: collection1.address,
         })
         const luw1TokenId2 = await collectionCreateSRR({
           fromAddress: luw1,
+          collectionAddress: collection1.address,
         })
 
         const luw2TokenId1 = await collectionCreateSRR({
           fromAddress: luw1,
           issueOnAddress: luw2,
+          collectionAddress: collection1.address,
         })
         const luw2TokenId2 = await collectionCreateSRR({
           fromAddress: luw1,
           issueOnAddress: luw2,
+          collectionAddress: collection1.address,
+        })
+        const luw2TokenId3 = await collectionCreateSRR({
+          fromAddress: luw2,
+          collectionAddress: collection2.address,
+        })
+        const luw2TokenId4 = await collectionCreateSRR({
+          fromAddress: luw2,
+          collectionAddress: collection2.address,
         })
 
         // create a new batch
@@ -346,23 +384,33 @@ describe('Bulk (transfers)', () => {
           [
             {
               actionType: 'approveSRRByCommitment',
-              contractAddress: toChecksumAddress(collection.address),
+              contractAddress: toChecksumAddress(collection1.address),
               tokenId: luw1TokenId1.toNumber(),
             },
             {
               actionType: 'approveSRRByCommitment',
-              contractAddress: toChecksumAddress(collection.address),
+              contractAddress: toChecksumAddress(collection1.address),
               tokenId: luw2TokenId1.toNumber(),
             },
             {
               actionType: 'transferFromWithProvenance',
-              contractAddress: toChecksumAddress(collection.address),
+              contractAddress: toChecksumAddress(collection1.address),
               tokenId: luw1TokenId2.toNumber(),
             },
             {
               actionType: 'transferFromWithProvenance',
-              contractAddress: toChecksumAddress(collection.address),
+              contractAddress: toChecksumAddress(collection1.address),
               tokenId: luw2TokenId2.toNumber(),
+            },
+            {
+              actionType: 'approveSRRByCommitment',
+              contractAddress: toChecksumAddress(collection2.address),
+              tokenId: luw2TokenId3.toNumber(),
+            },
+            {
+              actionType: 'transferFromWithProvenance',
+              contractAddress: toChecksumAddress(collection2.address),
+              tokenId: luw2TokenId4.toNumber(),
             },
           ],
           withCustomHistory
@@ -398,32 +446,71 @@ describe('Bulk (transfers)', () => {
           )
         }
 
-        it('success with valid leaf and proof', async () => {
+        it('success if luw is srr owner', async () => {
           const srrIdx = 0
           const srr = bulkActions[srrIdx]
           const srrLeafString = hashStrings[srrIdx]
           expect(srr.actionType).to.equal('approveSRRByCommitment')
 
           const txRspPromise = await approveSRRByCommitmentWithProof(srrIdx)
-
-          await expect(txRspPromise)
-            .to.emit(bulk, BULK_CONTRACT_EVENT_KEYS.approve)
-            .withArgs(
-              merkleRoot,
-              srr.data.contractAddress,
-              srr.data.tokenId,
-              srrLeafString
-            )
+          const txRsp = await txRspPromise
+          const receipt = await txRsp.wait()
           const bulkRecord = await bulk.batches(merkleRoot)
           expect(bulkRecord[1]).to.equal(luw1) // signer
           expect(bulkRecord[2]).to.equal(1) // processedCount
+          const eventBulkArgs = receipt.events.at(-1).args
+          expect(eventBulkArgs.merkleRoot).equal(merkleRoot)
+          expect(eventBulkArgs.contractAddress).equal(
+            toChecksumAddress(srr.data.contractAddress)
+          )
+          expect(eventBulkArgs.tokenId).equal(srr.data.tokenId)
+          expect(eventBulkArgs.leafHash).equal(srrLeafString)
+          verifyCollectionBulkFeatureEvent({
+            event: receipt.events[0],
+            expectedArgs: {
+              tokenId: srr.data.tokenId,
+              commitment: srr.data.commitment,
+              customHistoryId: srr.data.customHistoryId || undefined,
+              sender: luw1,
+            },
+          })
         })
 
-        it('rejects if luw is not a srr owner', async () => {
+        it('success if luw is collection owner', async () => {
           const srrIdx = 1
+          const srr = bulkActions[srrIdx]
+          const srrLeafString = hashStrings[srrIdx]
+          expect(srr.actionType).to.equal('approveSRRByCommitment')
+
+          const txRspPromise = await approveSRRByCommitmentWithProof(srrIdx)
+          const txRsp = await txRspPromise
+          const receipt = await txRsp.wait()
+          const bulkRecord = await bulk.batches(merkleRoot)
+          expect(bulkRecord[1]).to.equal(luw1) // signer
+          expect(bulkRecord[2]).to.equal(1) // processedCount
+          const eventBulkArgs = receipt.events.at(-1).args
+          expect(eventBulkArgs.merkleRoot).equal(merkleRoot)
+          expect(eventBulkArgs.contractAddress).equal(
+            toChecksumAddress(srr.data.contractAddress)
+          )
+          expect(eventBulkArgs.tokenId).equal(srr.data.tokenId)
+          expect(eventBulkArgs.leafHash).equal(srrLeafString)
+          verifyCollectionBulkFeatureEvent({
+            event: receipt.events[0],
+            expectedArgs: {
+              tokenId: srr.data.tokenId,
+              commitment: srr.data.commitment,
+              customHistoryId: srr.data.customHistoryId || undefined,
+              sender: luw1,
+            },
+          })
+        })
+
+        it('rejects if luw is not srr owner or collection owner', async () => {
+          const srrIdx = 4
           await expect(
             approveSRRByCommitmentWithProof(srrIdx)
-          ).to.eventually.be.rejectedWith(`NotSRROwner()`)
+          ).to.eventually.be.rejectedWith(`NotCollectionOwnerOrSRROwner()`)
         })
 
         it('rejects if leaf already processed', async () => {
@@ -524,7 +611,7 @@ describe('Bulk (transfers)', () => {
             srr.data.contractAddress
           )
         }
-        it('success with valid leaf and proof', async () => {
+        it('success if luw is srr owner', async () => {
           // choose a leaf and get details and proof
           const srrIdx = 2
           const srr = bulkActions[srrIdx]
@@ -533,25 +620,63 @@ describe('Bulk (transfers)', () => {
           expect(srr.actionType).to.equal('transferFromWithProvenance')
 
           const txRspPromise = transferFromWithProvenanceWithProof(srrIdx)
-
-          await expect(txRspPromise)
-            .to.emit(bulk, BULK_CONTRACT_EVENT_KEYS.transfer)
-            .withArgs(
-              merkleRoot,
-              toChecksumAddress(srr.data.contractAddress),
-              srr.data.tokenId,
-              srrLeafString
-            )
+          const txRsp = await txRspPromise
+          const receipt = await txRsp.wait()
           const bulkRecord = await bulk.batches(merkleRoot)
           expect(bulkRecord[1]).to.equal(luw1) // signer
           expect(bulkRecord[2]).to.equal(1) // processedCount
+          const eventBulkArgs = receipt.events.at(-1).args
+          expect(eventBulkArgs.merkleRoot).equal(merkleRoot)
+          expect(eventBulkArgs.contractAddress).equal(
+            toChecksumAddress(srr.data.contractAddress)
+          )
+          expect(eventBulkArgs.tokenId).equal(srr.data.tokenId)
+          expect(eventBulkArgs.leafHash).equal(srrLeafString)
+          verifyCollectionBulkFeatureEvent({
+            event: receipt.events[0],
+            expectedArgs: {
+              tokenId: srr.data.tokenId,
+              customHistoryId: srr.data.customHistoryId || undefined,
+              sender: luw1,
+            },
+          })
         })
 
-        it('rejects if luw is not a srr owner', async () => {
+        it('success if luw is collection owner', async () => {
           const srrIdx = 3
+          const srr = bulkActions[srrIdx]
+          const srrLeafString = hashStrings[srrIdx]
+
+          expect(srr.actionType).to.equal('transferFromWithProvenance')
+
+          const txRspPromise = transferFromWithProvenanceWithProof(srrIdx)
+          const txRsp = await txRspPromise
+          const receipt = await txRsp.wait()
+          const bulkRecord = await bulk.batches(merkleRoot)
+          expect(bulkRecord[1]).to.equal(luw1) // signer
+          expect(bulkRecord[2]).to.equal(1) // processedCount
+          const eventBulkArgs = receipt.events.at(-1).args
+          expect(eventBulkArgs.merkleRoot).equal(merkleRoot)
+          expect(eventBulkArgs.contractAddress).equal(
+            toChecksumAddress(srr.data.contractAddress)
+          )
+          expect(eventBulkArgs.tokenId).equal(srr.data.tokenId)
+          expect(eventBulkArgs.leafHash).equal(srrLeafString)
+          verifyCollectionBulkFeatureEvent({
+            event: receipt.events[0],
+            expectedArgs: {
+              tokenId: srr.data.tokenId,
+              customHistoryId: srr.data.customHistoryId || undefined,
+              sender: luw1,
+            },
+          })
+        })
+
+        it('rejects if luw is not srr owner or collection owner', async () => {
+          const srrIdx = 5
           await expect(
             transferFromWithProvenanceWithProof(srrIdx)
-          ).to.eventually.be.rejectedWith(`NotSRROwner()`)
+          ).to.eventually.be.rejectedWith(`NotCollectionOwnerOrSRROwner()`)
         })
 
         it('rejects if leaf already processed', async () => {

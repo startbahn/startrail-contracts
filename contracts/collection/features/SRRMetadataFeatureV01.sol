@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import "./interfaces/ISRRMetadataFeatureV01.sol";
 import "./storage/LibSRRMetadataStorage.sol";
 import "./shared/LibSRRMetadataEvents.sol";
-import "./shared/LibFeatureCommon.sol";
+import "./shared/LibFeatureCommonV01.sol";
 import "./storage/LibSRRStorage.sol";
 
 /**
@@ -22,19 +22,19 @@ contract SRRMetadataFeatureV01 is ISRRMetadataFeatureV01 {
     ) external override {
         LibERC721Storage.onlyExistingToken(tokenId);
 
-        if (LibFeatureCommon.isEmptyString(metadataCID)) {
+        if (LibFeatureCommonV01.isEmptyString(metadataCID)) {
             revert LibSRRMetadataStorage.SRRMetadataNotEmpty();
         }
 
         LibSRRStorage.SRR storage srr = LibSRRStorage.layout().srrs[tokenId];
 
-        address sendingWallet = LibFeatureCommon.msgSender();
+        address sendingWallet = LibFeatureCommonV01.msgSender();
         if (
             sendingWallet != srr.issuer &&
             sendingWallet != srr.artist &&
-            sendingWallet != LibFeatureCommon.getCollectionOwner()
+            sendingWallet != LibFeatureCommonV01.getCollectionOwner()
         ) {
-            revert LibFeatureCommon.OnlyIssuerOrArtistOrCollectionOwner();
+            revert LibFeatureCommonV01.OnlyIssuerOrArtistOrCollectionOwner();
         }
 
         LibSRRMetadataStorage.layout().srrs[tokenId] = metadataCID;

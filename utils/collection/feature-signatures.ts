@@ -83,6 +83,8 @@ const CollectionFunctionSignatures: CollectionFunctionSignaturesType =
       V01: [...erc721CommonFuncSignatures],
       V02: [...erc721CommonFuncSignatures],
       V03: [...erc721CommonFuncSignatures],
+      V04: [...erc721CommonFuncSignatures],
+      V05: [...erc721CommonFuncSignatures],
     },
     LockExternalTransferFeature: {
       V01: [...lockExternalTransferCommonFuncSignatures],
@@ -97,6 +99,8 @@ const CollectionFunctionSignatures: CollectionFunctionSignaturesType =
         `approveSRRByCommitmentFromBulk(uint256,bytes32,string,uint256)`,
       ],
       V02: [...srrApproveTransferCommonFuncSignatures],
+      V03: [...srrApproveTransferCommonFuncSignatures],
+      V04: [...srrApproveTransferCommonFuncSignatures],
     },
     SRRMetadataFeature: {
       V01: [...srrMetadataCommonFuncSignatures],
@@ -113,6 +117,14 @@ const CollectionFunctionSignatures: CollectionFunctionSignaturesType =
         `createSRRFromBulk(bool,address,string,address,bool,address,uint16)`,
       ],
       V02: [
+        ...bulkCommonFuncSignatures,
+        `createSRRFromBulk(bool,address,string,address,bool,address,address,uint16)`,
+      ],
+      V03: [
+        ...bulkCommonFuncSignatures,
+        `createSRRFromBulk(bool,address,string,address,bool,address,address,uint16)`,
+      ],
+      V04: [
         ...bulkCommonFuncSignatures,
         `createSRRFromBulk(bool,address,string,address,bool,address,address,uint16)`,
       ],

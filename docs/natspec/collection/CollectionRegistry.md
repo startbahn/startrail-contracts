@@ -26,13 +26,13 @@ function addCollection(address collectionAddress) external nonpayable
 |---|---|---|
 | collectionAddress | address | undefined |
 
-### owner
+### collectionFactory
 
 ```solidity
-function owner() external view returns (address)
+function collectionFactory() external view returns (address)
 ```
 
-get the ERC173 contract owner
+
 
 
 
@@ -41,7 +41,7 @@ get the ERC173 contract owner
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | conrtact owner |
+| _0 | address | undefined |
 
 ### registry
 
@@ -65,42 +65,20 @@ function registry(address) external view returns (bool)
 |---|---|---|
 | _0 | bool | undefined |
 
-### transferOwnership
+
+
+
+## Errors
+
+### OnlyCollectionFactory
 
 ```solidity
-function transferOwnership(address account) external nonpayable
-```
-
-transfer contract ownership to new account
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| account | address | address of new owner |
-
-
-
-## Events
-
-### OwnershipTransferred
-
-```solidity
-event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
+error OnlyCollectionFactory()
 ```
 
 
 
 
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| previousOwner `indexed` | address | undefined |
-| newOwner `indexed` | address | undefined |
 
 
 

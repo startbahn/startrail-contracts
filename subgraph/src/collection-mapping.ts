@@ -6,16 +6,23 @@ import {
   OwnershipTransferred as OwnershipTransferredEvent,
   SRRCommitment as SRRCommitmentEvent,
   SRRCommitment1 as SRRCommitmentWithCustomHistoryEvent,
+  SRRCommitment2 as SRRCommitmentEventLegacy,
+  SRRCommitment3 as SRRCommitmentWithCustomHistoryEventLegacy,
+  SRRCommitmentCancelled as SRRCommitmentCancelledEvent,
+  Provenance as SRRProvenanceWithIntermediaryEvent,
+  Provenance1 as SRRProvenanceWithCustomHistoryAndIntermediaryEvent,
   UpdateSRR as UpdateSRREvent,
 } from '../generated/templates/Collection/CollectionProxyFeaturesAggregate'
 import {
   handleLockExternalTransfer,
   handleRoyaltiesSet,
-  handleSRRCommitmentCancelled,
+  handleSRRCommitmentCancelledInternal,
+  handleSRRCommitmentCancelled as handleSRRCommitmentCancelledLegacy,
   handleSRRCommitmentInternal,
   handleSRRHistory,
-  handleSRRProvenanceWithCustomHistoryAndIntermediary,
-  handleSRRProvenanceWithIntermediary,
+  handleSRRProvenanceInternal,
+  handleSRRProvenanceWithCustomHistoryAndIntermediary as handleSRRProvenanceWithCustomHistoryAndIntermediaryWithoutSender,
+  handleSRRProvenanceWithIntermediary as handleSRRProvenanceWithIntermediaryWithoutSender,
   handleTransfer,
   handleUpdateSRRInternal,
   handleUpdateSRRMetadataWithCid,
@@ -32,10 +39,10 @@ import {
 // reexport handlers
 export {
   handleLockExternalTransfer,
-  handleSRRCommitmentCancelled,
+  handleSRRCommitmentCancelledLegacy,
   handleSRRHistory,
-  handleSRRProvenanceWithCustomHistoryAndIntermediary,
-  handleSRRProvenanceWithIntermediary,
+  handleSRRProvenanceWithCustomHistoryAndIntermediaryWithoutSender,
+  handleSRRProvenanceWithIntermediaryWithoutSender,
   handleUpdateSRRWithSender,
   handleRoyaltiesSet,
   handleTransfer,
@@ -80,6 +87,34 @@ export function handleUpdateSRR(event: UpdateSRREvent): void {
   )
 }
 
+export function handleSRRCommitmentLegacy(
+  event: SRRCommitmentEventLegacy
+): void {
+  logInvocation('handleSRRCommitmentLegacy', event)
+  let params = event.params
+  handleSRRCommitmentInternal(
+    eventUTCMillis(event),
+    params.commitment,
+    srrEntityId(event.address, params.tokenId),
+    null,
+    null
+  )
+}
+
+export function handleSRRCommitmentWithCustomHistoryLegacy(
+  event: SRRCommitmentWithCustomHistoryEventLegacy
+): void {
+  logInvocation('handleSRRCommitmentWithCustomHistoryLegacy', event)
+  let params = event.params
+  handleSRRCommitmentInternal(
+    eventUTCMillis(event),
+    params.commitment,
+    srrEntityId(event.address, params.tokenId),
+    params.customHistoryId,
+    null
+  )
+}
+
 export function handleSRRCommitment(event: SRRCommitmentEvent): void {
   logInvocation('handleSRRCommitment', event)
   let params = event.params
@@ -87,7 +122,8 @@ export function handleSRRCommitment(event: SRRCommitmentEvent): void {
     eventUTCMillis(event),
     params.commitment,
     srrEntityId(event.address, params.tokenId),
-    null
+    null,
+    params.sender
   )
 }
 
@@ -100,7 +136,58 @@ export function handleSRRCommitmentWithCustomHistory(
     eventUTCMillis(event),
     params.commitment,
     srrEntityId(event.address, params.tokenId),
-    params.customHistoryId
+    params.customHistoryId,
+    null
+  )
+}
+
+export function handleSRRCommitmentCancelled(
+  event: SRRCommitmentCancelledEvent
+): void {
+  logInvocation('handleSRRCommitmentCancelled', event)
+  handleSRRCommitmentCancelledInternal(
+    eventUTCMillis(event),
+    srrEntityId(event.address, event.params.tokenId),
+    event.params.sender
+  )
+}
+
+export function handleSRRProvenanceWithIntermediaryWithSender(
+  event: SRRProvenanceWithIntermediaryEvent
+): void {
+  logInvocation('handleSRRProvenanceWithIntermediaryWithSender', event)
+  let params = event.params
+  handleSRRProvenanceInternal(
+    eventUTCMillis(event),
+    srrEntityId(event.address, params.tokenId),
+    params.from,
+    params.to,
+    null,
+    params.historyMetadataHash,
+    params.historyMetadataURI,
+    params.isIntermediary,
+    params.sender
+  )
+}
+
+export function handleSRRProvenanceWithCustomHistoryAndIntermediaryWithSender(
+  event: SRRProvenanceWithCustomHistoryAndIntermediaryEvent
+): void {
+  logInvocation(
+    'handleSRRProvenanceWithCustomHistoryAndIntermediaryWithSender',
+    event
+  )
+  let params = event.params
+  handleSRRProvenanceInternal(
+    eventUTCMillis(event),
+    srrEntityId(event.address, params.tokenId),
+    params.from,
+    params.to,
+    params.customHistoryId,
+    params.historyMetadataHash,
+    params.historyMetadataURI,
+    params.isIntermediary,
+    event.params.sender
   )
 }
 

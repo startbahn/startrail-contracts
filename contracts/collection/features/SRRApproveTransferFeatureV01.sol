@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import "./interfaces/ISRRApproveTransferFeatureV01.sol";
-import "./shared/LibFeatureCommon.sol";
+import "./shared/LibFeatureCommonV01.sol";
 import "./shared/LibFeatureStartrailRegistry.sol";
-import "./shared/LibSRRApproveTransferFeatureEvents.sol";
 import "./storage/LibApproveTransferStorage.sol";
 import "./storage/LibSRRMetadataStorage.sol";
 
@@ -30,7 +29,7 @@ contract SRRApproveTransferFeatureV01 is ISRRApproveTransferFeatureV01 {
         LibERC721Storage.onlyExistingToken(tokenId);
         if (
             LibERC721Storage.layout().ownerOf[tokenId] !=
-            LibFeatureCommon.msgSender()
+            LibFeatureCommonV01.msgSender()
         ) {
             revert NotSRROwner();
         }
@@ -95,7 +94,7 @@ contract SRRApproveTransferFeatureV01 is ISRRApproveTransferFeatureV01 {
     function cancelSRRCommitment(uint256 tokenId) external override {
         onlySRROwner(tokenId);
         _clearSRRCommitment(tokenId);
-        emit LibSRRApproveTransferFeatureEvents.SRRCommitmentCancelled(tokenId);
+        emit SRRCommitmentCancelled(tokenId);
     }
 
     /**
@@ -119,7 +118,7 @@ contract SRRApproveTransferFeatureV01 is ISRRApproveTransferFeatureV01 {
 
         address from = LibERC721Storage.layout().ownerOf[tokenId];
 
-        LibFeatureCommon.logProvenance(
+        LibFeatureCommonV01.logProvenance(
             tokenId,
             from,
             to,
@@ -172,7 +171,7 @@ contract SRRApproveTransferFeatureV01 is ISRRApproveTransferFeatureV01 {
     ) private {
         if (
             customHistoryId > 0 &&
-            LibFeatureCommon.isEmptyString(
+            LibFeatureCommonV01.isEmptyString(
                 LibFeatureStartrailRegistry
                     .getStartrailRegistry()
                     .getCustomHistoryNameById(customHistoryId)
@@ -189,7 +188,7 @@ contract SRRApproveTransferFeatureV01 is ISRRApproveTransferFeatureV01 {
         // If approve has already been called then emit event that signifies
         // that prior approval is cancelled.
         if (approval.commitment != "") {
-            emit LibSRRApproveTransferFeatureEvents.SRRCommitmentCancelled(
+            emit SRRCommitmentCancelled(
                 tokenId
             );
         }
@@ -198,13 +197,13 @@ contract SRRApproveTransferFeatureV01 is ISRRApproveTransferFeatureV01 {
         approval.historyMetadataHash = historyMetadataHash;
 
         if (customHistoryId == NO_CUSTOM_HISTORY) {
-            emit LibSRRApproveTransferFeatureEvents.SRRCommitment(
+            emit SRRCommitment(
                 tokenId,
                 commitment
             );
         } else {
             approval.customHistoryId = customHistoryId;
-            emit LibSRRApproveTransferFeatureEvents.SRRCommitment(
+            emit SRRCommitment(
                 tokenId,
                 commitment,
                 customHistoryId

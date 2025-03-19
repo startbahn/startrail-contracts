@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import "../../../common/INameRegistry.sol";
 import "../../CollectionProxyStorage.sol";
-import "./LibFeatureCommon.sol";
+import "./LibFeatureCommonV01.sol";
 
 /**
  * Defines interface with a subset of the full StartrailRegistry.sol contract.
@@ -37,7 +37,7 @@ library LibFeatureStartrailRegistry {
     {
         return
             IStartrailRegistrySubset(
-                INameRegistry(LibFeatureCommon.getNameRegistry()).get(
+                INameRegistry(LibFeatureCommonV01.getNameRegistry()).get(
                     NAME_REGISTRY_KEY_STARTRAIL_REGISTRY
                 )
             );

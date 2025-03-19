@@ -41,10 +41,10 @@ prod-tag-only: &prod_tag_only
 executors:
   default:
     docker:
-      - image: cimg/node:18.15.0
+      - image: cimg/node:20.17.0
   foundry:
     docker:
-      - image: startbahn/foundry:node-18.15.0
+      - image: startbahn/foundry:node-20.17.0
 
 commands:
   #
@@ -104,7 +104,7 @@ commands:
     steps:
       - run:
           name: Create docker network
-          command: docker network create startrail
+          command: yarn run create-startrail-network
       - run:
           name: Start Startrail
           command: yarn run hardhat-up-bg
@@ -185,29 +185,29 @@ commands:
   deploy_develop:
     steps:
       - run:
-          name: deploy mumbai develop subgraph into public node
+          name: deploy amoy develop subgraph into public node
           command: cd subgraph && yarn run deploy-develop
   deploy_release:
     steps:
       - run:
-          name: deploy mumbai release subgraph into public node
-          command: cd subgraph && yarn run deploy-release && yarn run deploy-release2
+          name: deploy amoy release subgraph into Alchemy
+          command: cd subgraph && VERSION_LABEL=$CIRCLE_TAG yarn run deploy-alchemy-release
   deploy_staging:
     steps:
       - run:
-          name: deploy mumbai staging subgraph into public node
-          command: cd subgraph && yarn run deploy-staging && yarn run deploy-staging2
+          name: deploy amoy staging subgraph into Alchemy
+          command: cd subgraph && VERSION_LABEL=$CIRCLE_TAG yarn run deploy-alchemy-staging
 
   deploy_polygon:
     steps:
       - run:
-          name: deploy mainnet master subgraph into public node
-          command: cd subgraph && yarn run deploy-polygon && yarn run deploy-polygon2
+          name: deploy mainnet master subgraph into Alchemy
+          command: cd subgraph && VERSION_LABEL=$CIRCLE_TAG yarn run deploy-alchemy-polygon
 
   install_nodejs:
     steps:
       - node/install:
-          node-version: 18.15.0
+          node-version: 20.17.0
           install-yarn: false
 
   # Workaround because using 'install-yarn' from the node orb is failing
@@ -278,21 +278,21 @@ jobs:
       - checkout
       - install_node_dependencies_subgraph
       - build_subgraph_source
-  mumbai_develop:
+  amoy_develop:
     executor: default
     steps:
       - checkout
       - install_node_dependencies_subgraph
       - build_subgraph_develop_source
       - deploy_develop
-  mumbai_release:
+  amoy_release:
     executor: default
     steps:
       - checkout
       - install_node_dependencies_subgraph
       - build_subgraph_release_source
       - deploy_release
-  mumbai_staging:
+  amoy_staging:
     executor: default
     steps:
       - checkout

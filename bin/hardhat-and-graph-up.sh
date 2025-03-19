@@ -21,16 +21,18 @@ echo "Startup logfile: ${LOG}\n"
 echo "Shutdown any running containers ...\n"
 yarn down > $LOG 2>&1
 
+echo "Create startrail network if not existed"
+yarn create-startrail-network
+
 echo "Starting servers ...\n"
 yarn hardhat-up-bg >> $LOG 2>&1
 
-cd $SUBGRAPH_DIR
-yarn graph-up-bg >> $LOG 2>&1
-cd - > /dev/null
-
-`dirname $0`/../subgraph/bin/wait_for_subgraph
-if test "$?" = "1"; then
-  echo "Timeout waiting for subgraph!"
+echo "Waiting for Hardhat node to be up..."
+sh "./bin/wait-for-hardhat.sh"
+if [ $? -eq 0 ]; then
+  echo "Hardhat node is up!"
+else
+  echo "Failed to start Hardhat node. Exiting."
   exit 1
 fi
 
@@ -39,6 +41,17 @@ yarn deploy-local >> $LOG 2>&1 || exitWithMsg
 
 echo "Seeding contract data ...\n"
 yarn seed-minimal >> $LOG 2>&1 || exitWithMsg
+
+cd $SUBGRAPH_DIR
+
+yarn graph-up-bg >> $LOG 2>&1
+cd - > /dev/null
+
+`dirname $0`/../subgraph/bin/wait_for_subgraph
+if test "$?" = "1"; then
+  echo "Timeout waiting for subgraph!"
+  exit 1
+fi
 
 echo "Deploying subgraph ...\n"
 cd $SUBGRAPH_DIR

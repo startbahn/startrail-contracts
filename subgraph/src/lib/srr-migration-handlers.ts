@@ -129,6 +129,7 @@ export function handleSRRCommitmentFromMigration(
     secondsToMillis(event.params.originTimestamp),
     params.commitment,
     srrEntityId(event.address, params.tokenId),
+    null,
     null
   )
 }
@@ -142,7 +143,8 @@ export function handleSRRCommitmentWithCustomHistoryFromMigration(
     secondsToMillis(event.params.originTimestamp),
     params.commitment,
     srrEntityId(event.address, params.tokenId),
-    params.customHistoryId
+    params.customHistoryId,
+    null
   )
 }
 
@@ -159,7 +161,8 @@ export function handleSRRProvenanceFromMigration(
     null,
     params.historyMetadataDigest,
     params.historyMetadataURI,
-    false
+    false,
+    null
   )
 }
 
@@ -176,7 +179,8 @@ export function handleSRRProvenanceWithCustomHistoryFromMigration(
     params.customHistoryId,
     params.historyMetadataDigest,
     params.historyMetadataURI,
-    false
+    false,
+    null
   )
 }
 export function handleSRRCommitmentCancelledFromMigration(
@@ -185,7 +189,8 @@ export function handleSRRCommitmentCancelledFromMigration(
   logInvocation('handleSRRCommitmentCancelledFromMigration', event)
   handleSRRCommitmentCancelledInternal(
     secondsToMillis(event.params.originTimestamp),
-    srrEntityId(event.address, event.params.tokenId)
+    srrEntityId(event.address, event.params.tokenId),
+    null
   )
 }
 export function handleCreateCustomHistoryFromMigration(

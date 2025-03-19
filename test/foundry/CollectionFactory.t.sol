@@ -1,4 +1,4 @@
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import {IERC173} from "@solidstate/contracts/interfaces/IERC173.sol";
 import {IERC165} from "@solidstate/contracts/interfaces/IERC165.sol";
@@ -18,7 +18,7 @@ contract CollectionFactoryTest is StartrailTestBase {
     }
 
     function testCreateCollection() public {
-        address collectionCreator = licensedUser1;
+        address collectionCreator = licensedUser1Address;
         address collectionAddress = createCollection(collectionCreator);
 
         IERC173 cERC173 = IERC173(collectionAddress);

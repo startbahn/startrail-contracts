@@ -105,14 +105,14 @@ event AdminChanged(address previousAdmin, address newAdmin)
 
 
 
-
+*Emitted when the administration has been transferred.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| previousAdmin  | address | undefined |
-| newAdmin  | address | undefined |
+| previousAdmin  | address | Address of the previous admin. |
+| newAdmin  | address | Address of the new admin. |
 
 ### Upgraded
 
@@ -122,13 +122,13 @@ event Upgraded(address indexed implementation)
 
 
 
-
+*Emitted when the implementation is upgraded.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| implementation `indexed` | address | undefined |
+| implementation `indexed` | address | Address of the new implementation. |
 
 
 

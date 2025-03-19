@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
@@ -8,9 +8,8 @@ import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "../proxy/utils/InitializableWithGap.sol";
-import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable-v4/utils/ContextUpgradeable.sol";
 
 /**
  * @title ERC721 Non-Fungible Token Standard basic implementation
@@ -23,7 +22,6 @@ abstract contract ERC721UpgradeSafe is
     IERC721,
     IERC721Metadata
 {
-    using SafeMath for uint256;
     using Address for address;
     // using EnumerableSet for EnumerableSet.UintSet;
     // using EnumerableMap for EnumerableMap.UintToAddressMap;
@@ -488,7 +486,7 @@ abstract contract ERC721UpgradeSafe is
 
         _beforeTokenTransfer(address(0), to, tokenId);
 
-        _ownedTokensCount[to] = _ownedTokensCount[to].add(1);
+        _ownedTokensCount[to] = _ownedTokensCount[to] + 1;
         _tokenOwner[tokenId] = to;
 
         emit Transfer(address(0), to, tokenId);
@@ -506,7 +504,7 @@ abstract contract ERC721UpgradeSafe is
     function _setOwnerFromMigration(address owner, uint256 tokenId) internal virtual {
         require(owner != address(0), "ERC721: migration with ownership to the zero address");
         require(!_exists(tokenId), "ERC721: token already migrated");
-        _ownedTokensCount[owner] = _ownedTokensCount[owner].add(1);
+        _ownedTokensCount[owner] = _ownedTokensCount[owner] + 1;
         _tokenOwner[tokenId] = owner;
     }
 
@@ -528,7 +526,7 @@ abstract contract ERC721UpgradeSafe is
             delete _tokenURIs[tokenId];
         }
 
-        _ownedTokensCount[owner] = _ownedTokensCount[owner].sub(1);
+        _ownedTokensCount[owner] = _ownedTokensCount[owner] - 1;
         _tokenOwner[tokenId] = address(0);
 
         emit Transfer(owner, address(0), tokenId);
@@ -557,9 +555,9 @@ abstract contract ERC721UpgradeSafe is
         // Clear approvals from the previous owner
         _approve(address(0), tokenId);
 
-        _ownedTokensCount[from] = _ownedTokensCount[from].sub(1);
+        _ownedTokensCount[from] = _ownedTokensCount[from] - 1;
 
-        _ownedTokensCount[to] = _ownedTokensCount[to].add(1);
+        _ownedTokensCount[to] = _ownedTokensCount[to] + 1;
 
         _tokenOwner[tokenId] = to;
 
@@ -611,7 +609,7 @@ abstract contract ERC721UpgradeSafe is
         uint256 tokenId,
         bytes memory _data
     ) private returns (bool) {
-        if (!to.isContract()) {
+        if (to.code.length == 0) {
             return true;
         }
         // solhint-disable-next-line avoid-low-level-calls

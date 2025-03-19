@@ -86,7 +86,8 @@ export function handleTransfer(event: TransferEvent): void {
       null,
       null,
       null,
-      false
+      false,
+      null
     )
     checkAndClearCommitOnTransfer(srr, timestampMillis)
     srr.save()
@@ -147,7 +148,8 @@ export function handleSRRCommitmentCancelled(
   logInvocation('handleSRRCommitmentCancelled', event)
   handleSRRCommitmentCancelledInternal(
     eventUTCMillis(event),
-    srrEntityId(event.address, event.params.tokenId)
+    srrEntityId(event.address, event.params.tokenId),
+    null
   )
 }
 
@@ -164,7 +166,8 @@ export function handleSRRProvenanceWithIntermediary(
     null,
     params.historyMetadataHash,
     params.historyMetadataURI,
-    params.isIntermediary
+    params.isIntermediary,
+    null
   )
 }
 
@@ -182,7 +185,8 @@ export function handleSRRProvenanceWithCustomHistoryAndIntermediary(
     params.customHistoryId,
     params.historyMetadataHash,
     params.historyMetadataURI,
-    params.isIntermediary
+    params.isIntermediary,
+    null
   )
 }
 
@@ -275,7 +279,8 @@ export function handleSRRProvenanceInternal(
   customHistoryId: BigInt | null,
   historyMetadataHash: string | null,
   historyMetadataURI: string | null,
-  isIntermediary: boolean
+  isIntermediary: boolean,
+  sender: Address | null
 ): void {
   let srr = SRR.load(srrEntityId)
   if (!srr) {
@@ -303,6 +308,10 @@ export function handleSRRProvenanceInternal(
     provenance.srr = srr.id
     provenance.from = from
     provenance.to = to
+
+    if (sender) {
+      provenance.sender = sender
+    }
 
     if (historyMetadataHash) {
       // isHexString
@@ -340,7 +349,8 @@ export function handleSRRCommitmentInternal(
   eventTimestampMillis: BigInt,
   commitment: Bytes,
   srrEntityId: string,
-  customHistoryId: BigInt | null
+  customHistoryId: BigInt | null,
+  sender: Address | null
 ): void {
   let srr = SRR.load(srrEntityId)
   if (!srr) {
@@ -367,6 +377,10 @@ export function handleSRRCommitmentInternal(
 
   if (customHistoryId) {
     srrCommit.customHistory = customHistoryId.toString()
+  }
+
+  if (sender) {
+    srrCommit.sender = sender
   }
 
   srrCommit.updatedAt = eventTimestampMillis
@@ -534,7 +548,8 @@ export function saveSRRMetadataHistory(
 
 export function handleSRRCommitmentCancelledInternal(
   eventTimestampMillis: BigInt,
-  srrEntityId: string
+  srrEntityId: string,
+  sender: Address | null
 ): void {
   let srr = SRR.load(srrEntityId)
   if (!srr) {
@@ -554,6 +569,10 @@ export function handleSRRCommitmentCancelledInternal(
       [srrEntityId]
     )
     return
+  }
+
+  if (sender) {
+    srrCommit.sender = sender
   }
 
   srrCommit.lastAction = 'cancel'

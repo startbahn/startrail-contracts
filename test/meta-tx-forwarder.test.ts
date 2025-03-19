@@ -23,7 +23,7 @@ import {
   assertExecutionSuccessEmitted,
   assertRevert,
 } from './helpers/assertions'
-import { setupCollection } from './helpers/collections'
+import { createSRR, setupCollection } from './helpers/collections'
 import { fixtureDefault } from './helpers/fixtures'
 import {
   createLicensedUserWalletDirect,
@@ -244,8 +244,17 @@ describe('MetaTxForwarder', () => {
       let tokenId: BigNumber
 
       before(async () => {
-        ;({ collectionOwnerLUWAddress, collection, tokenId } =
-          await setupCollection(hre, adminEOAWallet, handlerEOAWallet))
+        ;({ collectionOwnerLUWAddress, collection } = await setupCollection(
+          hre,
+          adminEOAWallet,
+          handlerEOAWallet
+        ))
+        tokenId = await createSRR(
+          collectionOwnerLUWAddress,
+          handlerEOAWallet,
+          collection.address,
+          {}
+        )
       })
 
       it('should execute with a valid destination contract', async () => {
@@ -418,11 +427,17 @@ describe('MetaTxForwarder', () => {
       let eoaOwnerAddress = eoaOwnerWallet.address
 
       before(async () => {
-        ;({
-          collection,
+        ;({ collection, collectionOwnerLUWAddress } = await setupCollection(
+          hre,
+          adminEOAWallet,
+          handlerEOAWallet
+        ))
+        collectionTokenId = await createSRR(
           collectionOwnerLUWAddress,
-          tokenId: collectionTokenId,
-        } = await setupCollection(hre, adminEOAWallet, handlerEOAWallet))
+          handlerEOAWallet,
+          collection.address,
+          {}
+        )
 
         // transfer ownership of new token on new collection to an EOA owner
         // so we can use that new owner in the tests

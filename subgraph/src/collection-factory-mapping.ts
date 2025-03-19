@@ -34,6 +34,7 @@ function handleCollectionCreatedInternal(
   collection.name = name
   collection.symbol = symbol
   collection.ownerAddress = ownerAddress
+  collection.creatorAddress = ownerAddress
   collection.salt = salt
 
   collection.createdAt = eventTimestampMillis

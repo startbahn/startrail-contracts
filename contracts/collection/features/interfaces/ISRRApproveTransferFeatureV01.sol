@@ -1,15 +1,31 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 /**
- * @dev Functions and errors for the approve and transfer by commit reveal
- *   scheme. Events are defined in LibSRRApproveTransferFeatureEvents.sol.
+ * @dev Events, Errors and Functions for the approve and transfer by commit reveal scheme.
  */
 interface ISRRApproveTransferFeatureV01 {
+    /**
+     * Errors
+     */
+
     error CustomHistoryDoesNotExist();
     error IncorrectRevealHash();
     error NotSRROwner();
+    /**
+     * Events
+     */
+
+    event SRRCommitment(uint256 indexed tokenId, bytes32 indexed commitment);
+
+    event SRRCommitment(
+        uint256 indexed tokenId,
+        bytes32 indexed commitment,
+        uint256 indexed customHistoryId
+    );
+
+    event SRRCommitmentCancelled(uint256 indexed tokenId);
 
     /**
      * @dev Register an approval to transfer ownership by commitment scheme

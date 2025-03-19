@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import "./erc721/LibERC721Storage.sol";
 import "./interfaces/ISRRHistoryFeatureV01.sol";
-import "./shared/LibFeatureCommon.sol";
+import "./shared/LibFeatureCommonV01.sol";
 import "./shared/LibFeatureStartrailRegistry.sol";
 import "./shared/LibSRRHistoryEvents.sol";
 import "./storage/LibSRRStorage.sol";
@@ -32,9 +32,9 @@ contract SRRHistoryFeatureV01 is ISRRHistoryFeatureV01 {
             revert MaxCombinedTokensAndHistoriesExceeded();
         }
 
-        address sender = LibFeatureCommon.msgSender();
+        address sender = LibFeatureCommonV01.msgSender();
         bool senderIsCollectionOwner = sender ==
-            LibFeatureCommon.getCollectionOwner();
+            LibFeatureCommonV01.getCollectionOwner();
 
         uint16 i;
 
@@ -55,7 +55,7 @@ contract SRRHistoryFeatureV01 is ISRRHistoryFeatureV01 {
 
         for (i = 0; i < customHistoryIds.length; i++) {
             if (
-                LibFeatureCommon.isEmptyString(
+                LibFeatureCommonV01.isEmptyString(
                     sr.getCustomHistoryNameById(customHistoryIds[i])
                 )
             ) {

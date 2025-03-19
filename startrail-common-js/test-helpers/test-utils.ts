@@ -1,4 +1,5 @@
 import { BigNumber, ethers } from 'ethers'
+import { IsFlattenedSignature } from '../validation/flattened-signature.decorator'
 
 export const randomWallet = (): ethers.Wallet => ethers.Wallet.createRandom()
 export const randomTokenId = (): BigNumber =>
@@ -15,3 +16,8 @@ export const randomAddress = (): string =>
 
 export const regExpSha256 = new RegExp(/[a-z0-9]{64}/)
 export const regExpAnyValue = new RegExp(/.+?/)
+
+export class TestFlattenedSignatureDto {
+  @IsFlattenedSignature()
+  signature!: string
+}

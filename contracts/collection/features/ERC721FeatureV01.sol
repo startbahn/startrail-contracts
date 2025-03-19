@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import "./erc721/ERC721UpgradeableBase.sol";
 import "./erc721/LibERC721Storage.sol";
 import "./interfaces/IERC721FeatureV01.sol";
 import "./interfaces/ILockExternalTransferFeatureV01.sol";
-import "./shared/LibFeatureCommon.sol";
+import "./shared/LibFeatureCommonV01.sol";
 
 error ERC721FeatureAlreadyInitialized();
 
@@ -42,7 +42,7 @@ contract ERC721FeatureV01 is IERC721FeatureV01, ERC721UpgradeableBase {
         address to,
         uint256 id
     ) public override {
-        LibFeatureCommon.onlyExternalTransferUnlocked(id);
+        LibFeatureCommonV01.onlyExternalTransferUnlocked(id);
         ERC721UpgradeableBase.transferFrom(from, to, id);
     }
 
@@ -54,7 +54,7 @@ contract ERC721FeatureV01 is IERC721FeatureV01, ERC721UpgradeableBase {
         address to,
         uint256 tokenId
     ) public virtual override {
-        LibFeatureCommon.onlyExternalTransferUnlocked(tokenId);
+        LibFeatureCommonV01.onlyExternalTransferUnlocked(tokenId);
         ERC721UpgradeableBase.transferFrom(from, to, tokenId);
     }
 
@@ -67,7 +67,7 @@ contract ERC721FeatureV01 is IERC721FeatureV01, ERC721UpgradeableBase {
         uint256 tokenId,
         bytes calldata data
     ) public virtual override {
-        LibFeatureCommon.onlyExternalTransferUnlocked(tokenId);
+        LibFeatureCommonV01.onlyExternalTransferUnlocked(tokenId);
         ERC721UpgradeableBase.safeTransferFrom(from, to, tokenId, data);
     }
 
@@ -75,7 +75,7 @@ contract ERC721FeatureV01 is IERC721FeatureV01, ERC721UpgradeableBase {
      * @inheritdoc ERC721UpgradeableBase
      */
     function approve(address spender, uint256 tokenId) public override {
-        LibFeatureCommon.onlyExternalTransferUnlocked(tokenId);
+        LibFeatureCommonV01.onlyExternalTransferUnlocked(tokenId);
         ERC721UpgradeableBase.approve(spender, tokenId);
     }
 
@@ -89,10 +89,10 @@ contract ERC721FeatureV01 is IERC721FeatureV01, ERC721UpgradeableBase {
         uint256 customHistoryId,
         bool isIntermediary
     ) external override {
-        LibFeatureCommon.onlyExternalTransferUnlocked(tokenId);
+        LibFeatureCommonV01.onlyExternalTransferUnlocked(tokenId);
 
         address tokenOwner = ownerOf(tokenId);
-        address sender = LibFeatureCommon.msgSender();
+        address sender = LibFeatureCommonV01.msgSender();
 
         // Not using a custom error here to be consistent with how
         // ERC721UpgradeableBase handles these errors. In this way
@@ -100,7 +100,7 @@ contract ERC721FeatureV01 is IERC721FeatureV01, ERC721UpgradeableBase {
         // NOT_AUTHORIZED.
         require(sender == tokenOwner, "NOT_AUTHORIZED");
 
-        LibFeatureCommon.logProvenance(
+        LibFeatureCommonV01.logProvenance(
             tokenId,
             tokenOwner,
             to,

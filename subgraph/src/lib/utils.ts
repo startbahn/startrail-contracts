@@ -15,8 +15,8 @@ export let currentChainId = (): string => {
 
   if (network === 'matic') {
     chainId = 'eip155:137'
-  } else if (network.indexOf('mumbai') !== -1) {
-    chainId = 'eip155:80001'
+  } else if (network.indexOf('amoy') !== -1) {
+    chainId = 'eip155:80002'
   } else if (network === 'hardhat' || network.indexOf('local') !== -1) {
     chainId = 'eip155:31337'
   } else {

@@ -7,7 +7,8 @@
     "strict": false,
     "outDir": "dist",
     "allowJs": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
   },
   "include": ["./scripts", "./test", "./typechain-types"],
   "exclude": ["node_modules", "dist"],

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 /**
  * @dev Flag enabling standard ERC721 transfer methods to be disabled for a
