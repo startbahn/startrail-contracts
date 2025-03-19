@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import {IERC2981} from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import "./interfaces/IERC2981RoyaltyFeatureV01.sol";
@@ -8,7 +8,7 @@ import "./storage/LibERC2981RoyaltyStorage.sol";
 import "./storage/LibSRRStorage.sol";
 import "./shared/LibERC2981RoyaltyTypes.sol";
 import "./shared/LibERC2981RoyaltyEvents.sol";
-import "./shared/LibFeatureCommon.sol";
+import "./shared/LibFeatureCommonV01.sol";
 
 /**
  * @title A standardized way to retrieve royalty payment information for NFTs
@@ -35,7 +35,7 @@ contract ERC2981RoyaltyFeatureV01 is IERC2981RoyaltyFeatureV01, IERC2981 {
     ) external override {
         LibERC721Storage.onlyExistingToken(tokenId);
 
-        LibFeatureCommon.onlyAdministrator();
+        LibFeatureCommonV01.onlyAdministrator();
 
         LibERC2981RoyaltyStorage.onlyExistingRoyalty(tokenId);
         LibERC2981RoyaltyStorage.notAddressZero(royaltyReceiver);
@@ -55,7 +55,7 @@ contract ERC2981RoyaltyFeatureV01 is IERC2981RoyaltyFeatureV01, IERC2981 {
         uint256[] calldata tokenIds,
         address royaltyReceiver
     ) external override {
-        LibFeatureCommon.onlyAdministrator();
+        LibFeatureCommonV01.onlyAdministrator();
         LibERC2981RoyaltyStorage.notAddressZero(royaltyReceiver);
 
         for (uint256 i = 0; i < tokenIds.length; i++) {

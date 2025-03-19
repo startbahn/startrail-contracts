@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import {IERC721} from "@solidstate/contracts/interfaces/IERC721.sol";
 import "../../lib/IDGeneratorV3.sol";
 import "./interfaces/ISRRFeatureV02.sol";
-import "./shared/LibFeatureCommon.sol";
+import "./shared/LibFeatureCommonV01.sol";
 import "./shared/LibSRRCreate.sol";
 import "./storage/LibSRRStorage.sol";
 import "./storage/LibERC2981RoyaltyStorage.sol";
@@ -30,7 +30,7 @@ contract SRRFeatureV02 is ISRRFeatureV02 {
         address royaltyReceiver,
         uint16 royaltyBasisPoints
     ) external override {
-        address issuerAddress = LibFeatureCommon.msgSender();
+        address issuerAddress = LibFeatureCommonV01.msgSender();
         uint256 tokenId = LibSRRCreate.createSRR(
             isPrimaryIssuer,
             artistAddress,
@@ -69,18 +69,18 @@ contract SRRFeatureV02 is ISRRFeatureV02 {
         bool isPrimaryIssuer,
         address artistAddress
     ) external override {
-        LibFeatureCommon.onlyTrustedForwarder();
+        LibFeatureCommonV01.onlyTrustedForwarder();
         LibERC721Storage.onlyExistingToken(tokenId);
 
         LibSRRStorage.SRR storage srr = LibSRRStorage.layout().srrs[tokenId];
 
-        address sendingWallet = LibFeatureCommon.msgSender();
+        address sendingWallet = LibFeatureCommonV01.msgSender();
         if (
             sendingWallet != srr.issuer &&
             sendingWallet != srr.artist &&
-            sendingWallet != LibFeatureCommon.getCollectionOwner()
+            sendingWallet != LibFeatureCommonV01.getCollectionOwner()
         ) {
-            revert LibFeatureCommon.OnlyIssuerOrArtistOrCollectionOwner();
+            revert LibFeatureCommonV01.OnlyIssuerOrArtistOrCollectionOwner();
         }
 
         if (artistAddress == address(0)) {

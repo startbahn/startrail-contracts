@@ -80,6 +80,12 @@ const {
 const {
   deployBulkIssueOnBuyer,
 } = require('../../utils/deployment/027-deploy-bulk-issue-on-buyer')
+const {
+  deployCollectionSRRTransferPrivilegesUpdate,
+} = require('../../utils/deployment/029-deploy-collection-srr-transfer-privileges-update')
+const {
+  deployFixCollectionLogProvenance,
+} = require('../../utils/deployment/030-deploy-fix-collection-log-provenance')
 /**
  * Deploys latest version of Startrail contracts plus some test data
  * is seeded.
@@ -112,6 +118,8 @@ async function fixtureDefault() {
   await deployFixTransferFromWithProvenance(hre)
   await deployBulkCollection(hre)
   await deployBulkIssueOnBuyer(hre)
+  await deployCollectionSRRTransferPrivilegesUpdate(hre)
+  await deployFixCollectionLogProvenance(hre)
 
   const lum = await getContract(hre, 'LicensedUserManager')
   const metaTxForwarder = await getContract(hre, 'MetaTxForwarder')

@@ -18,11 +18,11 @@ mkdir -p $OUT
 UML_DIR=$OUT/uml
 mkdir -p $UML_DIR
 echo "\nGenerating UML diagrams [$UML_DIR]...\n"
-npx sol2uml -o $UML_DIR/LicensedUserManager.uml.svg -b LicensedUserManager contracts/licensedUser 2>/dev/null
-npx sol2uml -o $UML_DIR/StartrailRegistry.uml.svg -b StartrailRegistryV9 contracts/startrailregistry 2>/dev/null
-npx sol2uml -o $UML_DIR/MetaTxForwarder.uml.svg -b MetaTxForwarderV2 contracts/metaTx 2>/dev/null
-npx sol2uml -o $UML_DIR/BulkIssue.uml.svg -b BulkIssueV3 contracts/bulk 2>/dev/null
-npx sol2uml -o $UML_DIR/CollectionFactory.uml.svg -b CollectionFactory contracts/collection 2>/dev/null
+npx sol2uml -o $UML_DIR/LicensedUserManager.uml.svg -b LicensedUserManagerV02 contracts/licensedUser 2>/dev/null
+npx sol2uml -o $UML_DIR/StartrailRegistry.uml.svg -b StartrailRegistryV25 contracts/startrailregistry 2>/dev/null
+npx sol2uml -o $UML_DIR/MetaTxForwarder.uml.svg -b MetaTxForwarderV3 contracts/metaTx 2>/dev/null
+npx sol2uml -o $UML_DIR/Bulk.uml.svg -b BulkV6 contracts/bulk 2>/dev/null
+npx sol2uml -o $UML_DIR/CollectionFactory.uml.svg -b CollectionFactoryV01 contracts/collection 2>/dev/null
 npx sol2uml -o $UML_DIR/CollectionProxy.uml.svg -b CollectionProxy contracts/collection 2>/dev/null
 npx sol2uml -o $UML_DIR/StartrailCollectionFeatureRegistry.uml.svg -b StartrailCollectionFeatureRegistry contracts/collection/registry 2>/dev/null
 npx sol2uml -o $UML_DIR/CollectionFeatures.uml.svg contracts/collection/features 2>/dev/null
@@ -51,7 +51,7 @@ npx surya inheritance `find contracts/ -name "*.sol"` 2>/dev/null | dot -Tpng > 
 
 NATSPEC_DIR=$OUT/natspec
 echo "Generating Natspec markdown with dodoc hardhat plugin [$NATSPEC_DIR] ...\n"
-npx hardhat dodoc 2> /dev/null
+npx hardhat dodoc
 
 # dodoc generate docs for openzeppelin contracts under node_modules
 #  couldn't see a way to filter these out so remove the directory here

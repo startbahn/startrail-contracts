@@ -1,4 +1,4 @@
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
 import {DSTestPlus} from "solmate/test/utils/DSTestPlus.sol";
@@ -7,7 +7,7 @@ import "../../contracts/collection/features/erc721/ERC721Errors.sol";
 import "../../contracts/collection/features/erc721/LibERC721Events.sol";
 import {SRRHistoryFeatureV01} from "../../contracts/collection/features/SRRHistoryFeatureV01.sol";
 import "../../contracts/collection/features/interfaces/ISRRHistoryFeatureV01.sol";
-import "../../contracts/collection/features/shared/LibFeatureCommon.sol";
+import "../../contracts/collection/features/shared/LibFeatureCommonV02.sol";
 import "../../contracts/collection/features/shared/LibSRRHistoryEvents.sol";
 import "../../contracts/lib/IDGeneratorV3.sol";
 import "../../contracts/name/Contracts.sol";
@@ -33,7 +33,7 @@ contract SRRHistoryFeatureTest is StartrailTestBase {
     function setUp() public override {
         super.setUp();
 
-        collectionOwnerLU = licensedUser1;
+        collectionOwnerLU = licensedUser1Address;
         notAnOwner = vm.addr(0x7788);
         newCollectionOwner = vm.addr(0x9900);
 

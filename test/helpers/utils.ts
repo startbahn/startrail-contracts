@@ -275,6 +275,19 @@ const BULK_CONTRACT_EVENT_KEYS = Object.freeze({
   transferStartrailRegistry: `TransferFromWithProvenanceWithProof(bytes32,uint256,bytes32)`,
 })
 
+const BULK_FEATURE_CONTRACT_EVENT_SIG_KEYS = Object.freeze({
+  srrCommitmentCancelled:
+    'event SRRCommitmentCancelled(uint256 indexed tokenId, address sender)',
+  srrCommitmentWithNoCustomId:
+    'event SRRCommitment(uint256 indexed tokenId, bytes32 indexed commitment, address sender)',
+  srrCommitmentWithCustomId:
+    'event SRRCommitment(uint256 indexed tokenId, bytes32 indexed commitment, uint256 indexed customHistoryId, address sender)',
+  provenanceWithCustomId:
+    'event Provenance(uint256 indexed tokenId, address indexed from, address indexed to, uint256 customHistoryId, string historyMetadataHash, string historyMetadataURI, bool isIntermediary, address sender)',
+  provenanceWithNoCustomId:
+    'event Provenance(uint256 indexed tokenId, address indexed from, address indexed to, string historyMetadataHash, string historyMetadataURI, bool isIntermediary, address sender)',
+})
+
 export {
   generateLicensedUserCreate2Address,
   randomSalt,
@@ -301,4 +314,5 @@ export {
   // bulk contract keys
   BULK_CONTRACT_METHOD_KEYS,
   BULK_CONTRACT_EVENT_KEYS,
+  BULK_FEATURE_CONTRACT_EVENT_SIG_KEYS,
 }

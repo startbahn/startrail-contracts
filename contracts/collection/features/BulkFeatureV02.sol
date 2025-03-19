@@ -1,16 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import "../../name/Contracts.sol";
 import "./interfaces/IBulkFeatureV02.sol";
-import "./ERC721FeatureV03.sol";
 import "./erc721/LibERC721Storage.sol";
 
-import "./shared/LibFeatureCommon.sol";
-import "./shared/LibSRRApproveTransfer.sol";
+import "./shared/LibFeatureCommonV01.sol";
+import "./shared/LibSRRApproveTransferV01.sol";
 import "./shared/LibSRRCreate.sol";
-import "./shared/LibTransferWithProvenance.sol";
+import "./shared/LibTransferWithProvenanceV01.sol";
 
 error OnlyBulkContract();
 
@@ -23,7 +22,7 @@ contract BulkFeatureV02 is IBulkFeatureV02, Contracts {
     function onlyBulk() private view {
         if (
             msg.sender !=
-            INameRegistry(LibFeatureCommon.getNameRegistry()).get(BULK)
+            INameRegistry(LibFeatureCommonV01.getNameRegistry()).get(BULK)
         ) {
             revert OnlyBulkContract();
         }
@@ -33,12 +32,12 @@ contract BulkFeatureV02 is IBulkFeatureV02, Contracts {
      * @dev Ensures that the address is the owner of the specified SRR token.
      * @param toCheck The address to check against the owner of the SRR token.
      * @param tokenId Token Id.
-     * @dev Reverts with `LibSRRApproveTransfer.NotSRROwner()` error if the toCheck is not the owner.
+     * @dev Reverts with `LibSRRApproveTransferV01.NotSRROwner()` error if the toCheck is not the owner.
      */
     function onlySRROwner(address toCheck, uint256 tokenId) private view {
         LibERC721Storage.onlyExistingToken(tokenId);
         if (LibERC721Storage.layout().ownerOf[tokenId] != toCheck) {
-            revert LibSRRApproveTransfer.NotSRROwner();
+            revert LibSRRApproveTransferV01.NotSRROwner();
         }
     }
 
@@ -56,7 +55,7 @@ contract BulkFeatureV02 is IBulkFeatureV02, Contracts {
         uint16 royaltyBasisPoints
     ) public override(IBulkFeatureV02) returns (uint256) {
         onlyBulk();
-        LibFeatureCommon.onlyCollectionOwner(issuerAddress);
+        LibFeatureCommonV01.onlyCollectionOwner(issuerAddress);
         uint256 tokenId = LibSRRCreate.createSRR(
             isPrimaryIssuer,
             artistAddress,
@@ -85,7 +84,7 @@ contract BulkFeatureV02 is IBulkFeatureV02, Contracts {
     ) public override(IBulkFeatureV02) {
         onlyBulk();
         onlySRROwner(signer, tokenId);
-        LibSRRApproveTransfer.approveSRRByCommitment(
+        LibSRRApproveTransferV01.approveSRRByCommitment(
             tokenId,
             commitment,
             historyMetadataHash,
@@ -106,7 +105,7 @@ contract BulkFeatureV02 is IBulkFeatureV02, Contracts {
     ) external override(IBulkFeatureV02) {
         onlyBulk();
         onlySRROwner(signer, tokenId);
-        LibTransferWithProvenance.transferFromWithProvenance(
+        LibTransferWithProvenanceV01.transferFromWithProvenance(
             to,
             tokenId,
             historyMetadataHash,

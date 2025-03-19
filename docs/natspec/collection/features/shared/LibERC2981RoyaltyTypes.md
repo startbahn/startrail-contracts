@@ -1,0 +1,12 @@
+# LibERC2981RoyaltyTypes
+
+
+
+
+
+
+
+
+
+
+

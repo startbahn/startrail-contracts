@@ -58,7 +58,7 @@ function createSRRFromBulk(bool isPrimaryIssuer, address artistAddress, bytes32 
 ### createSRRFromBulk
 
 ```solidity
-function createSRRFromBulk(bool isPrimaryIssuer, address artistAddress, bytes32 metadataDigest, string metadataCID, address issuerAddress, bool lockExternalTransfer, address royaltyReceiver, uint16 royaltyPercentage) external nonpayable returns (uint256)
+function createSRRFromBulk(bool isPrimaryIssuer, address artistAddress, bytes32 metadataDigest, string metadataCID, address issuerAddress, bool lockExternalTransfer, address royaltyReceiver, uint16 royaltyBasisPoints) external nonpayable returns (uint256)
 ```
 
 
@@ -76,7 +76,7 @@ function createSRRFromBulk(bool isPrimaryIssuer, address artistAddress, bytes32 
 | issuerAddress | address | undefined |
 | lockExternalTransfer | bool | undefined |
 | royaltyReceiver | address | undefined |
-| royaltyPercentage | uint16 | undefined |
+| royaltyBasisPoints | uint16 | undefined |
 
 #### Returns
 

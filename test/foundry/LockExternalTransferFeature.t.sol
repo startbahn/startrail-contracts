@@ -1,8 +1,8 @@
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import "../../contracts/collection/features/erc721/ERC721Errors.sol";
 import {LockExternalTransferFeatureV01} from "../../contracts/collection/features/LockExternalTransferFeatureV01.sol";
-import "../../contracts/collection/features/shared/LibFeatureCommon.sol";
+import "../../contracts/collection/features/shared/LibFeatureCommonV02.sol";
 import "../../contracts/name/Contracts.sol";
 
 import "./StartrailTestBase.sol";
@@ -16,7 +16,7 @@ contract LockExternalTransferFeatureTest is StartrailTestBase {
 
     function setUp() public override {
         super.setUp();
-        collectionOwnerLU = licensedUser1;
+        collectionOwnerLU = licensedUser1Address;
         collectionAddress = createCollection(collectionOwnerLU);
         lockExternalTransferFeature = LockExternalTransferFeatureV01(
             collectionAddress

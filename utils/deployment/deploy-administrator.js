@@ -76,11 +76,8 @@ const deployAdministratorContract = async (hre) => {
   const isGnosisDeployed =
     [
       1, // Ethereum
-      4, // Rinkeby
-      5, // Ropsten
-      42, // Kovan
       chainIds.polygon,
-      chainIds.mumbai,
+      chainIds.amoy,
     ].indexOf(chainId) !== -1;
 
   //

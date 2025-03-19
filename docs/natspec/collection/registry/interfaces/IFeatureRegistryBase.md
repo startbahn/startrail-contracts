@@ -24,7 +24,7 @@ Get the support status of a given ERC165 interface. NOTE: intentionally does not
 
 | Name | Type | Description |
 |---|---|---|
-| interfaceId | bytes4 | 4 bytes interface id of the supported interface |
+| interfaceId | bytes4 | 4 bytes interface id of thes supported interface |
 
 #### Returns
 

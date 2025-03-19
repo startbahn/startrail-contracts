@@ -93,10 +93,11 @@ const deployEIP2470SingletonFactory = async () => {
   return txRsp;
 };
 
-// EIP2470 contracts are already deployed on mainnet, rinkeby, görli and kovan
+// EIP2470 contracts are already deployed on mainnet, rinkeby, görli and kovan, amoy
+// https://www.oklink.com/amoy/tx/0x803351deb6d745e91545a6a3e1c0ea3e9a6a02a1a4193b70edfcd2f40f71a01c
 const isEIP2470Deployed = async (hre) => {
   const { chainId } = await hre.ethers.provider.getNetwork();
-  if ([1, 4, 5, 42, chainIds.mumbai].indexOf(chainId) !== -1) {
+  if ([1, 4, 5, 42, chainIds.amoy].indexOf(chainId) !== -1) {
     return true;
   }
   return hre.ethers.provider

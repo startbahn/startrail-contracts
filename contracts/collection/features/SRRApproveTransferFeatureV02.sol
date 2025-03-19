@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import "./interfaces/ISRRApproveTransferFeatureV02.sol";
-import "./shared/LibFeatureCommon.sol";
-import "./shared/LibSRRApproveTransfer.sol";
-import "./shared/LibSRRApproveTransferFeatureEvents.sol";
+import "./shared/LibFeatureCommonV01.sol";
+import "./shared/LibSRRApproveTransferV01.sol";
 import "./storage/LibApproveTransferStorage.sol";
 
 /**
@@ -27,9 +26,9 @@ contract SRRApproveTransferFeatureV02 is ISRRApproveTransferFeatureV02 {
         LibERC721Storage.onlyExistingToken(tokenId);
         if (
             LibERC721Storage.layout().ownerOf[tokenId] !=
-            LibFeatureCommon.msgSender()
+            LibFeatureCommonV01.msgSender()
         ) {
-            revert LibSRRApproveTransfer.NotSRROwner();
+            revert LibSRRApproveTransferV01.NotSRROwner();
         }
     }
 
@@ -43,7 +42,7 @@ contract SRRApproveTransferFeatureV02 is ISRRApproveTransferFeatureV02 {
         uint256 customHistoryId
     ) external override {
         onlySRROwner(tokenId);
-        LibSRRApproveTransfer.approveSRRByCommitment(
+        LibSRRApproveTransferV01.approveSRRByCommitment(
             tokenId,
             commitment,
             historyMetadataHash,
@@ -60,11 +59,11 @@ contract SRRApproveTransferFeatureV02 is ISRRApproveTransferFeatureV02 {
         string memory historyMetadataHash
     ) external override {
         onlySRROwner(tokenId);
-        LibSRRApproveTransfer.approveSRRByCommitment(
+        LibSRRApproveTransferV01.approveSRRByCommitment(
             tokenId,
             commitment,
             historyMetadataHash,
-            LibSRRApproveTransfer.NO_CUSTOM_HISTORY
+            LibSRRApproveTransferV01.NO_CUSTOM_HISTORY
         );
     }
 
@@ -74,7 +73,7 @@ contract SRRApproveTransferFeatureV02 is ISRRApproveTransferFeatureV02 {
     function cancelSRRCommitment(uint256 tokenId) external override {
         onlySRROwner(tokenId);
         _clearSRRCommitment(tokenId);
-        emit LibSRRApproveTransferFeatureEvents.SRRCommitmentCancelled(tokenId);
+        emit SRRCommitmentCancelled(tokenId);
     }
 
     /**
@@ -93,12 +92,12 @@ contract SRRApproveTransferFeatureV02 is ISRRApproveTransferFeatureV02 {
                 tokenId
             ];
         if (keccak256(abi.encode(reveal)) != approval.commitment) {
-            revert LibSRRApproveTransfer.IncorrectRevealHash();
+            revert LibSRRApproveTransferV01.IncorrectRevealHash();
         }
 
         address from = LibERC721Storage.layout().ownerOf[tokenId];
 
-        LibFeatureCommon.logProvenance(
+        LibFeatureCommonV01.logProvenance(
             tokenId,
             from,
             to,

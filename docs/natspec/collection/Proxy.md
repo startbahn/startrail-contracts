@@ -10,3 +10,17 @@
 
 
 
+## Errors
+
+### Proxy__ImplementationIsNotContract
+
+```solidity
+error Proxy__ImplementationIsNotContract()
+```
+
+
+
+
+
+
+

@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
-
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+pragma solidity 0.8.28;
 
 /**
  * Library to support Meta Transactions from OpenSea.
@@ -12,7 +10,6 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
  *   (especially as it's part of the typehash) but it should be "calldata".
  */
 library OpenSeaMetaTransactionLibrary {
-    using SafeMath for uint256;
 
     // External data to be passed in from the stateful contract
     struct OpenSeaMetaTransactionStorage {
@@ -97,7 +94,7 @@ library OpenSeaMetaTransactionLibrary {
         );
 
         // increase nonce for user (to avoid re-use)
-        self.nonces[userAddress] = self.nonces[userAddress].add(1);
+        self.nonces[userAddress] = self.nonces[userAddress] + 1;
 
         emit MetaTransactionExecuted(
             userAddress,

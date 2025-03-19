@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable-v4/proxy/utils/Initializable.sol";
 
 /**
  * Startrail contracts were deployed with an older version of

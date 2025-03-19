@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import "hardhat/console.sol";
 import "forge-std/Vm.sol";
@@ -11,7 +11,8 @@ import {IDiamondWritableInternal} from "@solidstate/contracts/proxy/diamond/writ
 
 import "../../contracts/collection/registry/StartrailCollectionFeatureRegistry.sol";
 import "../../contracts/collection/features/SRRFeatureV02.sol";
-import "../../contracts/collection/features/ERC721FeatureV03.sol";
+import "../../contracts/collection/features/ERC721FeatureV04.sol";
+import "../../contracts/collection/features/interfaces/ISRRApproveTransferFeatureV03.sol";
 
 contract StartrailTestLibrary is Test {
     // Shared test data
@@ -216,6 +217,24 @@ contract StartrailTestLibrary is Test {
         require(success);
     }
 
+    function cancelSRRCommitment(
+        address collectionAddress,
+        address sender,
+        uint256 tokenId
+    ) internal {
+        vm.prank(sender);
+        (bool success, ) = collectionAddress.call(
+            eip2771AppendSender(
+                abi.encodeWithSelector(
+                    ISRRApproveTransferFeatureV03.cancelSRRCommitment.selector,
+                    tokenId
+                ),
+                sender
+            )
+        );
+        require(success);
+    }
+
     function setLockExternalTransfer(
         address collectionAddress,
         address collectionOwnerLU,
@@ -233,6 +252,30 @@ contract StartrailTestLibrary is Test {
                     true
                 ),
                 collectionOwnerLU
+            )
+        );
+    }
+
+    function transferFromWithProvenance(
+        address collectionAddress,
+        address to,
+        uint256 tokenId,
+        string memory historyMetadataHash,
+        uint256 customHistoryId,
+        bool isIntermediary,
+        address sender
+    ) internal returns (bool success) {
+        (success, ) = collectionAddress.call(
+            eip2771AppendSender(
+                abi.encodeWithSelector(
+                    IERC721FeatureV04.transferFromWithProvenance.selector,
+                    to,
+                    tokenId,
+                    historyMetadataHash,
+                    customHistoryId,
+                    isIntermediary
+                ),
+                sender
             )
         );
     }

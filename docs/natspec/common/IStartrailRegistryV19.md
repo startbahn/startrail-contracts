@@ -609,23 +609,6 @@ function updateSRRRoyalty(uint256 tokenId, address royaltyReceiver, uint16 royal
 | royaltyReceiver | address | undefined |
 | royaltyPercentage | uint16 | undefined |
 
-### updateSRRRoyaltyReceiverMulti
-
-```solidity
-function updateSRRRoyaltyReceiverMulti(uint256[] tokenIds, address royaltyReceiver) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenIds | uint256[] | undefined |
-| royaltyReceiver | address | undefined |
-
 ### writeCustomHistory
 
 ```solidity

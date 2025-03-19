@@ -1,6 +1,8 @@
-# foundry doesn't have a stable tag so lock at a specific commit here.
-FROM ghcr.io/foundry-rs/foundry:nightly-03aa926203e6dabdcf9b7e59219271294717c2eb as foundry
-RUN apk add --update bash curl git openssh-client sudo yarn libstdc++
-RUN wget  https://nodejs.org/download/release/v18.15.0/node-v18.15.0-linux-x64.tar.gz
-RUN mkdir -p /opt/nodejs && tar -zxvf *.tar.gz --directory /opt/nodejs --strip-components=1 && rm *.tar.gz
-RUN ln -s /opt/nodejs/bin/node /usr/local/bin/node && ln -s /opt/nodejs/bin/npm /usr/local/bin/npm
+FROM ghcr.io/foundry-rs/foundry:nightly-75fc63be4fc9241a1981a55c12b6e300fd82a51b AS foundry
+FROM node:20.17-alpine AS runner
+COPY --from=foundry /usr/local/bin/forge /usr/local/bin/forge
+RUN apk add curl git openssh-client libc6-compat
+RUN curl -o solc-linux-amd64-v0.8.28+commit.7893614a -sL https://github.com/ethereum/solc-bin/raw/refs/heads/gh-pages/linux-amd64/solc-linux-amd64-v0.8.28+commit.7893614a
+RUN mkdir -p ~/.svm/0.8.28
+RUN cp solc-linux-amd64-v0.8.28+commit.7893614a ~/.svm/0.8.28/solc-0.8.28
+RUN chmod +x ~/.svm/0.8.28/solc-0.8.28

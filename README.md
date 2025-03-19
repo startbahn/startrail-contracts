@@ -83,7 +83,7 @@ Registry of Startrail contract addresses.
 
 ### Live networks (optional)
 
-If you need to interact with live deployments (eg. polygon or mumbais) then set a provider in `.env` with the variable `<network>_PROVIDER_URL`.
+If you need to interact with live deployments (eg. polygon or amoy) then set a provider in `.env` with the variable `<network>_PROVIDER_URL`.
 
 If you need to send transactions to a live environment then set a private key in `.env` with the variable `<network>_PRIVATE_KEY`. This key will be the default key used for sending transactions from hardhat scripts or hardhat console commands.
 
@@ -100,19 +100,19 @@ CircleCI is configured to run all the tests also. See `.circleci/config.yml` for
 
 ## :bookmark: Contract Addresses
 
-You can check the address of each deployed contract in `deploy.json` under [deployments/](./deployments). It is managed according to each network or network/deployment name pair such as `polygon` and `mumbai-staging`.
+You can check the address of each deployed contract in `deploy.json` under [deployments/](./deployments). It is managed according to each network or network/deployment name pair such as `polygon` and `amoy-staging`.
 
 [polygon/deploy.json](./deployments/polygon/deploy.json)
 
-[mumbai-staging/deploy.json](./deployments/mumbai-staging/deploy.json)
+[amoy-staging/deploy.json](./deployments/amoy-staging/deploy.json)
 
-[mumbai-release/deploy.json](./deployments/mumbai-release/deploy.json) [QA]
+[amoy-release/deploy.json](./deployments/amoy-release/deploy.json) [QA]
 
-[mumbai-develop/deploy.json](./deployments/mumbai-develop/deploy.json)
+[amoy-develop/deploy.json](./deployments/amoy-develop/deploy.json)
 
 ## Docker hub - startbahn/foundry repo
 
-To upgrade Node.js to a version newer than 18.15.0 in the Docker hub repository "startbahn/foundry," follow these steps:
+To upgrade Node.js to a version newer than 20.17.0 in the Docker hub repository "startbahn/foundry," follow these steps:
 
 * Update the Dockerfile located in docker/foundry.
 
@@ -124,4 +124,10 @@ To upgrade Node.js to a version newer than 18.15.0 in the Docker hub repository 
 
 * Push the foundry image to Docker Hub using the command "yarn docker:hub:push:foundry."
 
-* Update the image version in .circleci/config.yml to the newer version, replacing "startbahn/foundry:node-18.15.0."
+* Update the image version in .circleci/config.yml to the newer version, replacing "startbahn/foundry:node-20.17.0."
+
+## Solc version
+
+When we want to upgrade the solc version, you need to update it not only in `*.sol` files but also in others such as `foundry.toml`, `hardhat.config.ts` and `docker/foundry/Dockerfile`.
+
+The `Dockerfile` can be tricky, you need to change the binary to download. The name of the file can be found at [Ethereum's solc-bin repository](https://github.com/ethereum/solc-bin/tree/gh-pages/linux-amd64). You can change the filename and the version based on it.

@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity 0.8.21;
-
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+pragma solidity 0.8.28;
 
 // Imports signatureSplit:
 import "../common/SignatureDecoder.sol";
@@ -13,8 +11,6 @@ import "../common/SignatureDecoder.sol";
  * @dev Adapted checkSignatures from Gnosis safe. See comments on function below.
  */
 contract SignatureChecker is SignatureDecoder {
-
-  using SafeMath for uint256;
 
   // see OwnerManager.sol
   address private constant SENTINEL_OWNER = address(0x1);
@@ -40,7 +36,7 @@ contract SignatureChecker is SignatureDecoder {
 
     // Check that the provided signature data is not too short
     require(
-      _signatures.length >= _threshold.mul(65),
+      _signatures.length >= _threshold * 65,
       "Signatures data too short"
     );
 

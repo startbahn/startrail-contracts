@@ -1,0 +1,17 @@
+{
+  "idGeneratorLibraryAddress": "0x690F427A11EDc5D2C007313b9A8BF925E6342c3e",
+  "multiSendAddress": "0xCCB892A1bb7E7413c2F7bf1C03ca49ca05dAc5Ea",
+  "startrailAdministratorAddress": "0x8F2bC93c2e63B4C1856BFDE6CBf945dDfaf8D093",
+  "proxyAdminAddress": "0x672DEfe3835eb4d837135476022D5cfea7722A06",
+  "nameRegistryProxyAddress": "0x4EA3ad5aA21e918689C2330dc481775C33150476",
+  "metaTxForwarderProxyAddress": "0x2D856B33Ce60E708ccA0D7bc13fa2A8fDb9e087B",
+  "licensedUserManagerProxyAddress": "0x4357c3DfC2F9A4F0719F915dD10E3BabA42DbFc1",
+  "startrailRegistryProxyAddress": "0xD4924A21b06A73193eEeA8096316956E23a61E80",
+  "bulkIssueProxyAddress": "0x7d40823B789194a6e3cbF705Ce38f97f69872EA3",
+  "bulkTransferProxyAddress": "0xE29582618dDc258511A1faF568812A14b8370238",
+  "openSeaMetaTransactionLibraryAddress": "0x0860cdfFD8d1185AEd5Df69033F670Da3B48Ebdb",
+  "bulkProxyAddress": "0x2bA4d8576bA583D9C74948641E57617b956D1359",
+  "startrailRegistryLibraryAddress": "0x1D29EF7E94cc4fb8AA46D60B933BcE2ae024616e",
+  "startrailCollectionFeatureRegistryAddress": "0xeBD295b0b9e064F98b86384738E12B5E99c40112",
+  "collectionFactoryProxyAddress": "0xF2EaD08A10F140E4096944892CB7340C2891971e"
+}

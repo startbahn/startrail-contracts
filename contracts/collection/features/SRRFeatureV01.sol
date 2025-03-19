@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import {IERC721} from "@solidstate/contracts/interfaces/IERC721.sol";
 import "../../lib/IDGeneratorV3.sol";
 import "./interfaces/ISRRFeatureV01.sol";
 import "./interfaces/IERC721FeatureV01.sol";
-import "./shared/LibFeatureCommon.sol";
+import "./shared/LibFeatureCommonV01.sol";
 import "./storage/LibSRRStorage.sol";
 import "./storage/LibERC2981RoyaltyStorage.sol";
 import "./storage/LibSRRMetadataStorage.sol";
@@ -30,10 +30,10 @@ contract SRRFeatureV01 is ISRRFeatureV01 {
         address royaltyReceiver,
         uint16 royaltyBasisPoints
     ) external override {
-        LibFeatureCommon.onlyTrustedForwarder();
-        LibFeatureCommon.onlyCollectionOwner();
+        LibFeatureCommonV01.onlyTrustedForwarder();
+        LibFeatureCommonV01.onlyCollectionOwner();
 
-        if (LibFeatureCommon.isEmptyString(metadataCID)) {
+        if (LibFeatureCommonV01.isEmptyString(metadataCID)) {
             revert LibSRRMetadataStorage.SRRMetadataNotEmpty();
         }
 
@@ -48,7 +48,7 @@ contract SRRFeatureV01 is ISRRFeatureV01 {
         uint256 tokenId = IDGeneratorV3.generate(metadataCID, artistAddress);
         LibERC721Storage.onlyNonExistantToken(tokenId);
 
-        address issuer = LibFeatureCommon.msgSender();
+        address issuer = LibFeatureCommonV01.msgSender();
 
         LibSRRStorage.SRR storage srr = LibSRRStorage.layout().srrs[tokenId];
         srr.isPrimaryIssuer = isPrimaryIssuer;
@@ -107,18 +107,18 @@ contract SRRFeatureV01 is ISRRFeatureV01 {
         bool isPrimaryIssuer,
         address artistAddress
     ) external override {
-        LibFeatureCommon.onlyTrustedForwarder();
+        LibFeatureCommonV01.onlyTrustedForwarder();
         LibERC721Storage.onlyExistingToken(tokenId);
 
         LibSRRStorage.SRR storage srr = LibSRRStorage.layout().srrs[tokenId];
 
-        address sendingWallet = LibFeatureCommon.msgSender();
+        address sendingWallet = LibFeatureCommonV01.msgSender();
         if (
             sendingWallet != srr.issuer &&
             sendingWallet != srr.artist &&
-            sendingWallet != LibFeatureCommon.getCollectionOwner()
+            sendingWallet != LibFeatureCommonV01.getCollectionOwner()
         ) {
-            revert LibFeatureCommon.OnlyIssuerOrArtistOrCollectionOwner();
+            revert LibFeatureCommonV01.OnlyIssuerOrArtistOrCollectionOwner();
         }
 
         if (artistAddress == address(0)) {

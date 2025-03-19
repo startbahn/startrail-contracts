@@ -1,7 +1,7 @@
 # See config options https://book.getfoundry.sh/reference/config.html
 
 [profile.default]
-solc = "0.8.21"
+solc = "0.8.28"
 src = 'contracts'
 out = 'forge-out'
 libs = ['node_modules', 'lib']

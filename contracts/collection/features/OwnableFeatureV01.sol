@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import {IERC173} from "@solidstate/contracts/interfaces/IERC173.sol";
 import {IOwnable} from "@solidstate/contracts/access/ownable/IOwnable.sol";
@@ -9,7 +9,7 @@ import {OwnableStorage} from "@solidstate/contracts/access/ownable/OwnableStorag
 import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
 
 import "./interfaces/IOwnableFeatureV01.sol";
-import "./shared/LibFeatureCommon.sol";
+import "./shared/LibFeatureCommonV01.sol";
 
 error OwnableFeatureAlreadyInitialized();
 
@@ -42,8 +42,8 @@ contract OwnableFeatureV01 is IOwnable, IOwnableFeatureV01, OwnableInternal {
      * @inheritdoc IERC173
      */
     function transferOwnership(address newOwner) external override {
-        LibFeatureCommon.onlyTrustedForwarder();
-        LibFeatureCommon.onlyCollectionOwner();
+        LibFeatureCommonV01.onlyTrustedForwarder();
+        LibFeatureCommonV01.onlyCollectionOwner();
 
         if (newOwner == address(0)) {
             revert ZeroAddress();

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import "../../../lib/IDGeneratorV3.sol";
 
@@ -8,7 +8,7 @@ import "../interfaces/ISRRFeatureV02.sol";
 import "../storage/LibSRRStorage.sol";
 import "../storage/LibERC2981RoyaltyStorage.sol";
 
-import "./LibFeatureCommon.sol";
+import "./LibFeatureCommonV01.sol";
 
 library LibSRRCreate {
     struct SRR {
@@ -47,11 +47,11 @@ library LibSRRCreate {
         bool fromBulk
     ) internal returns (uint256 tokenId) {
         if (!fromBulk) {
-            LibFeatureCommon.onlyTrustedForwarder();
-            LibFeatureCommon.onlyCollectionOwner();
+            LibFeatureCommonV01.onlyTrustedForwarder();
+            LibFeatureCommonV01.onlyCollectionOwner();
         }
 
-        if (LibFeatureCommon.isEmptyString(metadataCID)) {
+        if (LibFeatureCommonV01.isEmptyString(metadataCID)) {
             revert LibSRRMetadataStorage.SRRMetadataNotEmpty();
         }
 

@@ -8,6 +8,7 @@ delete pj.dependencies;
 delete pj.devDependencies;
 delete pj.scripts;
 delete pj.engines;
+delete pj.resolutions;
 
 // backup package.json and write the minimal version
 const pjBackupPath = "package.json.backup";

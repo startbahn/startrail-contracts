@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import "forge-std/Vm.sol";
 import {Test} from "forge-std/Test.sol";
@@ -8,13 +8,14 @@ import {IDiamondWritable} from "@solidstate/contracts/proxy/diamond/writable/IDi
 import {IERC721} from "@solidstate/contracts/interfaces/IERC721.sol";
 import {IERC721Metadata} from "@solidstate/contracts/token/ERC721/metadata/IERC721Metadata.sol";
 import {IERC2981} from "@openzeppelin/contracts/interfaces/IERC2981.sol";
+import {UpgradeableBeacon} from "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 
 import "../../contracts/collection/CollectionFactoryV01.sol";
-import "../../contracts/collection/CollectionProxy.sol";
-import "../../contracts/collection/features/BulkFeatureV01.sol";
-import "../../contracts/collection/features/ERC721FeatureV03.sol";
+import {CollectionProxy} from "../../contracts/collection/CollectionProxy.sol";
+import "../../contracts/collection/features/BulkFeatureV04.sol";
+import "../../contracts/collection/features/ERC721FeatureV05.sol";
 import "../../contracts/collection/features/LockExternalTransferFeatureV01.sol";
-import "../../contracts/collection/features/SRRApproveTransferFeatureV02.sol";
+import "../../contracts/collection/features/SRRApproveTransferFeatureV04.sol";
 import "../../contracts/collection/features/SRRFeatureV02.sol";
 import "../../contracts/collection/features/ERC2981RoyaltyFeatureV01.sol";
 import "../../contracts/collection/features/SRRHistoryFeatureV01.sol";
@@ -23,8 +24,8 @@ import "../../contracts/collection/registry/StartrailCollectionFeatureRegistry.s
 
 import "../../contracts/name/Contracts.sol";
 import "../../contracts/name/NameRegistry.sol";
+import {LicensedUserManagerV02} from "../../contracts/licensedUser/LicensedUserManagerV02.sol";
 
-import "./mock/MockLicensedUserManager.sol";
 import "./mock/MockStartrailRegistry.sol";
 
 import "./StartrailTestLibrary.sol";
@@ -47,8 +48,9 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     StartrailCollectionFeatureRegistry internal featureRegistry;
     CollectionFactoryV01 internal collectionFactory;
     NameRegistry internal nameRegistry;
-
-    MockLicensedUserManager internal mockLicensedUserManager;
+    UpgradeableBeacon internal licensedUserBeacon;
+    LicensedUserManagerV02 internal licensedUserManager;
+    
     MockStartrailRegistry internal mockStartrailRegistry;
 
     address internal ownableFeatureImpl;
@@ -64,15 +66,15 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     address internal collectionProxyImpl;
 
     address internal admin;
-    address internal collectionOwner1;
     address internal trustedForwarder;
 
-    address internal licensedUser1;
-    address internal licensedUser2;
+    address internal licensedUser1Owner;
+    address internal licensedUser2Owner;
+    address internal licensedUser1Address;
+    address internal licensedUser2Address;
 
     function setUp() public virtual {
         admin = vm.addr(0xabc);
-        collectionOwner1 = vm.addr(0x123);
         trustedForwarder = vm.addr(0x456);
 
         nameRegistry = new NameRegistry();
@@ -117,19 +119,35 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
         srrHistoryFeatureImpl = deploySRRHistoryFeature(featureRegistry);
         bulkFeatureImpl = deployBulkFeature(featureRegistry);
 
-        // Mock LUM
-        mockLicensedUserManager = new MockLicensedUserManager();
+        licensedUserBeacon = new UpgradeableBeacon(
+            address(nameRegistry), admin); // Obviously, nameRegistry isn't an implementation of the wallet, but just working as a dummy until it's implemented and upgraded
+        licensedUserManager = new LicensedUserManagerV02();
+        licensedUserManager.initialize(address(nameRegistry), trustedForwarder);
+        licensedUserManager.initializeV2(address(licensedUserBeacon));
         vm.prank(admin);
-        nameRegistry.set(
-            Contracts.LICENSED_USER_MANAGER,
-            address(mockLicensedUserManager)
+        nameRegistry.set(Contracts.LICENSED_USER_MANAGER, address(licensedUserManager));
+        licensedUser1Owner = vm.addr(0x1212);
+        licensedUser2Owner = vm.addr(0x1313);
+        address[] memory licensedUser1Owners = new address[](1);
+        address[] memory licensedUser2Owners = new address[](1);
+        licensedUser1Owners[0] = licensedUser1Owner;
+        licensedUser2Owners[0] = licensedUser2Owner;
+        licensedUser1Address = createLicensedUser(
+            licensedUser1Owners,
+            1,
+            LicensedUserManagerV02.UserType.HANDLER,
+            "Licensed User 1",
+            "X",
+            "salt1"
         );
-
-        // Mock LU wallets
-        licensedUser1 = vm.addr(0x1212);
-        licensedUser2 = vm.addr(0x1313);
-        mockLicensedUserManager.addWallet(licensedUser1);
-        mockLicensedUserManager.addWallet(licensedUser2);
+        licensedUser2Address = createLicensedUser(
+            licensedUser2Owners,
+            1,
+            LicensedUserManagerV02.UserType.HANDLER,
+            "Licensed User 2",
+            "Y",
+            "salt2"
+        );
 
         // Mock StartrailRegistry
         mockStartrailRegistry = new MockStartrailRegistry();
@@ -152,11 +170,10 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
         // Setup labels for traces
         vm.label(admin, "Administrator");
         vm.label(address(collectionFactory), "CollectionFactory");
-        vm.label(collectionOwner1, "CollectionOwner1");
         vm.label(address(featureRegistry), "FeatureRegistry");
-        vm.label(licensedUser1, "LicensedUser1");
-        vm.label(licensedUser2, "LicensedUser2");
-        vm.label(address(mockLicensedUserManager), "MockLicensedUserManager");
+        vm.label(licensedUser1Address, "LicensedUser1");
+        vm.label(licensedUser2Address, "LicensedUser2");
+        vm.label(address(licensedUserManager), "LicensedUserManager");
         vm.label(address(mockStartrailRegistry), "MockStartrailRegistry");
         vm.label(address(nameRegistry), "NameRegistry");
         vm.label(trustedForwarder, "TrustedForwarder");
@@ -165,7 +182,7 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     function deployERC721Feature(
         StartrailCollectionFeatureRegistry featureRegistry_
     ) internal returns (address erc721ddress) {
-        ERC721FeatureV03 erc721Feature = new ERC721FeatureV03();
+        ERC721FeatureV05 erc721Feature = new ERC721FeatureV05();
 
         // Initialize the implementation contract for safety
         erc721Feature.__ERC721Feature_initialize("ImplOnly", "IMPLONLY");
@@ -175,11 +192,11 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
         uint8 selIdx = 0;
 
         // ERC721Feature
-        selectors[selIdx++] = ERC721FeatureV03
+        selectors[selIdx++] = ERC721FeatureV05
             .__ERC721Feature_initialize
             .selector;
-        selectors[selIdx++] = ERC721FeatureV03.exists.selector;
-        selectors[selIdx++] = ERC721FeatureV03
+        selectors[selIdx++] = ERC721FeatureV05.exists.selector;
+        selectors[selIdx++] = ERC721FeatureV05
             .transferFromWithProvenance
             .selector;
         // ERC721
@@ -254,19 +271,19 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     function deploySRRApproveTransferFeature(
         StartrailCollectionFeatureRegistry featureRegistry_
     ) internal returns (address) {
-        SRRApproveTransferFeatureV02 feature = new SRRApproveTransferFeatureV02();
+        SRRApproveTransferFeatureV04 feature = new SRRApproveTransferFeatureV04();
 
         bytes4[] memory selectors = new bytes4[](6);
 
         selectors[0] = 0xc0b00724; // approveSRRByCommitment(uint256,bytes32,string,uint256)
         selectors[1] = 0x81882bd0; // approveSRRByCommitment(uint256,bytes32,string)
-        selectors[2] = SRRApproveTransferFeatureV02
+        selectors[2] = SRRApproveTransferFeatureV04
             .cancelSRRCommitment
             .selector;
-        selectors[3] = SRRApproveTransferFeatureV02
+        selectors[3] = SRRApproveTransferFeatureV04
             .transferSRRByReveal
             .selector;
-        selectors[4] = SRRApproveTransferFeatureV02.getSRRCommitment.selector;
+        selectors[4] = SRRApproveTransferFeatureV04.getSRRCommitment.selector;
 
         srrApprovalFeatureImpl = address(feature);
         deployFeature(
@@ -335,13 +352,13 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     function deployBulkFeature(
         StartrailCollectionFeatureRegistry featureRegistry_
     ) internal returns (address) {
-        BulkFeatureV01 feature = new BulkFeatureV01();
+        BulkFeatureV04 feature = new BulkFeatureV04();
 
         bytes4[] memory selectors = new bytes4[](3);
 
-        selectors[0] = BulkFeatureV01.createSRRFromBulk.selector;
-        selectors[1] = BulkFeatureV01.approveSRRByCommitmentFromBulk.selector;
-        selectors[2] = BulkFeatureV01
+        selectors[0] = BulkFeatureV04.createSRRFromBulk.selector;
+        selectors[1] = BulkFeatureV04.approveSRRByCommitmentFromBulk.selector;
+        selectors[2] = BulkFeatureV04
             .transferFromWithProvenanceFromBulk
             .selector;
 
@@ -369,6 +386,27 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
         );
 
         return srrHistoryFeatureImpl;
+    }
+
+    function createLicensedUser(
+        address[] memory owners,
+        uint8 threshold,
+        LicensedUserManagerV02.UserType userType,
+        string memory englishName,
+        string memory originalName,
+        bytes32 salt
+    ) internal returns (address luAddress) {
+        vm.prank(admin);
+        luAddress = licensedUserManager.createWallet(
+            LicensedUserManagerV02.LicensedUserDto({
+                owners: owners,
+                threshold: threshold,
+                userType: userType,
+                englishName: englishName,
+                originalName: originalName
+            }),
+            salt
+        );
     }
 
     function createCollection(address creatorLU) internal returns (address) {

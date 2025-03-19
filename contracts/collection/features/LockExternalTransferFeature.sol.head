@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import "./erc721//ERC721Errors.sol";
 import {LibERC721Storage} from "./erc721//LibERC721Storage.sol";
 import "./interfaces/ILockExternalTransferFeatureV01.sol";
-import "./shared/LibFeatureCommon.sol";
+import "./shared/LibFeatureCommonV01.sol";
 import "./storage/LibLockExternalTransferStorage.sol";
 import "./storage/LibSRRStorage.sol";
 
@@ -28,19 +28,19 @@ contract LockExternalTransferFeatureV01 is ILockExternalTransferFeatureV01 {
         uint256 tokenId,
         bool flag
     ) external override {
-        LibFeatureCommon.onlyTrustedForwarder();
+        LibFeatureCommonV01.onlyTrustedForwarder();
         LibERC721Storage.onlyExistingToken(tokenId);
 
         address issuer = LibSRRStorage.layout().srrs[tokenId].issuer;
-        address sendingWallet = LibFeatureCommon.msgSender();
+        address sendingWallet = LibFeatureCommonV01.msgSender();
         if (
             sendingWallet != issuer &&
-            sendingWallet != LibFeatureCommon.getCollectionOwner()
+            sendingWallet != LibFeatureCommonV01.getCollectionOwner()
         ) {
             revert OnlyIssuerOrCollectionOwner();
         }
 
-        LibFeatureCommon.getCollectionOwner();
+        LibFeatureCommonV01.getCollectionOwner();
 
         LibLockExternalTransferStorage.layout().tokenIdToLockFlag[
             tokenId

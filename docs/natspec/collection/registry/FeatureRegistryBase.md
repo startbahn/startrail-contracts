@@ -13,7 +13,7 @@
 ### diamondCut
 
 ```solidity
-function diamondCut(IDiamondWritable.FacetCut[] facetCuts, address target, bytes data) external nonpayable
+function diamondCut(IDiamondWritableInternal.FacetCut[] facetCuts, address target, bytes data) external nonpayable
 ```
 
 
@@ -24,7 +24,7 @@ function diamondCut(IDiamondWritable.FacetCut[] facetCuts, address target, bytes
 
 | Name | Type | Description |
 |---|---|---|
-| facetCuts | IDiamondWritable.FacetCut[] | undefined |
+| facetCuts | IDiamondWritableInternal.FacetCut[] | undefined |
 | target | address | undefined |
 | data | bytes | undefined |
 
@@ -120,7 +120,7 @@ Get the support status of a given ERC165 interface. NOTE: intentionally does not
 
 | Name | Type | Description |
 |---|---|---|
-| interfaceId | bytes4 | 4 bytes interface id of the supported interface |
+| interfaceId | bytes4 | 4 bytes interface id of thes supported interface |
 
 #### Returns
 
@@ -143,7 +143,7 @@ get the ERC173 contract owner
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | conrtact owner |
+| _0 | address | contract owner |
 
 ### setSupportedInterface
 
@@ -185,7 +185,7 @@ transfer contract ownership to new account
 ### DiamondCut
 
 ```solidity
-event DiamondCut(IDiamondWritable.FacetCut[] facetCuts, address target, bytes data)
+event DiamondCut(IDiamondWritableInternal.FacetCut[] facetCuts, address target, bytes data)
 ```
 
 
@@ -196,7 +196,7 @@ event DiamondCut(IDiamondWritable.FacetCut[] facetCuts, address target, bytes da
 
 | Name | Type | Description |
 |---|---|---|
-| facetCuts  | IDiamondWritable.FacetCut[] | undefined |
+| facetCuts  | IDiamondWritableInternal.FacetCut[] | undefined |
 | target  | address | undefined |
 | data  | bytes | undefined |
 
@@ -233,6 +233,119 @@ event OwnershipTransferred(address indexed previousOwner, address indexed newOwn
 |---|---|---|
 | previousOwner `indexed` | address | undefined |
 | newOwner `indexed` | address | undefined |
+
+
+
+## Errors
+
+### DiamondWritable__InvalidInitializationParameters
+
+```solidity
+error DiamondWritable__InvalidInitializationParameters()
+```
+
+
+
+
+
+
+### DiamondWritable__RemoveTargetNotZeroAddress
+
+```solidity
+error DiamondWritable__RemoveTargetNotZeroAddress()
+```
+
+
+
+
+
+
+### DiamondWritable__ReplaceTargetIsIdentical
+
+```solidity
+error DiamondWritable__ReplaceTargetIsIdentical()
+```
+
+
+
+
+
+
+### DiamondWritable__SelectorAlreadyAdded
+
+```solidity
+error DiamondWritable__SelectorAlreadyAdded()
+```
+
+
+
+
+
+
+### DiamondWritable__SelectorIsImmutable
+
+```solidity
+error DiamondWritable__SelectorIsImmutable()
+```
+
+
+
+
+
+
+### DiamondWritable__SelectorNotFound
+
+```solidity
+error DiamondWritable__SelectorNotFound()
+```
+
+
+
+
+
+
+### DiamondWritable__SelectorNotSpecified
+
+```solidity
+error DiamondWritable__SelectorNotSpecified()
+```
+
+
+
+
+
+
+### DiamondWritable__TargetHasNoCode
+
+```solidity
+error DiamondWritable__TargetHasNoCode()
+```
+
+
+
+
+
+
+### Ownable__NotOwner
+
+```solidity
+error Ownable__NotOwner()
+```
+
+
+
+
+
+
+### Ownable__NotTransitiveOwner
+
+```solidity
+error Ownable__NotTransitiveOwner()
+```
+
+
+
+
 
 
 

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 /// @title Multi Send - Allows to batch multiple transactions into one.
 /// @author Nick Dodson - <nick.dodson@consensys.net>

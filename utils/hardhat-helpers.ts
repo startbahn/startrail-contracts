@@ -191,11 +191,9 @@ const getCollectionFeatureContractPaths = (): ReadonlyArray<string> => {
     ...getLatestFeatureContractPaths(),
     `contracts/collection/features/shared/LibERC2981RoyaltyEvents.sol`,
     `contracts/collection/features/erc721/LibERC721Events.sol`,
-    `contracts/collection/features/shared/LibSRRApproveTransferFeatureEvents.sol`,
     `contracts/collection/features/shared/LibSRRCreate.sol`,
     `contracts/collection/features/shared/LibSRRHistoryEvents.sol`,
     `contracts/collection/features/shared/LibSRRMetadataEvents.sol`,
-    `contracts/collection/features/shared/LibSRRProvenanceEvents.sol`,
   ]
 }
 
@@ -277,7 +275,7 @@ const getContractFactory = (
  */
 const waitTxHH = (hre, txResultOrHash, numConfirmations) => {
   if (!numConfirmations) {
-    // Wait 1 blocks on polygon, mumbai (instant finality so wait just 1 block)
+    // Wait 1 blocks on polygon, amoy (instant finality so wait just 1 block)
     // Wait 0 blocks on local test networks
     numConfirmations = isLiveNetwork(hre) ? 1 : 0
   }

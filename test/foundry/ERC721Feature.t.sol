@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
-import "../../contracts/collection/features/ERC721FeatureV02.sol";
-import "../../contracts/collection/features/shared/LibFeatureCommon.sol";
+import "../../contracts/collection/features/ERC721FeatureV04.sol";
+import "../../contracts/collection/features/shared/LibFeatureCommonV02.sol";
 
 import "./StartrailTestBase.sol";
 
 contract ERC721FeatureTest is StartrailTestBase {
-    ERC721FeatureV02 internal erc721Feature;
+    ERC721FeatureV04 internal erc721Feature;
     address internal collectionAddress;
     address internal collectionOwnerLU;
 
@@ -26,9 +26,9 @@ contract ERC721FeatureTest is StartrailTestBase {
     function setUp() public override {
         super.setUp();
 
-        collectionOwnerLU = licensedUser1;
+        collectionOwnerLU = licensedUser1Address;
         collectionAddress = createCollection(collectionOwnerLU);
-        erc721Feature = ERC721FeatureV02(collectionAddress);
+        erc721Feature = ERC721FeatureV04(collectionAddress);
 
         unlockedTokenId = createSRRWithDefaults(
             collectionAddress,
@@ -52,73 +52,91 @@ contract ERC721FeatureTest is StartrailTestBase {
         );
     }
 
+    function executeAndVerifyTransferFromWithProvenance(
+        address sender,
+        address recipient,
+        uint256 tokenId,
+        address expectedSender
+    ) internal {
+        vm.recordLogs();
+
+        vm.prank(sender);
+        bool success = transferFromWithProvenance(
+            collectionAddress,
+            recipient,
+            tokenId,
+            tpHistoryMetadataHash,
+            tpCustomHistoryId,
+            tpIsIntermediary,
+            sender
+        );
+        assertTrue(success);
+
+        verifyTransferFromWithProvenanceLog(recipient, tokenId, expectedSender);
+    }
+
+    function verifyTransferFromWithProvenanceLog(
+        address recipient,
+        uint256 tokenId,
+        address expectedSender
+    ) internal {
+        Vm.Log[] memory entries = vm.getRecordedLogs();
+
+        // Verify provenance log
+        Vm.Log memory provenanceLog = entries[0];
+        assertEq(uint256(provenanceLog.topics[1]), tokenId);
+        assertEq(bytes32ToAddress(provenanceLog.topics[2]), expectedSender);
+        assertEq(bytes32ToAddress(provenanceLog.topics[3]), recipient);
+
+        // Verify transfer log
+        Vm.Log memory transferLog = entries[1];
+        assertEq(bytes32ToAddress(transferLog.topics[1]), expectedSender);
+        assertEq(bytes32ToAddress(transferLog.topics[2]), recipient);
+        assertEq(uint256(transferLog.topics[3]), tokenId);
+    }
+
     function testInitialized() public {
         assertEq(erc721Feature.name(), COLLECTION_NAME);
         assertEq(erc721Feature.symbol(), COLLECTION_SYMBOL);
     }
 
-    function testTransferFromWithProvenance() public {
-        vm.recordLogs();
-
-        vm.prank(trustedForwarder);
-        (bool success, ) = collectionAddress.call(
-            eip2771AppendSender(
-                abi.encodeWithSelector(
-                    IERC721FeatureV02.transferFromWithProvenance.selector,
-                    tpTo,
-                    unlockedTokenId,
-                    tpHistoryMetadataHash,
-                    tpCustomHistoryId,
-                    tpIsIntermediary
-                ),
-                collectionOwnerLU
-            )
+    function testTransferFromWithProvenanceByCollectionOwner() public {
+        executeAndVerifyTransferFromWithProvenance(
+            collectionOwnerLU,
+            tpTo,
+            unlockedTokenId,
+            collectionOwnerLU
         );
-        assertTrue(success);
+    }
 
-        Vm.Log[] memory entries = vm.getRecordedLogs();
+    function testTransferFromWithProvenanceBySRROwner() public {
+        vm.prank(collectionOwnerLU);
+        transferFromWithProvenance(
+            collectionAddress,
+            user1,
+            unlockedTokenId,
+            tpHistoryMetadataHash,
+            tpCustomHistoryId,
+            tpIsIntermediary,
+            collectionOwnerLU
+        );
 
-        Vm.Log memory provenanceLog = entries[0];
-        assertEq(uint256(provenanceLog.topics[1]), unlockedTokenId);
-        assertEq(bytes32ToAddress(provenanceLog.topics[2]), collectionOwnerLU);
-        assertEq(bytes32ToAddress(provenanceLog.topics[3]), tpTo);
-
-        Vm.Log memory transferLog = entries[1];
-        assertEq(bytes32ToAddress(transferLog.topics[1]), collectionOwnerLU);
-        assertEq(bytes32ToAddress(transferLog.topics[2]), tpTo);
-        assertEq(uint256(transferLog.topics[3]), unlockedTokenId);
+        // Transfer by srr owner and verify logs
+        executeAndVerifyTransferFromWithProvenance(
+            user1,
+            tpTo,
+            unlockedTokenId,
+            user1
+        );
     }
 
     function testTransferFromWithProvenanceEvenIfLockedToken() public {
-        vm.recordLogs();
-
-        vm.prank(trustedForwarder);
-        (bool success, ) = collectionAddress.call(
-            eip2771AppendSender(
-                abi.encodeWithSelector(
-                    IERC721FeatureV02.transferFromWithProvenance.selector,
-                    tpTo,
-                    lockedTokenId,
-                    tpHistoryMetadataHash,
-                    tpCustomHistoryId,
-                    tpIsIntermediary
-                ),
-                collectionOwnerLU
-            )
+        executeAndVerifyTransferFromWithProvenance(
+            collectionOwnerLU,
+            tpTo,
+            lockedTokenId,
+            collectionOwnerLU
         );
-        assertTrue(success);
-
-        Vm.Log[] memory entries = vm.getRecordedLogs();
-
-        Vm.Log memory provenanceLog = entries[0];
-        assertEq(uint256(provenanceLog.topics[1]), lockedTokenId);
-        assertEq(bytes32ToAddress(provenanceLog.topics[2]), collectionOwnerLU);
-        assertEq(bytes32ToAddress(provenanceLog.topics[3]), tpTo);
-
-        Vm.Log memory transferLog = entries[1];
-        assertEq(bytes32ToAddress(transferLog.topics[1]), collectionOwnerLU);
-        assertEq(bytes32ToAddress(transferLog.topics[2]), tpTo);
-        assertEq(uint256(transferLog.topics[3]), lockedTokenId);
     }
 
     function testApproveTransferERC721() public {
@@ -182,22 +200,22 @@ contract ERC721FeatureTest is StartrailTestBase {
     }
 
     function testRevert_TransferFromLockedToken() public {
-        vm.expectRevert(LibFeatureCommon.ERC721ExternalTransferLocked.selector);
+        vm.expectRevert(LibFeatureCommonV02.ERC721ExternalTransferLocked.selector);
         erc721Feature.transferFrom(user1, user2, lockedTokenId);
     }
 
     function testRevert_SafeTransferFromLockedToken() public {
-        vm.expectRevert(LibFeatureCommon.ERC721ExternalTransferLocked.selector);
+        vm.expectRevert(LibFeatureCommonV02.ERC721ExternalTransferLocked.selector);
         erc721Feature.safeTransferFrom(user1, user2, lockedTokenId);
     }
 
     function testRevert_SafeTransferWithDataFromLockedToken() public {
-        vm.expectRevert(LibFeatureCommon.ERC721ExternalTransferLocked.selector);
+        vm.expectRevert(LibFeatureCommonV02.ERC721ExternalTransferLocked.selector);
         erc721Feature.safeTransferFrom(user1, user2, lockedTokenId, "");
     }
 
     function testRevert_approveLockedToken() public {
-        vm.expectRevert(LibFeatureCommon.ERC721ExternalTransferLocked.selector);
+        vm.expectRevert(LibFeatureCommonV02.ERC721ExternalTransferLocked.selector);
         erc721Feature.approve(user2, lockedTokenId);
     }
 }

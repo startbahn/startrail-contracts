@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 /**
  * @title Replay protection for wallet meta transactions using a 2-dimensional nonce.

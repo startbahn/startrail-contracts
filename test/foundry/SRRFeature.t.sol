@@ -1,10 +1,10 @@
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 import "../../contracts/collection/features/erc721/ERC721Errors.sol";
 import {SRRFeatureV01} from "../../contracts/collection/features/SRRFeatureV01.sol";
 import {ERC2981RoyaltyFeatureV01} from "../../contracts/collection/features/ERC2981RoyaltyFeatureV01.sol";
 import {LockExternalTransferFeatureV01} from "../../contracts/collection/features/LockExternalTransferFeatureV01.sol";
-import "../../contracts/collection/features/shared/LibFeatureCommon.sol";
+import "../../contracts/collection/features/shared/LibFeatureCommonV02.sol";
 import "../../contracts/lib/IDGeneratorV3.sol";
 import "../../contracts/name/Contracts.sol";
 import "../../contracts/collection/features/storage/LibERC2981RoyaltyStorage.sol";
@@ -24,7 +24,7 @@ contract SRRFeatureTest is StartrailTestBase {
     function setUp() public override {
         super.setUp();
 
-        collectionOwnerLU = licensedUser1;
+        collectionOwnerLU = licensedUser1Address;
         notAnOwner = vm.addr(0x7788);
 
         collectionAddress = createCollection(collectionOwnerLU);
@@ -171,7 +171,7 @@ contract SRRFeatureTest is StartrailTestBase {
             address(0),
             address(0),
             100,
-            LibFeatureCommon.NotCollectionOwner.selector // expect revert with this error
+            LibFeatureCommonV02.NotCollectionOwner.selector // expect revert with this error
         );
     }
 
@@ -333,7 +333,7 @@ contract SRRFeatureTest is StartrailTestBase {
     function testRevert_UpdateSRROnlyIssuerOrArtistOrCollectionOwner() public {
         vm.prank(trustedForwarder);
         vm.expectRevert(
-            LibFeatureCommon.OnlyIssuerOrArtistOrCollectionOwner.selector
+            LibFeatureCommonV02.OnlyIssuerOrArtistOrCollectionOwner.selector
         );
         (bool success, ) = collectionAddress.call(
             eip2771AppendSender(

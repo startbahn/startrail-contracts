@@ -1,8 +1,31 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.28;
 
 interface IERC721FeatureV02 {
+    /**
+     * Events
+     */
+
+    event Provenance(
+        uint256 indexed tokenId,
+        address indexed from,
+        address indexed to,
+        string historyMetadataHash,
+        string historyMetadataURI,
+        bool isIntermediary
+    );
+
+    event Provenance(
+        uint256 indexed tokenId,
+        address indexed from,
+        address indexed to,
+        uint256 customHistoryId,
+        string historyMetadataHash,
+        string historyMetadataURI,
+        bool isIntermediary
+    );
+
     /**
      * @dev ERC721 initializer to set the name and symbol
      */

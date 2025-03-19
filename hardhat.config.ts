@@ -4,11 +4,12 @@ import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-solhint'
 import '@nomicfoundation/hardhat-chai-matchers'
 import '@nomicfoundation/hardhat-network-helpers'
+import 'hardhat-contract-sizer'
+import 'hardhat-dependency-compiler'
 import 'hardhat-gas-reporter'
 import 'hardhat-log-remover'
-import '@primitivefi/hardhat-dodoc'
-import 'hardhat-contract-sizer'
 import 'hardhat-storage-layout'
+import '@primitivefi/hardhat-dodoc'
 import '@openzeppelin/hardhat-upgrades'
 import '@nomiclabs/hardhat-etherscan'
 
@@ -32,6 +33,31 @@ import {
 dotenv.config()
 
 //
+// Factory salts for LUM across each environment
+//
+const FACTORY_SALT_LUM_IMPLEMENTATION =
+  '0x415a817a056348b03262d7e3a6adf1b95beda769af089aec36bd95b670057b5e'
+const FACTORY_SALT_LUM_PROXY =
+  '0x7da1e2b16f45bc6cdebc856d5b774109788975ad8089cd4b5ecb8762cab30419'
+
+const AMOY_QA_FACTORY_SALT_LUM_IMPLEMENTATION =
+  '0x73b9711dae1e0d9228046845bac30c4ca5463f2e6b707fbfd216ab28caba48f8'
+const AMOY_QA_FACTORY_SALT_LUM_PROXY =
+  '0xedd78991abde9cbb0d2e027f519d07a70ca2ccae7576605a8f89559baf894dcb'
+
+const AMOY_STAGING_FACTORY_SALT_LUM_IMPLEMENTATION =
+  '0xb45c00a346a3b4a0c102ca43a5bc4aa69f37dd3cad8f252b3b3cd1f110e6cee4'
+const AMOY_STAGING_FACTORY_SALT_LUM_PROXY =
+  '0xe3996dd5bb658a16ad67f0d3a9bd8d8cf4d2915da1bf72eb1826be57c8d4414f'
+
+const AMOY_DEVELOP_FACTORY_SALT_LUM_IMPLEMENTATION =
+  FACTORY_SALT_LUM_IMPLEMENTATION
+const AMOY_DEVELOP_FACTORY_SALT_LUM_PROXY = FACTORY_SALT_LUM_PROXY
+
+const POLYGON_FACTORY_SALT_LUM_IMPLEMENTATION = FACTORY_SALT_LUM_IMPLEMENTATION
+const POLYGON_FACTORY_SALT_LUM_PROXY = FACTORY_SALT_LUM_PROXY
+
+//
 // Setup test accounts for local networks
 //
 const mnemonicLocal =
@@ -49,9 +75,16 @@ const defaultAccount = accountN(0)
 //
 // Startrail administator configuration for local network
 //
-interface StartrailAdministratorConfig {
+export interface StartrailAdministratorConfig {
   owners: string[]
   threshold: number
+}
+
+export interface StartrailLUMConfig {
+  salt: {
+    implementation: string
+    proxy: string
+  }
 }
 
 const startrailAdministratorLocal: StartrailAdministratorConfig = {
@@ -62,8 +95,10 @@ const startrailAdministratorLocal: StartrailAdministratorConfig = {
 //
 // Known address in Live networks
 //
-const MUMBAI_DEPLOYER_ADDRESS = '0x2A02C20195CA2A9bCc8E043cf7acE2EEa8Ab71Db'
-const MUMBAI_API_ADDRESS = '0x2B5de787FaC8c91608254158d6b7184feDC783Aa'
+const AMOY_DEPLOYER_ADDRESS = '0x2A02C20195CA2A9bCc8E043cf7acE2EEa8Ab71Db'
+const AMOY_DEVELOP_API_ADDRESS = '0x2B5de787FaC8c91608254158d6b7184feDC783Aa'
+const AMOY_QA_API_ADDRESS = '0x07E3461Fc2f0541FF2Aa49B983e9d2cCaCB6D007'
+const AMOY_STAGING_API_ADDRESS = '0x1f0032e1C4f90c916580747f5f64584D58c2f5ED'
 
 const MAINNET_DEPLOYER_ADDRESS = '0x4F59ae1E7b5708d5E153402351A3b72F5F493B50'
 const MAINNET_API_ADDRESS = '0xb435B200C72277035a6fb58BD4bB8e3d39877d08'
@@ -71,9 +106,9 @@ const MAINNET_API_ADDRESS = '0xb435B200C72277035a6fb58BD4bB8e3d39877d08'
 const POLYGON_DEPLOYER_ADDRESS = MAINNET_DEPLOYER_ADDRESS
 const POLYGON_API_ADDRESS = MAINNET_API_ADDRESS
 
-const QA_ADMIN_OWNER_LIST = [
-  MUMBAI_DEPLOYER_ADDRESS,
-  MUMBAI_API_ADDRESS,
+
+const AMOY_COMMON_ADMIN_OWNER_LIST = [
+  AMOY_DEPLOYER_ADDRESS,
 ]
 
 //
@@ -144,8 +179,15 @@ task('accounts', 'Prints the list of accounts', async () => {
 
 const networksLocalShared: Partial<HardhatNetworkConfig> & {
   startrailAdministrator: StartrailAdministratorConfig
+  licensedUserManager: StartrailLUMConfig
 } = {
   startrailAdministrator: startrailAdministratorLocal,
+  licensedUserManager: {
+    salt: {
+      implementation: FACTORY_SALT_LUM_IMPLEMENTATION,
+      proxy: FACTORY_SALT_LUM_PROXY,
+    },
+  },
   gasPrice: ethers.utils.parseUnits(`1`, `gwei`).toNumber(),
 
   // evm logging with tests
@@ -156,7 +198,7 @@ const networksLocalShared: Partial<HardhatNetworkConfig> & {
   // Reason 2: Polygon blocks are around 30M, but sometimes nodes produce blocks under 30M.
   blockGasLimit: 29_000_000,
 
-  // To replicate Mumbai/Polygon/live chain type behavior set these to false.
+  // To replicate Amoy/Polygon/live chain type behavior set these to false.
   // For unit tests and quick detection of errors locally set these to true.
   //
   // For example if these flags are set to true and Hardhat detects a
@@ -168,6 +210,22 @@ const networksLocalShared: Partial<HardhatNetworkConfig> & {
   // to be false so the transactions will fail on chain.
   throwOnTransactionFailures: true,
   throwOnCallFailures: true,
+}
+
+const getAmoyNetworkConfig = (
+  apiAddress: string,
+  lumConfig: StartrailLUMConfig
+) => {
+  return {
+    chainId: chainIds.amoy,
+    url: process.env.AMOY_PROVIDER_URL || 'http://placeholder',
+    accounts: [process.env.AMOY_PRIVATE_KEY || privateKeysLocal[0]],
+    startrailAdministrator: {
+      threshold: 1,
+      owners: [apiAddress, ...AMOY_COMMON_ADMIN_OWNER_LIST],
+    },
+    licensedUserManager: lumConfig,
+  }
 }
 
 // Go to https://hardhat.dev/config/ to learn more
@@ -204,35 +262,24 @@ export default {
       timeout: 120000,
       url: 'http://127.0.0.1:8545',
     },
-
-    'mumbai-develop': {
-      chainId: chainIds.mumbai,
-      url: process.env.MUMBAI_PROVIDER_URL || 'http://placeholder',
-      accounts: [process.env.MUMBAI_PRIVATE_KEY || privateKeysLocal[0]],
-      startrailAdministrator: {
-        threshold: 1,
-        owners: QA_ADMIN_OWNER_LIST,
+    'amoy-develop': getAmoyNetworkConfig(AMOY_DEVELOP_API_ADDRESS, {
+      salt: {
+        implementation: AMOY_DEVELOP_FACTORY_SALT_LUM_IMPLEMENTATION,
+        proxy: AMOY_DEVELOP_FACTORY_SALT_LUM_PROXY,
       },
-    },
-
-    'mumbai-release': {
-      chainId: chainIds.mumbai,
-      url: process.env.MUMBAI_PROVIDER_URL || 'http://placeholder',
-      accounts: [process.env.MUMBAI_PRIVATE_KEY || privateKeysLocal[0]],
-      startrailAdministrator: {
-        threshold: 1,
-        owners: QA_ADMIN_OWNER_LIST,
+    }),
+    'amoy-release': getAmoyNetworkConfig(AMOY_QA_API_ADDRESS, {
+      salt: {
+        implementation: AMOY_QA_FACTORY_SALT_LUM_IMPLEMENTATION,
+        proxy: AMOY_QA_FACTORY_SALT_LUM_PROXY,
       },
-    },
-    'mumbai-staging': {
-      chainId: 80001,
-      url: process.env.MUMBAI_PROVIDER_URL || 'http://placeholder',
-      accounts: [process.env.MUMBAI_PRIVATE_KEY || privateKeysLocal[0]],
-      startrailAdministrator: {
-        threshold: 1,
-        owners: QA_ADMIN_OWNER_LIST,
+    }),
+    'amoy-staging': getAmoyNetworkConfig(AMOY_STAGING_API_ADDRESS, {
+      salt: {
+        implementation: AMOY_STAGING_FACTORY_SALT_LUM_IMPLEMENTATION,
+        proxy: AMOY_STAGING_FACTORY_SALT_LUM_PROXY,
       },
-    },
+    }),
     polygon: {
       chainId: chainIds.polygon,
       url: process.env.POLYGON_PROVIDER_URL || 'http://placeholder',
@@ -241,10 +288,18 @@ export default {
         threshold: 1,
         owners: [POLYGON_DEPLOYER_ADDRESS, POLYGON_API_ADDRESS],
       },
+      licensedUserManager: {
+        salt: {
+          implementation: POLYGON_FACTORY_SALT_LUM_IMPLEMENTATION,
+          proxy: POLYGON_FACTORY_SALT_LUM_PROXY,
+        },
+      },
       // workaround for "Error: cannot estimate gas; transaction may fail or may require manual gas limit"
       allowUnlimitedContractSize: true,
       // workaround for "Error: transaction underpriced"
-      gasPrice: ethers.utils.parseUnits(process.env.POLYGON_GAS_PRICE_GWEI, `gwei`).toNumber(),
+      gasPrice: ethers.utils
+        .parseUnits(process.env.POLYGON_GAS_PRICE_GWEI, `gwei`)
+        .toNumber(),
     },
   },
 
@@ -272,7 +327,7 @@ export default {
   solidity: {
     compilers: [
       {
-        version: '0.8.21', // Current Startrail contracts
+        version: '0.8.28', // Current Startrail contracts
         settings: {
           optimizer: {
             enabled: true,
@@ -302,6 +357,7 @@ export default {
   dodoc: {
     runOnCompile: false,
     outputDir: 'docs/natspec',
+    include: [`contracts`],
     exclude: [`contracts/test`],
   },
 
@@ -323,6 +379,12 @@ export default {
       // to that one.
       abiElement.name !== 'supportsInterface' ||
       fullyQualifiedName.includes(`collection/features/ERC721Feature`),
+  },
+
+  dependencyCompiler: {
+    paths: [
+      '@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol',
+    ],
   },
 
   etherscan: {
