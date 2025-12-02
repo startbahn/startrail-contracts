@@ -1,9 +1,7 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import {
-  assertContractDeployed,
   getAdministratorInstance
 } from '../hardhat-helpers'
-import { loadDeployJSON } from './deploy-json'
 import {
   deployBeacon,
   deployLUM

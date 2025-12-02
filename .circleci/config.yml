@@ -118,9 +118,8 @@ commands:
           command: subgraph/bin/wait_for_subgraph
   run_startrail_deploy_and_seed:
     steps:
-      - run:
-          name: Compile Local
-          command: yarn compile
+      - attach_workspace:
+          at: .
       - run:
           name: Deploy Local
           command: yarn deploy-local
@@ -239,12 +238,19 @@ jobs:
       - checkout
       - install_node_dependencies_startrail
       - run_hardhat_compile
+      - persist_to_workspace:
+          root: .
+          paths:
+            - artifacts/
+            - cache/
+            - typechain-types/
   test_startrail_hardhat:
     executor: default
     steps:
       - checkout
       - install_node_dependencies_startrail
-      - run_hardhat_compile
+      - attach_workspace:
+          at: .
       - run_hardhat_unit_test
   test_startrail_forge:
     executor: foundry
@@ -323,7 +329,8 @@ workflows:
             - build_startrail
       - test_startrail_forge:
           requires:
-            - build_startrail
+            - install_dependencies
       - test_subgraph:
           requires:
             - build_subgraph
+            - build_startrail

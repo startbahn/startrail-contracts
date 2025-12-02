@@ -69,7 +69,7 @@ const verifyCollectionBulkFeatureEvent = (args: { event; expectedArgs }) => {
   })
 
   Object.entries(expectedArgs).forEach(([key, expectedValue]) => {
-    if(expectedArgs[key] !== undefined) {
+    if (expectedArgs[key] !== undefined) {
       expect(log.args[key]).equal(expectedArgs[key])
     }
   })
@@ -236,20 +236,20 @@ describe('Bulk (transfers)', () => {
         historyTypeName: randomText(),
       }
     )
-    ;({ walletAddress: luw1 } = await createLicensedUserWalletDirect(
-      hre,
-      {
+    ;({ walletAddress: luw1 } = await createLicensedUserWalletDirect({
+      hreArg: hre,
+      detailsOverride: {
         owners: [collectionOwnerWallet.address],
       },
-      administratorWallet
-    ))
-    ;({ walletAddress: luw2 } = await createLicensedUserWalletDirect(
-      hre,
-      {
+      adminWallet: administratorWallet,
+    }))
+    ;({ walletAddress: luw2 } = await createLicensedUserWalletDirect({
+      hreArg: hre,
+      detailsOverride: {
         owners: [collectionOwnerWallet.address],
       },
-      administratorWallet
-    ))
+      adminWallet: administratorWallet,
+    }))
   })
 
   describe('initializer', () => {
@@ -305,7 +305,7 @@ describe('Bulk (transfers)', () => {
       return expect(
         bulkTransferNotTrusted.prepareBatchFromLicensedUser(merkleRoot)
       ).to.eventually.be.rejectedWith(
-        `Function can only be called through the trusted Forwarder`
+        `reverted with custom error 'OnlyTrustedForwarderOrActiveDeployedWallet()'`
       )
     })
   })

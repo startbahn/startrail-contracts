@@ -402,6 +402,24 @@ const upgradeFromAdmin = async (hre, proxy, newImplementation) => {
   return res
 }
 
+const upgradeFromAdminForUups = async (
+  hre,
+  proxyAddress,
+  newImplementation
+) => {
+  const administratorContract = await getAdministratorInstance(hre)
+  suppressLoggerWarnings(ethers)
+  // Encode UUPS upgradeTo(address) call without needing a contract instance
+  const iface = new ethers.utils.Interface(['function upgradeTo(address)'])
+  const updateCalldata = iface.encodeFunctionData('upgradeTo', [newImplementation])
+  const res = await administratorContract.execTransaction({
+    to: proxyAddress,
+    data: updateCalldata,
+    waitConfirmed: true,
+  })
+  return res
+}
+
 export {
   assertContractDeployed,
   assertContractNotDeployed,
@@ -428,4 +446,5 @@ export {
   suppressLoggerWarnings,
   waitTxHH,
   upgradeFromAdmin,
+  upgradeFromAdminForUups,
 }

@@ -10,21 +10,24 @@ import {IERC721Metadata} from "@solidstate/contracts/token/ERC721/metadata/IERC7
 import {IERC2981} from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import {UpgradeableBeacon} from "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 
-import "../../contracts/collection/CollectionFactoryV01.sol";
+import "../../contracts/collection/CollectionFactoryV02.sol";
 import {CollectionProxy} from "../../contracts/collection/CollectionProxy.sol";
 import "../../contracts/collection/features/BulkFeatureV04.sol";
 import "../../contracts/collection/features/ERC721FeatureV05.sol";
-import "../../contracts/collection/features/LockExternalTransferFeatureV01.sol";
-import "../../contracts/collection/features/SRRApproveTransferFeatureV04.sol";
-import "../../contracts/collection/features/SRRFeatureV02.sol";
+import "../../contracts/collection/features/OwnableFeatureV02.sol";
+import "../../contracts/collection/features/LockExternalTransferFeatureV02.sol";
+import "../../contracts/collection/features/SRRApproveTransferFeatureV05.sol";
+import "../../contracts/collection/features/SRRFeatureV03.sol";
 import "../../contracts/collection/features/ERC2981RoyaltyFeatureV01.sol";
-import "../../contracts/collection/features/SRRHistoryFeatureV01.sol";
-import "../../contracts/collection/features/SRRMetadataFeatureV01.sol";
+import "../../contracts/collection/features/SRRHistoryFeatureV02.sol";
+import "../../contracts/collection/features/SRRMetadataFeatureV02.sol";
 import "../../contracts/collection/registry/StartrailCollectionFeatureRegistry.sol";
 
 import "../../contracts/name/Contracts.sol";
 import "../../contracts/name/NameRegistry.sol";
-import {LicensedUserManagerV02} from "../../contracts/licensedUser/LicensedUserManagerV02.sol";
+import {EntryPoint} from "../../contracts/test/EntryPoint.sol";
+import {LicensedUserManagerV03} from "../../contracts/licensedUser/LicensedUserManagerV03.sol";
+import {LicensedUserWallet} from "../../contracts/licensedUser/LicensedUserWallet.sol";
 
 import "./mock/MockStartrailRegistry.sol";
 
@@ -46,11 +49,12 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     ///                                                          ///
 
     StartrailCollectionFeatureRegistry internal featureRegistry;
-    CollectionFactoryV01 internal collectionFactory;
+    CollectionFactoryV02 internal collectionFactory;
     NameRegistry internal nameRegistry;
     UpgradeableBeacon internal licensedUserBeacon;
-    LicensedUserManagerV02 internal licensedUserManager;
-    
+    EntryPoint internal entryPoint;
+    LicensedUserManagerV03 internal licensedUserManager;
+
     MockStartrailRegistry internal mockStartrailRegistry;
 
     address internal ownableFeatureImpl;
@@ -97,13 +101,14 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
 
         vm.prank(admin);
 
-        collectionFactory = new CollectionFactoryV01();
+        collectionFactory = new CollectionFactoryV02();
         collectionFactory.initialize(
             featureRegistryAddress,
             collectionProxyImpl
         );
 
         // Deploy Feature Contracts
+        ownableFeatureImpl = upgradeOwnableFeature(featureRegistry);
         erc721FeatureImpl = deployERC721Feature(featureRegistry);
         lockExternalTransferFeatureImpl = deployLockExternalTransferFeature(
             featureRegistry
@@ -120,12 +125,26 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
         bulkFeatureImpl = deployBulkFeature(featureRegistry);
 
         licensedUserBeacon = new UpgradeableBeacon(
-            address(nameRegistry), admin); // Obviously, nameRegistry isn't an implementation of the wallet, but just working as a dummy until it's implemented and upgraded
-        licensedUserManager = new LicensedUserManagerV02();
-        licensedUserManager.initialize(address(nameRegistry), trustedForwarder);
-        licensedUserManager.initializeV2(address(licensedUserBeacon));
+            address(nameRegistry),
+            admin
+        );
+        address newImplementation = address(new LicensedUserWallet()); // We can also set LicensedUserWallet as an initial implementation but here we test what has happened in production
         vm.prank(admin);
-        nameRegistry.set(Contracts.LICENSED_USER_MANAGER, address(licensedUserManager));
+        licensedUserBeacon.upgradeTo(newImplementation);
+        licensedUserManager = new LicensedUserManagerV03();
+        entryPoint = new EntryPoint();
+        licensedUserManager.initialize(address(nameRegistry), trustedForwarder);
+        licensedUserManager.initializeV3(
+            address(licensedUserBeacon),
+            address(entryPoint)
+        );
+        vm.prank(admin);
+        licensedUserManager.setEntryPoint(address(entryPoint));
+        vm.prank(admin);
+        nameRegistry.set(
+            Contracts.LICENSED_USER_MANAGER,
+            address(licensedUserManager)
+        );
         licensedUser1Owner = vm.addr(0x1212);
         licensedUser2Owner = vm.addr(0x1313);
         address[] memory licensedUser1Owners = new address[](1);
@@ -135,7 +154,7 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
         licensedUser1Address = createLicensedUser(
             licensedUser1Owners,
             1,
-            LicensedUserManagerV02.UserType.HANDLER,
+            LicensedUserManagerV03.UserType.HANDLER,
             "Licensed User 1",
             "X",
             "salt1"
@@ -143,7 +162,7 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
         licensedUser2Address = createLicensedUser(
             licensedUser2Owners,
             1,
-            LicensedUserManagerV02.UserType.HANDLER,
+            LicensedUserManagerV03.UserType.HANDLER,
             "Licensed User 2",
             "Y",
             "salt2"
@@ -231,13 +250,13 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     function deployLockExternalTransferFeature(
         StartrailCollectionFeatureRegistry featureRegistry_
     ) internal returns (address) {
-        LockExternalTransferFeatureV01 lockExternalTransferFeature = new LockExternalTransferFeatureV01();
+        LockExternalTransferFeatureV02 lockExternalTransferFeature = new LockExternalTransferFeatureV02();
 
         bytes4[] memory selectors = new bytes4[](2);
-        selectors[0] = LockExternalTransferFeatureV01
+        selectors[0] = LockExternalTransferFeatureV02
             .getLockExternalTransfer
             .selector;
-        selectors[1] = LockExternalTransferFeatureV01
+        selectors[1] = LockExternalTransferFeatureV02
             .setLockExternalTransfer
             .selector;
 
@@ -255,12 +274,12 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     function deploySRRFeature(
         StartrailCollectionFeatureRegistry featureRegistry_
     ) internal returns (address) {
-        SRRFeatureV02 feature = new SRRFeatureV02();
+        SRRFeatureV03 feature = new SRRFeatureV03();
 
         bytes4[] memory selectors = new bytes4[](3);
-        selectors[0] = SRRFeatureV02.createSRR.selector;
-        selectors[1] = SRRFeatureV02.getSRR.selector;
-        selectors[2] = SRRFeatureV02.updateSRR.selector;
+        selectors[0] = SRRFeatureV03.createSRR.selector;
+        selectors[1] = SRRFeatureV03.getSRR.selector;
+        selectors[2] = SRRFeatureV03.updateSRR.selector;
 
         srrFeatureImpl = address(feature);
         deployFeature(admin, featureRegistry_, srrFeatureImpl, selectors);
@@ -271,19 +290,19 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     function deploySRRApproveTransferFeature(
         StartrailCollectionFeatureRegistry featureRegistry_
     ) internal returns (address) {
-        SRRApproveTransferFeatureV04 feature = new SRRApproveTransferFeatureV04();
+        SRRApproveTransferFeatureV05 feature = new SRRApproveTransferFeatureV05();
 
         bytes4[] memory selectors = new bytes4[](6);
 
         selectors[0] = 0xc0b00724; // approveSRRByCommitment(uint256,bytes32,string,uint256)
         selectors[1] = 0x81882bd0; // approveSRRByCommitment(uint256,bytes32,string)
-        selectors[2] = SRRApproveTransferFeatureV04
+        selectors[2] = SRRApproveTransferFeatureV05
             .cancelSRRCommitment
             .selector;
-        selectors[3] = SRRApproveTransferFeatureV04
+        selectors[3] = SRRApproveTransferFeatureV05
             .transferSRRByReveal
             .selector;
-        selectors[4] = SRRApproveTransferFeatureV04.getSRRCommitment.selector;
+        selectors[4] = SRRApproveTransferFeatureV05.getSRRCommitment.selector;
 
         srrApprovalFeatureImpl = address(feature);
         deployFeature(
@@ -330,13 +349,13 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     function deploySRRMetadataFeature(
         StartrailCollectionFeatureRegistry featureRegistry_
     ) internal returns (address) {
-        SRRMetadataFeatureV01 feature = new SRRMetadataFeatureV01();
+        SRRMetadataFeatureV02 feature = new SRRMetadataFeatureV02();
 
         bytes4[] memory selectors = new bytes4[](3);
 
-        selectors[0] = SRRMetadataFeatureV01.updateSRRMetadata.selector;
-        selectors[1] = SRRMetadataFeatureV01.getSRRMetadata.selector;
-        selectors[2] = SRRMetadataFeatureV01.tokenURI.selector;
+        selectors[0] = SRRMetadataFeatureV02.updateSRRMetadata.selector;
+        selectors[1] = SRRMetadataFeatureV02.getSRRMetadata.selector;
+        selectors[2] = SRRMetadataFeatureV02.tokenURI.selector;
 
         srrMetadataFeatureImpl = address(feature);
         deployFeature(
@@ -371,11 +390,11 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     function deploySRRHistoryFeature(
         StartrailCollectionFeatureRegistry featureRegistry_
     ) internal returns (address) {
-        SRRHistoryFeatureV01 feature = new SRRHistoryFeatureV01();
+        SRRHistoryFeatureV02 feature = new SRRHistoryFeatureV02();
 
         bytes4[] memory selectors = new bytes4[](1);
 
-        selectors[0] = SRRHistoryFeatureV01.addHistory.selector;
+        selectors[0] = SRRHistoryFeatureV02.addHistory.selector;
 
         srrHistoryFeatureImpl = address(feature);
         deployFeature(
@@ -388,17 +407,31 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
         return srrHistoryFeatureImpl;
     }
 
+    function upgradeOwnableFeature(
+        StartrailCollectionFeatureRegistry featureRegistry_
+    ) internal returns (address impl) {
+        OwnableFeatureV02 feature = new OwnableFeatureV02();
+        bytes4[] memory selectors = new bytes4[](3);
+
+        selectors[0] = IERC173.owner.selector;
+        selectors[1] = IERC173.transferOwnership.selector;
+        selectors[2] = OwnableFeatureV02.__OwnableFeature_initialize.selector;
+
+        impl = address(feature);
+        upgradeFeature(admin, featureRegistry_, impl, selectors);
+    }
+
     function createLicensedUser(
         address[] memory owners,
         uint8 threshold,
-        LicensedUserManagerV02.UserType userType,
+        LicensedUserManagerV03.UserType userType,
         string memory englishName,
         string memory originalName,
         bytes32 salt
     ) internal returns (address luAddress) {
         vm.prank(admin);
         luAddress = licensedUserManager.createWallet(
-            LicensedUserManagerV02.LicensedUserDto({
+            LicensedUserManagerV03.LicensedUserDto({
                 owners: owners,
                 threshold: threshold,
                 userType: userType,
@@ -410,24 +443,83 @@ contract StartrailTestBase is StartrailTestLibrary, Contracts {
     }
 
     function createCollection(address creatorLU) internal returns (address) {
+        return createCollection(creatorLU, trustedForwarder);
+    }
+
+    function createCollection(
+        address creatorLU,
+        address sender
+    ) internal returns (address) {
         vm.recordLogs();
 
-        vm.prank(trustedForwarder);
-        (bool success, ) = address(collectionFactory).call(
-            eip2771AppendSender(
+        bytes memory callData;
+        bool success;
+        if (sender == trustedForwarder) {
+            callData = eip2771AppendSender(
                 abi.encodeWithSelector(
-                    CollectionFactoryV01.createCollectionContract.selector,
+                    CollectionFactoryV02.createCollectionContract.selector,
                     COLLECTION_NAME,
                     COLLECTION_SYMBOL,
                     bytes32(keccak256("random salt"))
                 ),
                 creatorLU
-            )
-        );
+            );
+        } else {
+            callData = abi.encodeWithSelector(
+                CollectionFactoryV02.createCollectionContract.selector,
+                COLLECTION_NAME,
+                COLLECTION_SYMBOL,
+                bytes32(keccak256("random salt"))
+            );
+        }
+        vm.prank(sender);
+        (success, callData) = address(collectionFactory).call(callData);
         require(success);
 
         Vm.Log[] memory entries = vm.getRecordedLogs();
+        if (entries.length == 0) {
+            return address(0);
+        }
         Vm.Log memory collectionCreatedLog = entries[entries.length - 1];
         return bytes32ToAddress(collectionCreatedLog.topics[1]);
+    }
+
+    function createSRRWithDefaults(
+        address collectionAddress,
+        address sender,
+        address minter
+    ) internal returns (uint256 tokenId) {
+        bool isPrimaryIssuer = true;
+        address artistOwner = vm.addr(pseudorandomUint256());
+        address[] memory owners = new address[](1);
+        owners[0] = artistOwner;
+        address artist = createLicensedUser(
+            owners,
+            1,
+            LicensedUserManagerV03.UserType.ARTIST,
+            "Artist",
+            "Z",
+            bytes32(keccak256(abi.encodePacked("artist_salt", artistOwner)))
+        );
+        string memory metadataCID = A_CID;
+        bool lockExternalTransfer = false;
+        address to = address(0);
+        address royaltyReceiver = address(0);
+        uint16 royaltyBasisPoints = 0;
+
+        return
+            createSRR(
+                collectionAddress,
+                sender,
+                minter,
+                isPrimaryIssuer,
+                artist,
+                metadataCID,
+                lockExternalTransfer,
+                to,
+                royaltyReceiver,
+                royaltyBasisPoints,
+                bytes4(0)
+            );
     }
 }

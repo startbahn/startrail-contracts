@@ -63,16 +63,16 @@ describe('LicensedUserManager', () => {
       .then((detailsArray) => licensedUserArrayToRecord(detailsArray))
 
   describe('createWallet', () => {
-    it('should create user wallet with predictable create2 addresses', async () => {
+    it('should create user wallet', async () => {
       const walletRequest = createLicensedUserWalletRequest({
         owners: [handlerEOAWallet.address],
       })
-      const createEventArgs = await createLicensedUserWalletDirect(
-        hre,
-        walletRequest.details,
-        adminEOAWallet,
-        walletRequest.salt
-      )
+      const createEventArgs = await createLicensedUserWalletDirect({
+        hreArg: hre,
+        detailsOverride: walletRequest.details,
+        adminWallet: adminEOAWallet,
+        saltOverride: walletRequest.salt,
+      })
 
       // Verify emitted event properties
       assert.sameMembers(createEventArgs.owners, walletRequest.details.owners)
@@ -90,12 +90,6 @@ describe('LicensedUserManager', () => {
 
       // Verify the Create2 address
       const walletAddress = createEventArgs.walletAddress
-
-      const expectedAddress = await generateLicensedUserCreate2Address(
-        lum.address,
-        walletRequest.salt
-      )
-      expect(walletAddress).to.equal(expectedAddress)
 
       // Verify the luw details from state
       const walletDetails = await getLicensedUser(lum, walletAddress)
@@ -133,80 +127,6 @@ describe('LicensedUserManager', () => {
       const lumHandler = lum.connect(handlerEOAWallet)
       return assertRevert(
         lumHandler.createWallet(...Object.values(walletRequest)),
-        `Caller is not the Startrail Administrator`
-      )
-    })
-  })
-
-  describe('createWalletFromMigration', () => {
-    const createFromMigrationRequest = (overrideProps) => {
-      const createRequest = createLicensedUserWalletRequest({
-        ...overrideProps,
-      })
-      delete createRequest.salt // salt not used for migration creates
-
-      createRequest.contractAddress = ethers.Wallet.createRandom().address
-      createRequest.originChain = 'eip155:1'
-      createRequest.originTimestamp = ethers.BigNumber.from(Date.now())
-
-      return createRequest
-    }
-
-    const createFromMigration = async (createRequest) =>
-      lum
-        .createWalletFromMigration(
-          createRequest.details,
-          createRequest.contractAddress,
-          createRequest.originChain,
-          createRequest.originTimestamp
-        )
-        .then((txRsp) => txRsp.wait(0))
-        .then((txReceipt) =>
-          decodeEventLog(lum, 'CreateLicensedUserWallet', txReceipt.logs[0])
-        )
-
-    it('should create multi user wallet from migration with known address', async () => {
-      const walletRequest = createFromMigrationRequest({
-        owners: [handlerEOAWallet.address],
-      })
-
-      const createEventArgs = await createFromMigration(walletRequest)
-      expect(createEventArgs.salt).to.equal(zeroBytes32)
-
-      const walletDetails = await getLicensedUser(
-        lum,
-        walletRequest.contractAddress
-      )
-
-      expect(walletDetails.originalName).to.equal(
-        walletRequest.details.originalName
-      )
-      expect(walletDetails.englishName).to.equal(
-        walletRequest.details.englishName
-      )
-      expect(walletDetails.userType).to.equal(walletRequest.details.userType)
-      expect(walletDetails.active).to.be.true
-      expect(await lum.getThreshold(walletRequest.contractAddress)).to.equal(
-        walletRequest.details.threshold
-      )
-      assert.sameMembers(
-        await lum.getOwners(walletRequest.contractAddress),
-        walletRequest.details.owners
-      )
-    })
-
-    it('should reject create multi from migration from non-admin wallet', () => {
-      const walletRequest = createFromMigrationRequest({
-        owners: [handlerEOAWallet.address],
-      })
-      const lumHandler = lum.connect(handlerEOAWallet)
-      return assertRevert(
-        lumHandler.createWalletFromMigration(
-          walletRequest.details,
-          walletRequest.contractAddress,
-          walletRequest.originChain,
-          walletRequest.originTimestamp
-        ),
         `Caller is not the Startrail Administrator`
       )
     })
@@ -271,14 +191,14 @@ describe('LicensedUserManager', () => {
 
     before(async () => {
       for (const testCase of EXEC_TEST_CASES) {
-        const { walletAddress } = await createLicensedUserWalletDirect(
-          hre,
-          {
+        const { walletAddress } = await createLicensedUserWalletDirect({
+          hreArg: hre,
+          detailsOverride: {
             owners: testCase.ownerAddresses,
             threshold: testCase.threshold,
           },
-          adminEOAWallet
-        )
+          adminWallet: adminEOAWallet,
+        })
         testCase.luAddress = walletAddress
       }
     })
@@ -335,13 +255,13 @@ describe('LicensedUserManager', () => {
     it(`should execute transaction with calldata (data field) [STARTRAIL-737]`, async () => {
       // Setup an LUW and issue a token
       const { walletAddress: fromAddress } =
-        await createLicensedUserWalletDirect(
-          hre,
-          {
+        await createLicensedUserWalletDirect({
+          hreArg: hre,
+          detailsOverride: {
             owners: [handlerEOAWallet.address],
           },
-          adminEOAWallet
-        )
+          adminWallet: adminEOAWallet,
+        })
       const issueRequest = await createSRRRequest()
 
       const tokenId = await encodeSignExecute({
@@ -383,13 +303,13 @@ describe('LicensedUserManager', () => {
     let addOwnerRequest
 
     beforeEach(async () => {
-      const { walletAddress } = await createLicensedUserWalletDirect(
-        hre,
-        {
+      const { walletAddress } = await createLicensedUserWalletDirect({
+        hreArg: hre,
+        detailsOverride: {
           owners: [owner1.address],
         },
-        adminEOAWallet
-      )
+        adminWallet: adminEOAWallet,
+      })
       luwAddress = walletAddress
       luDetails = await lum.getLicensedUser(luwAddress)
       addOwnerRequest = {
@@ -453,7 +373,7 @@ describe('LicensedUserManager', () => {
       const lumFromNonAdmin = lum.connect(outsiderEOAWallet)
       return assertRevert(
         lumFromNonAdmin.addOwner(...Object.values(addOwnerRequest)),
-        `Wallet function can only be called from trusted forwarder or admin`
+        `Wallet function can only be called from trusted forwarder, admin or active deployed wallet`
       )
     })
   })
@@ -488,13 +408,13 @@ describe('LicensedUserManager', () => {
         let setNameRequest
 
         beforeEach(async () => {
-          const { walletAddress } = await createLicensedUserWalletDirect(
-            hre,
-            {
+          const { walletAddress } = await createLicensedUserWalletDirect({
+            hreArg: hre,
+            detailsOverride: {
               owners: [owner1.address],
             },
-            adminEOAWallet
-          )
+            adminWallet: adminEOAWallet,
+          })
           luwAddress = walletAddress
           setNameRequest = {
             wallet: luwAddress,
@@ -553,7 +473,7 @@ describe('LicensedUserManager', () => {
             lumFromNonAdmin[testCase.functionName](
               ...Object.values(setNameRequest)
             ),
-            `Wallet function can only be called from trusted forwarder or admin`
+            `Wallet function can only be called from trusted forwarder, admin or active deployed wallet`
           )
         })
       })

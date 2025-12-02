@@ -14,7 +14,8 @@ wallet.json example:
   "englishName: "Artist A",
   "originalName: "アーティストA",
   "userType: "artist",
-  "salt": "0x64e604787cbf194841e7b68d7cd28786f6c9a0a3ab9f8b0a0e87cb4387ab0107"
+  "salt": "0x64e604787cbf194841e7b68d7cd28786f6c9a0a3ab9f8b0a0e87cb4387ab0107",
+  "toDeploy": false
 }
 
 luaddress.txt:

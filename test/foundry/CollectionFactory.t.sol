@@ -5,9 +5,6 @@ import {IERC165} from "@solidstate/contracts/interfaces/IERC165.sol";
 import {IERC721} from "@solidstate/contracts/interfaces/IERC721.sol";
 import {IERC721Metadata} from "@solidstate/contracts/token/ERC721/metadata/IERC721Metadata.sol";
 
-import "../../contracts/collection/CollectionFactoryV01.sol";
-import "../../contracts/collection/features/ERC721FeatureV01.sol";
-import "../../contracts/collection/features/OwnableFeatureV01.sol";
 import "../../contracts/collection/registry/StartrailCollectionFeatureRegistry.sol";
 
 import "./StartrailTestBase.sol";
@@ -24,7 +21,7 @@ contract CollectionFactoryTest is StartrailTestBase {
         IERC173 cERC173 = IERC173(collectionAddress);
         assertEq(cERC173.owner(), collectionCreator);
 
-        ERC721FeatureV01 cERC721Feature = ERC721FeatureV01(collectionAddress);
+        ERC721FeatureV05 cERC721Feature = ERC721FeatureV05(collectionAddress);
         assertEq(cERC721Feature.name(), COLLECTION_NAME);
         assertEq(cERC721Feature.symbol(), COLLECTION_SYMBOL);
 
@@ -37,6 +34,20 @@ contract CollectionFactoryTest is StartrailTestBase {
         );
 
         assertFalse(cERC165.supportsInterface(0x1111ffff));
+    }
+
+    function testCreateCollection_DeployedWallet() public {
+        vm.prank(admin);
+        licensedUserManager.deploy("salt1", licensedUser1Address);
+        address collectionAddress = createCollection(licensedUser1Address, licensedUser1Address);
+        ERC721FeatureV05 cERC721Feature = ERC721FeatureV05(collectionAddress);
+        assertEq(cERC721Feature.name(), COLLECTION_NAME);
+        assertEq(cERC721Feature.symbol(), COLLECTION_SYMBOL);
+    }
+
+    function testRevert_NotTrustedForwarderOrDeployedWallet() public {
+        vm.expectRevert(LibEIP2771Or4337.NotTrustedForwarderOrActiveDeployedWallet.selector);
+        createCollection(licensedUser1Address, licensedUser1Address);
     }
 
     function testRevert_AlreadyInitialized() public {

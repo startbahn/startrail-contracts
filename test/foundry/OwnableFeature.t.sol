@@ -2,13 +2,13 @@
 
 pragma solidity 0.8.28;
 
-import {OwnableFeatureV01, OwnableFeatureAlreadyInitialized} from "../../contracts/collection/features/OwnableFeatureV01.sol";
-import "../../contracts/collection/features/shared/LibFeatureCommonV02.sol";
+import {OwnableFeatureV02} from "../../contracts/collection/features/OwnableFeatureV02.sol";
+import "../../contracts/collection/features/shared/LibFeatureCommonV03.sol";
 
 import "./StartrailTestBase.sol";
 
 contract OwnableFeatureTest is StartrailTestBase {
-    OwnableFeatureV01 internal ownableFeature;
+    OwnableFeatureV02 internal ownableFeature;
     address internal collectionAddress;
     address internal collectionOwnerLU;
 
@@ -23,7 +23,7 @@ contract OwnableFeatureTest is StartrailTestBase {
 
         collectionOwnerLU = licensedUser1Address;
         collectionAddress = createCollection(collectionOwnerLU);
-        ownableFeature = OwnableFeatureV01(collectionAddress);
+        ownableFeature = OwnableFeatureV02(collectionAddress);
     }
 
     function testInitialized() public {
@@ -45,11 +45,36 @@ contract OwnableFeatureTest is StartrailTestBase {
         assertEq(ownableFeature.owner(), newOwner);
     }
 
+    function testTransferOwnershipFromDeployedWallet() public {
+        vm.prank(admin);
+        licensedUserManager.deploy("salt1", collectionOwnerLU);
+        vm.prank(collectionOwnerLU);
+        ownableFeature.transferOwnership(newOwner);
+        assertEq(ownableFeature.owner(), newOwner);
+    }
+
+    // function testTransferOwnershipFromAliasFrom() public {
+    //     address collectionAddress = createCollection(collectionOwnerLU);
+    //     vm.prank(admin);
+    //     address newAddress = licensedUserManager.deploy("new_salt1", collectionOwnerLU);
+    //     (bool success, ) = collectionAddress.call(
+    //         eip2771AppendSender(
+    //             abi.encodeWithSelector(
+    //                 ownableFeature.transferOwnership.selector,
+    //                 newOwner
+    //             ),
+    //             collectionOwnerLU
+    //         )
+    //     );
+    //     require(success);
+    //     assertEq(ownableFeature.owner(), newOwner);
+    // }
+
     function testRevert_TransferOwnershipNotCollectionOwner() public {
         expectRevertTransferOwnership(
             notOwner,
             newOwner,
-            LibFeatureCommonV02.NotCollectionOwner.selector
+            LibFeatureCommonV03.NotCollectionOwner.selector
         );
     }
 
@@ -57,18 +82,12 @@ contract OwnableFeatureTest is StartrailTestBase {
         expectRevertTransferOwnership(
             collectionOwnerLU,
             address(0x0),
-            IOwnableFeatureV01.ZeroAddress.selector
+            IOwnableFeatureV02.ZeroAddress.selector
         );
     }
 
-    function testRevert_TransferOwnershipNotTrustedForwarder() public {
-        vm.prank(collectionOwnerLU);
-        vm.expectRevert(LibEIP2771.NotTrustedForwarder.selector);
-        ownableFeature.transferOwnership(newOwner);
-    }
-
     function testRevert_AlreadyInitialized() public {
-        vm.expectRevert(OwnableFeatureAlreadyInitialized.selector);
+        vm.expectRevert(OwnableFeatureV02.OwnableFeatureAlreadyInitialized.selector);
         ownableFeature.__OwnableFeature_initialize(collectionOwnerLU);
     }
 

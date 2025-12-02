@@ -11,6 +11,9 @@ typechain-types/
 forge-cache/
 forge-out/
 
+# Other compiled files
+bin/contracts
+
 # OZ upgrades
 .openzeppelin/unknown-*.json
 

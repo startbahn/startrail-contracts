@@ -28,6 +28,7 @@ import {
   getAdministratorSigner,
   getContract,
 } from '../../utils/hardhat-helpers'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 const ZERO_ADDRESS = ethersConstants.AddressZero
 
@@ -36,23 +37,6 @@ const ZERO_METADATA_DIGEST =
 
 // see OwnerManager.sol SENTINAL_OWNERS
 const SENTINEL_ADDRESS = '0x0000000000000000000000000000000000000001'
-
-/**
- * Compute the create2 LicensedUser wallet address given the salt
- * @param {string} lumAddress Address of the LicensedUserManager.
- * @param {string} salt A hex string of a bytes32 salt.
- * @return {string} Computed create2 address
- */
-const generateLicensedUserCreate2Address = async (lumAddress, salt) =>
-  hre.ethers
-    .getContractFactory('WalletProxyMinimal')
-    .then((walletProxy) =>
-      ethersUtils.getCreate2Address(
-        lumAddress,
-        salt,
-        ethersUtils.keccak256(walletProxy.bytecode)
-      )
-    )
 
 /**
  * Generate a random Salt for create2 input
@@ -98,24 +82,37 @@ const createLicensedUserWalletRequest = (overrides) => ({
  * Create LUW from an Admin EOA as opposed to from admin contract.
  * @return Arguments emitted from event CreateLicensedUserWallet.
  */
-const createLicensedUserWalletDirect = async (
+const createLicensedUserWalletDirect = async ({
   hreArg,
   detailsOverride,
   adminWallet,
+  saltOverride,
+  toDeploy = false,
+}: {
+  hreArg: HardhatRuntimeEnvironment
+  detailsOverride: Record<string, any>
+  adminWallet: Wallet
   saltOverride?: string
-) => {
+  toDeploy?: boolean
+}) => {
   const walletRequest = createLicensedUserWalletRequest(detailsOverride)
   const walletSalt = saltOverride ? saltOverride : walletRequest.salt
 
   const lum = await getContract(hreArg, 'LicensedUserManager')
   const lumFromAdmin = lum.connect(adminWallet)
 
-  return lumFromAdmin
+  const txRsp = await lumFromAdmin
     .createWallet(Object.values(walletRequest.details), walletSalt)
     .then((txRsp) => txRsp.wait(0))
     .then((txReceipt) =>
       decodeEventLog(lum, 'CreateLicensedUserWallet', txReceipt.logs[0])
     )
+
+  if (toDeploy) {
+    await lumFromAdmin.deploy(walletSalt, txRsp.walletAddress)
+  }
+
+  return txRsp
 }
 
 /**
@@ -289,7 +286,6 @@ const BULK_FEATURE_CONTRACT_EVENT_SIG_KEYS = Object.freeze({
 })
 
 export {
-  generateLicensedUserCreate2Address,
   randomSalt,
   randomSha256,
   randomText,

@@ -231,7 +231,7 @@ const getAmoyNetworkConfig = (
 // Go to https://hardhat.dev/config/ to learn more
 export default {
   defaultNetwork: 'hardhat',
-  hardfork: 'berlin',
+  hardfork: 'cancun',
 
   networks: {
     hardhat: {
@@ -333,6 +333,7 @@ export default {
             enabled: true,
             runs: 200,
           },
+          evmVersion: 'cancun',
           outputSelection: {
             '*': {
               '*': ['storageLayout'],

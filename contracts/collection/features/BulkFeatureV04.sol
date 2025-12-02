@@ -6,10 +6,10 @@ import "../../name/Contracts.sol";
 import "./interfaces/IBulkFeatureV04.sol";
 import "./erc721/LibERC721Storage.sol";
 
-import "./shared/LibFeatureCommonV02.sol";
+import "./shared/LibFeatureCommonV03.sol";
 import "./shared/LibSRRApproveTransferV02.sol";
 import "./shared/LibSRRCreate.sol";
-import "./shared/LibTransferWithProvenanceV03.sol";
+import "./shared/LibTransferWithProvenanceV04.sol";
 
 error OnlyBulkContract();
 
@@ -22,7 +22,7 @@ contract BulkFeatureV04 is IBulkFeatureV04, Contracts {
     function onlyBulk() private view {
         if (
             msg.sender !=
-            INameRegistry(LibFeatureCommonV02.getNameRegistry()).get(BULK)
+            INameRegistry(LibFeatureCommonV03.getNameRegistry()).get(BULK)
         ) {
             revert OnlyBulkContract();
         }
@@ -42,7 +42,7 @@ contract BulkFeatureV04 is IBulkFeatureV04, Contracts {
         uint16 royaltyBasisPoints
     ) public override(IBulkFeatureV04) returns (uint256) {
         onlyBulk();
-        LibFeatureCommonV02.onlyCollectionOwner(issuerAddress);
+        LibFeatureCommonV03.onlyCollectionOwner(issuerAddress);
         uint256 tokenId = LibSRRCreate.createSRR(
             isPrimaryIssuer,
             artistAddress,
@@ -70,7 +70,7 @@ contract BulkFeatureV04 is IBulkFeatureV04, Contracts {
         uint256 customHistoryId
     ) public override(IBulkFeatureV04) {
         onlyBulk();
-        LibFeatureCommonV02.onlyCollectionOwnerOrSRROwner(signer, tokenId);
+        LibFeatureCommonV03.onlyCollectionOwnerOrSRROwner(signer, tokenId);
         LibSRRApproveTransferV02.approveSRRByCommitment(
             tokenId,
             commitment,
@@ -92,8 +92,8 @@ contract BulkFeatureV04 is IBulkFeatureV04, Contracts {
         bool isIntermediary
     ) external override(IBulkFeatureV04) {
         onlyBulk();
-        LibFeatureCommonV02.onlyCollectionOwnerOrSRROwner(signer, tokenId);
-        LibTransferWithProvenanceV03.transferFromWithProvenance(
+        LibFeatureCommonV03.onlyCollectionOwnerOrSRROwner(signer, tokenId);
+        LibTransferWithProvenanceV04.transferFromWithProvenance(
             to,
             tokenId,
             historyMetadataHash,

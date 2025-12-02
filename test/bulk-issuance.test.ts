@@ -12,7 +12,7 @@ import {
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers'
 
 import { CollectionProxyFeaturesAggregate } from '../typechain-types'
-import { getWallets } from '../utils/hardhat-helpers'
+import { getWallets, getContract } from '../utils/hardhat-helpers'
 import { nameRegistrySet } from '../utils/name-registry-set'
 import { setupCollection } from './helpers/collections'
 import { fixtureDefault } from './helpers/fixtures'
@@ -240,9 +240,8 @@ const createSRRWithProofMulti = async (
 
 describe('Bulk (issuances)', () => {
   before(async () => {
-    ;({ bulk, nameRegistry, startrailRegistry } = await loadFixture(
-      fixtureDefault
-    ))
+    ;({ bulk, nameRegistry, startrailRegistry } =
+      await loadFixture(fixtureDefault))
 
     // For unit testing set the trusted forwarders and the administrator to
     // EOA wallets. This will allow transactions to be sent directly to the
@@ -252,13 +251,14 @@ describe('Bulk (issuances)', () => {
       ContractKeys.Administrator,
       administratorWallet.address
     )
-    ;({ walletAddress: luwAddress } = await createLicensedUserWalletDirect(
-      hre,
-      {
+    ;({ walletAddress: luwAddress } = await createLicensedUserWalletDirect({
+      hreArg: hre,
+      detailsOverride: {
         owners: [collectionOwnerWallet.address],
       },
-      administratorWallet
-    ))
+      adminWallet: administratorWallet,
+      toDeploy: true,
+    }))
 
     bulk = bulk.connect(administratorWallet)
     return bulk.setTrustedForwarder(trustedForwarderWallet.address)
@@ -298,6 +298,37 @@ describe('Bulk (issuances)', () => {
       expect(bulkRecord[2]).to.equal(0) // processedCount
     })
 
+    it('prepares batch from deployed LUW', async () => {
+      const merkleRoot = randomSha256()
+
+      const { data } =
+        await bulk.populateTransaction.prepareBatchFromLicensedUser(
+          merkleRoot
+        )
+      const luw = await hre.ethers.getContractAt(
+        'LicensedUserWallet',
+        luwAddress
+      )
+      const execTx = await luw
+        .connect(collectionOwnerWallet)
+        .execute([
+          {
+            to: bulk.address,
+            value: ethers.BigNumber.from(0),
+            data: data as string,
+          },
+        ])
+
+      await expect(execTx)
+        .to.emit(bulk, 'BatchPrepared')
+        .withArgs(merkleRoot, luwAddress)
+
+      const bulkRecord = await bulk.batches(merkleRoot)
+      expect(bulkRecord[0]).to.equal(true) // prepared
+      expect(bulkRecord[1]).to.equal(luwAddress) // issuer
+      expect(bulkRecord[2]).to.equal(0) // processedCount
+    })
+
     it('rejects duplicate batch', async () => {
       // Prepare a new batch
       const merkleRoot = randomSha256()
@@ -317,7 +348,7 @@ describe('Bulk (issuances)', () => {
       return expect(
         bulkIssueNotTrusted.prepareBatchFromLicensedUser(merkleRoot)
       ).to.eventually.be.rejectedWith(
-        `Function can only be called through the trusted Forwarder`
+        `reverted with custom error 'OnlyTrustedForwarderOrActiveDeployedWallet()'`
       )
     })
   })

@@ -1,13 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 pragma solidity 0.8.28;
-
-/**
- * @notice The version has not been deployed yet. 
- * Please refrain from creating a new version from this version. 
- * Update the version when changes are made.
- * Remove this notice once the version is added to the deployment script.
- */
 interface IERC721FeatureV05 {
     /*
      * Events

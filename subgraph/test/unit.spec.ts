@@ -92,6 +92,7 @@ test('licensedUserWallets ', async () => {
       userType
       owners
       salt
+      isDeployed
       issuedSRRs(orderBy: tokenId) {
         id
         tokenId

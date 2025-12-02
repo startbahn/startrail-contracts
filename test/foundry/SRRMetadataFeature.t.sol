@@ -72,7 +72,7 @@ contract SRRMetadataFeatureTest is StartrailTestBase {
         vm.prank(notAnOwner);
 
         vm.expectRevert(
-            LibFeatureCommonV02.OnlyIssuerOrArtistOrCollectionOwner.selector
+            LibFeatureCommonV03.OnlyArtistOrCollectionOwner.selector
         );
 
         string memory metadataCID = A_CID;

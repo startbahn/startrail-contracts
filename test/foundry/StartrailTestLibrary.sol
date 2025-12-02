@@ -10,9 +10,10 @@ import {IDiamondWritable} from "@solidstate/contracts/proxy/diamond/writable/IDi
 import {IDiamondWritableInternal} from "@solidstate/contracts/proxy/diamond/writable/IDiamondWritableInternal.sol";
 
 import "../../contracts/collection/registry/StartrailCollectionFeatureRegistry.sol";
-import "../../contracts/collection/features/SRRFeatureV02.sol";
-import "../../contracts/collection/features/ERC721FeatureV04.sol";
-import "../../contracts/collection/features/interfaces/ISRRApproveTransferFeatureV03.sol";
+import "../../contracts/collection/features/SRRFeatureV03.sol";
+import "../../contracts/collection/features/ERC721FeatureV05.sol";
+import "../../contracts/collection/features/interfaces/ILockExternalTransferFeatureV02.sol";
+import "../../contracts/collection/features/interfaces/ISRRApproveTransferFeatureV05.sol";
 
 contract StartrailTestLibrary is Test {
     // Shared test data
@@ -63,6 +64,27 @@ contract StartrailTestLibrary is Test {
         featureRegistry_.diamondCut(cuts, address(0x0), "");
     }
 
+    function upgradeFeature(
+        address featureRegistryOwner,
+        StartrailCollectionFeatureRegistry featureRegistry_,
+        address featureAddress,
+        bytes4[] memory selectors
+    ) internal {
+        IDiamondWritable.FacetCut[]
+            memory cuts = new IDiamondWritable.FacetCut[](1);
+        cuts[0] = IDiamondWritableInternal.FacetCut({
+            target: featureAddress,
+            action: IDiamondWritableInternal.FacetCutAction.REPLACE,
+            selectors: selectors
+        });
+        vm.prank(featureRegistryOwner);
+        featureRegistry_.diamondCut(
+            cuts,
+            address(0x0),
+            ""
+        );
+    }
+
     function eip2771AppendSender(
         bytes memory callData,
         address sender
@@ -81,38 +103,9 @@ contract StartrailTestLibrary is Test {
         return address(bytes20(b32 << 96));
     }
 
-    function createSRRWithDefaults(
-        address collectionAddress,
-        address eip2771TrustedForwarder,
-        address minter
-    ) internal returns (uint256 tokenId) {
-        bool isPrimaryIssuer = true;
-        address artist = vm.addr(pseudorandomUint256());
-        string memory metadataCID = A_CID;
-        bool lockExternalTransfer = false;
-        address to = address(0);
-        address royaltyReceiver = address(0);
-        uint16 royaltyBasisPoints = 0;
-
-        return
-            createSRR(
-                collectionAddress,
-                eip2771TrustedForwarder,
-                minter,
-                isPrimaryIssuer,
-                artist,
-                metadataCID,
-                lockExternalTransfer,
-                to,
-                royaltyReceiver,
-                royaltyBasisPoints,
-                bytes4(0)
-            );
-    }
-
     function createSRRWithToAddress(
         address collectionAddress,
-        address eip2771TrustedForwarder,
+        address sender,
         address minter,
         address to
     ) internal returns (uint256 tokenId) {
@@ -126,7 +119,7 @@ contract StartrailTestLibrary is Test {
         return
             createSRR(
                 collectionAddress,
-                eip2771TrustedForwarder,
+                sender,
                 minter,
                 isPrimaryIssuer,
                 artist,
@@ -141,7 +134,7 @@ contract StartrailTestLibrary is Test {
 
     function createSRR(
         address collectionAddress,
-        address eip2771TrustedForwarder,
+        address sender,
         address minter,
         bool isPrimaryIssuer,
         address artist,
@@ -152,16 +145,30 @@ contract StartrailTestLibrary is Test {
         uint16 royaltyBasisPoints,
         bytes4 expectRevertError
     ) internal returns (uint256 tokenId) {
-        vm.prank(eip2771TrustedForwarder);
+        vm.prank(sender);
 
         if (expectRevertError != bytes4(0)) {
             vm.expectRevert(expectRevertError);
         }
 
-        (bool success, ) = collectionAddress.call(
-            eip2771AppendSender(
+        bytes memory callData;
+
+        if (sender == minter) {
+            callData = abi.encodeWithSelector(
+                SRRFeatureV03.createSRR.selector,
+                isPrimaryIssuer,
+                artist,
+                metadataCID,
+                lockExternalTransfer,
+                to,
+                royaltyReceiver,
+                royaltyBasisPoints
+            );
+        } else {
+            // sender != minter means the call is from a trusted forwarder
+            callData = eip2771AppendSender(
                 abi.encodeWithSelector(
-                    SRRFeatureV02.createSRR.selector,
+                    SRRFeatureV03.createSRR.selector,
                     isPrimaryIssuer,
                     artist,
                     metadataCID,
@@ -171,8 +178,9 @@ contract StartrailTestLibrary is Test {
                     royaltyBasisPoints
                 ),
                 minter
-            )
-        );
+            );
+        }
+        (bool success, ) = collectionAddress.call(callData);
         require(success);
 
         return IDGeneratorV3.generate(metadataCID, artist);
@@ -226,7 +234,7 @@ contract StartrailTestLibrary is Test {
         (bool success, ) = collectionAddress.call(
             eip2771AppendSender(
                 abi.encodeWithSelector(
-                    ISRRApproveTransferFeatureV03.cancelSRRCommitment.selector,
+                    ISRRApproveTransferFeatureV05.cancelSRRCommitment.selector,
                     tokenId
                 ),
                 sender
@@ -238,22 +246,33 @@ contract StartrailTestLibrary is Test {
     function setLockExternalTransfer(
         address collectionAddress,
         address collectionOwnerLU,
-        address trustedForwarder,
+        address sender,
         uint256 tokenId
     ) internal returns (bool success) {
-        vm.prank(trustedForwarder);
-        (success, ) = collectionAddress.call(
-            eip2771AppendSender(
+        vm.prank(sender);
+        bytes memory callData;
+
+        if (sender == collectionOwnerLU) {
+            callData = abi.encodeWithSelector(
+                ILockExternalTransferFeatureV02
+                    .setLockExternalTransfer
+                    .selector,
+                tokenId,
+                true
+            );
+        } else {
+            callData = eip2771AppendSender(
                 abi.encodeWithSelector(
-                    ILockExternalTransferFeatureV01
+                    ILockExternalTransferFeatureV02
                         .setLockExternalTransfer
                         .selector,
                     tokenId,
                     true
                 ),
                 collectionOwnerLU
-            )
-        );
+            );
+        }
+        (success, ) = collectionAddress.call(callData);
     }
 
     function transferFromWithProvenance(
@@ -268,7 +287,7 @@ contract StartrailTestLibrary is Test {
         (success, ) = collectionAddress.call(
             eip2771AppendSender(
                 abi.encodeWithSelector(
-                    IERC721FeatureV04.transferFromWithProvenance.selector,
+                    IERC721FeatureV05.transferFromWithProvenance.selector,
                     to,
                     tokenId,
                     historyMetadataHash,

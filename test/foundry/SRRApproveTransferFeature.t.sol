@@ -2,11 +2,11 @@ pragma solidity 0.8.28;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
 
+import "../../contracts/collection/features/ERC721FeatureV05.sol";
 import "../../contracts/collection/features/erc721/ERC721Errors.sol";
 import "../../contracts/collection/features/erc721/LibERC721Events.sol";
 import {SRRApproveTransferFeatureV04} from "../../contracts/collection/features/SRRApproveTransferFeatureV04.sol";
 import "../../contracts/collection/features/interfaces/ISRRApproveTransferFeatureV04.sol";
-import "../../contracts/collection/features/interfaces/IERC721FeatureV05.sol";
 import "../../contracts/collection/features/shared/LibFeatureCommonV02.sol";
 import "../../contracts/lib/IDGeneratorV3.sol";
 import "../../contracts/name/Contracts.sol";
@@ -293,7 +293,7 @@ contract SRRApproveTransferFeatureTest is StartrailTestBase {
     }
 
     function testTransferSuccess() public {
-        ERC721FeatureV01 erc721 = ERC721FeatureV01(collectionAddress);
+        ERC721FeatureV05 erc721 = ERC721FeatureV05(collectionAddress);
         address currentOwner = erc721.ownerOf(tokenIdShared);
 
         vm.expectEmit(true, true, true, false);

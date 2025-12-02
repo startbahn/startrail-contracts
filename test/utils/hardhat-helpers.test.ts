@@ -8,18 +8,21 @@ import {
 
 describe('hardhat-helpers', () => {
   it('getContractNameLatest', () => {
-    expect(getContractNameLatest('Bulk')).to.equal('BulkV6')
+    expect(getContractNameLatest('Bulk')).to.equal('BulkV7')
     expect(getContractNameLatest('StartrailRegistry')).to.equal(
-      'StartrailRegistryV25'
+      'StartrailRegistryV26'
     )
     expect(getContractNameLatest('ERC721Feature')).to.equal('ERC721FeatureV05')
-    expect(getContractNameLatest('LockExternalTransferFeature')).to.equal('LockExternalTransferFeatureV01')
-    expect(getContractNameLatest('SRRFeature')).to.equal('SRRFeatureV02')
-    expect(getContractNameLatest('SRRApproveTransferFeature')).to.equal('SRRApproveTransferFeatureV04')
-    expect(getContractNameLatest('SRRMetadataFeature')).to.equal('SRRMetadataFeatureV01')
-    expect(getContractNameLatest('SRRHistoryFeature')).to.equal('SRRHistoryFeatureV01')
+    expect(getContractNameLatest('LockExternalTransferFeature')).to.equal('LockExternalTransferFeatureV02')
+    expect(getContractNameLatest('SRRFeature')).to.equal('SRRFeatureV03')
+    expect(getContractNameLatest('SRRApproveTransferFeature')).to.equal('SRRApproveTransferFeatureV05')
+    expect(getContractNameLatest('SRRMetadataFeature')).to.equal('SRRMetadataFeatureV02')
+    expect(getContractNameLatest('SRRHistoryFeature')).to.equal('SRRHistoryFeatureV02')
     expect(getContractNameLatest('ERC2981RoyaltyFeature')).to.equal('ERC2981RoyaltyFeatureV01')
     expect(getContractNameLatest('BulkFeature')).to.equal('BulkFeatureV04')
+    expect(getContractNameLatest('OwnableFeature')).to.equal('OwnableFeatureV02')
+    expect(getContractNameLatest('CollectionFactory')).to.equal('CollectionFactoryV02')
+    expect(getContractNameLatest('StartrailPaymaster')).to.equal('StartrailPaymasterV01')
   })
 
   it('getContractNamesUnversioned', () => {

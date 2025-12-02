@@ -19,9 +19,9 @@ UML_DIR=$OUT/uml
 mkdir -p $UML_DIR
 echo "\nGenerating UML diagrams [$UML_DIR]...\n"
 npx sol2uml -o $UML_DIR/LicensedUserManager.uml.svg -b LicensedUserManagerV02 contracts/licensedUser 2>/dev/null
-npx sol2uml -o $UML_DIR/StartrailRegistry.uml.svg -b StartrailRegistryV25 contracts/startrailregistry 2>/dev/null
+npx sol2uml -o $UML_DIR/StartrailRegistry.uml.svg -b StartrailRegistryV26 contracts/startrailregistry 2>/dev/null
 npx sol2uml -o $UML_DIR/MetaTxForwarder.uml.svg -b MetaTxForwarderV3 contracts/metaTx 2>/dev/null
-npx sol2uml -o $UML_DIR/Bulk.uml.svg -b BulkV6 contracts/bulk 2>/dev/null
+npx sol2uml -o $UML_DIR/Bulk.uml.svg -b BulkV7 contracts/bulk 2>/dev/null
 npx sol2uml -o $UML_DIR/CollectionFactory.uml.svg -b CollectionFactoryV01 contracts/collection 2>/dev/null
 npx sol2uml -o $UML_DIR/CollectionProxy.uml.svg -b CollectionProxy contracts/collection 2>/dev/null
 npx sol2uml -o $UML_DIR/StartrailCollectionFeatureRegistry.uml.svg -b StartrailCollectionFeatureRegistry contracts/collection/registry 2>/dev/null

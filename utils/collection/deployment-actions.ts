@@ -18,9 +18,11 @@ import {
   getAdministratorInstance,
   getContract,
   getContractFactory,
+  upgradeFromAdminForUups,
 } from '../hardhat-helpers'
 import ercInterfaces from './erc-interfaces'
 import { deployFeature, upgradeFeature } from './utils'
+import { deployContract } from '../deployment/deploy-contract'
 import {
   StartrailUpgradeVersion,
   StartrailFeatureEnum,
@@ -49,6 +51,20 @@ const setCollectionRegistryOnCollectionFactory = async (
   if (crAddress != (await metaTxForwarder.collectionRegistry())) {
     throw new Error(`MetaTxForwarder.setCollectionRegistry failed`)
   }
+}
+
+const upgradeCollectionFactory = async (
+    hre: HardhatRuntimeEnvironment,
+    newImplementationName: string
+) => {
+    // get the current proxy address from deploy.json
+    const collectionFactoryProxyAddress = loadDeployJSON(hre)['collectionFactoryProxyAddress']
+    const newImplementation = await deployContract(hre, newImplementationName);
+    await upgradeFromAdminForUups(hre, collectionFactoryProxyAddress, newImplementation.address)
+    updateImplJSON(hre, {
+        collectionFactoryImplementationAddress: newImplementation.address,
+      });
+    console.log(`Upgraded CollectionFactory to ${newImplementation.address}`)
 }
 
 const deployERC721Feature = async (
@@ -221,6 +237,17 @@ const upgradeSRRMetadataFeature = async (
   })
 }
 
+const upgradeOwnableFeature = async (
+    hre: HardhatRuntimeEnvironment,
+    upgradeVersion: StartrailUpgradeVersion
+  ): Promise<Contract> => {
+    return upgradeFeature({
+      hre,
+      featureName: StartrailFeatureEnum.OwnableFeature,
+      upgradeVersion,
+    })
+  }
+
 const upgradeSRRApproveTransferFeature = async (
   hre: HardhatRuntimeEnvironment,
   upgradeVersion: StartrailUpgradeVersion
@@ -333,6 +360,8 @@ const upgradeFeatureContract = async (params: {
       return upgradeERC721Feature(hre, upgradeVersion)
     case StartrailFeatureEnum.LockExternalTransferFeature:
       return upgradeLockExternalTransferFeature(hre, upgradeVersion)
+    case StartrailFeatureEnum.OwnableFeature:
+      return upgradeOwnableFeature(hre, upgradeVersion)
     case StartrailFeatureEnum.SRRApproveTransferFeature:
       return upgradeSRRApproveTransferFeature(hre, upgradeVersion)
     case StartrailFeatureEnum.SRRFeature:
@@ -413,7 +442,7 @@ const deployCollectionsCore = async (
     `0x0000000000000000000000000000000000000001`
   )
 
-  const cfFactory = await getContractFactory(hre, 'CollectionFactory')
+  const cfFactory = await hre.ethers.getContractFactory('CollectionFactoryV01')
 
   const cfContract: Contract = await upgrades.deployProxy(
     cfFactory,
@@ -547,5 +576,6 @@ export {
   deployCollectionsCore,
   deployFeature,
   deployFeatureContract,
+  upgradeCollectionFactory,
   upgradeFeatureContract,
 }

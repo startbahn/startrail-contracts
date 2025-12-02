@@ -3,6 +3,7 @@ enum CollectionFeatureEnum {
   ERC721Feature = 'ERC721Feature',
   ERC2981RoyaltyFeature = 'ERC2981RoyaltyFeature',
   LockExternalTransferFeature = 'LockExternalTransferFeature',
+  OwnableFeature = 'OwnableFeature',
   SRRFeature = 'SRRFeature',
   SRRApproveTransferFeature = 'SRRApproveTransferFeature',
   SRRMetadataFeature = 'SRRMetadataFeature',
@@ -33,6 +34,12 @@ const erc721CommonFuncSignatures = Object.freeze([
 const lockExternalTransferCommonFuncSignatures = Object.freeze([
   `setLockExternalTransfer(uint256,bool)`,
   `getLockExternalTransfer(uint256)`,
+])
+
+const ownableCommonFuncSignatures = Object.freeze([
+  `owner()`,
+  `transferOwnership(address)`,
+  `__OwnableFeature_initialize(address)`,
 ])
 
 const srrCommonFuncSignatures = Object.freeze([
@@ -88,6 +95,10 @@ const CollectionFunctionSignatures: CollectionFunctionSignaturesType =
     },
     LockExternalTransferFeature: {
       V01: [...lockExternalTransferCommonFuncSignatures],
+    },
+    OwnableFeature: {
+      V01: [...ownableCommonFuncSignatures],
+      V02: [...ownableCommonFuncSignatures],
     },
     SRRFeature: {
       V01: [...srrCommonFuncSignatures],

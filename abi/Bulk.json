@@ -1,5 +1,10 @@
 [
   {
+    "inputs": [],
+    "name": "OnlyTrustedForwarderOrActiveDeployedWallet",
+    "type": "error"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
@@ -444,11 +449,59 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "wallet",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "licensedUserManagerAddress",
+        "type": "address"
+      }
+    ],
+    "name": "isActiveDeployedWallet",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "isFromActiveDeployedWallet",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "forwarder",
         "type": "address"
       }
     ],
     "name": "isTrustedForwarder",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "forwarder",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "licensedUserManagerAddress",
+        "type": "address"
+      }
+    ],
+    "name": "isTrustedForwarderOrActiveDeployedWallet",
     "outputs": [
       {
         "internalType": "bool",

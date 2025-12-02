@@ -9,6 +9,7 @@ export enum StartrailFeatureEnum {
   ERC721Feature = 'ERC721Feature',
   ERC2981RoyaltyFeature = 'ERC2981RoyaltyFeature',
   LockExternalTransferFeature = 'LockExternalTransferFeature',
+  OwnableFeature = 'OwnableFeature',
   SRRFeature = 'SRRFeature',
   SRRApproveTransferFeature = 'SRRApproveTransferFeature',
   SRRMetadataFeature = 'SRRMetadataFeature',

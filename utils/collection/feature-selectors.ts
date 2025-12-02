@@ -56,6 +56,14 @@ const CollectionFeatureSelectors: StartrailFeatureSelectorsType = {
         StartrailFeatureEnum.LockExternalTransferFeature
       ][version]
     ),
+  OwnableFeature: async (version: string) =>
+    getSelectors(
+      {
+        name: StartrailFeatureEnum.OwnableFeature,
+        version,
+      },
+      CollectionFunctionSignatures[StartrailFeatureEnum.OwnableFeature][version]
+    ),
   SRRFeature: async (version: string) =>
     getSelectors(
       {

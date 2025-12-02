@@ -4,6 +4,7 @@ import {
   AddedOwner as AddedOwnerEvent,
   ChangedThreshold as ChangedThresholdEvent,
   CreateLicensedUserWallet as CreateLUWEvent,
+  DeployLicensedUserWallet as DeployLicensedUserWalletEvent,
   MigrateLicensedUserWallet as MigrateLicensedUserWalletEvent,
   RemovedOwner as RemovedOwnerEvent,
   UpdateLicensedUserDetail as UpdateLicensedUserDetailEvent,
@@ -48,6 +49,7 @@ export function handleCreateLicensedUserWallet(event: CreateLUWEvent): void {
     luw.threshold = event.params.threshold
     luw.createdAt = timestampMillis
     luw.createdAtStr = toUTCString(luw.createdAt)
+    luw.isDeployed = false
   } else {
     log.info('migrating legacy LUW {}', [luwId])
   }
@@ -57,6 +59,23 @@ export function handleCreateLicensedUserWallet(event: CreateLUWEvent): void {
   luw.updatedAt = timestampMillis
   luw.updatedAtStr = toUTCString(luw.updatedAt)
   luw.save()
+}
+
+export function handleDeployLicensedUserWallet(
+  event: DeployLicensedUserWalletEvent
+): void {
+  logInvocation('handleDeployLicensedUserWallet', event)
+  let luwId = event.params.walletAddress.toHex()
+  let luw = LicensedUserWallet.load(luwId)
+  if (luw) {
+    luw.isDeployed = true
+    luw.save()
+  } else {
+    log.error('received DeployLicensedUserWallet event for unknown LUW: {}', [
+      luwId,
+    ])
+  }
+  return
 }
 
 export function handleAddedOwner(event: AddedOwnerEvent): void {

@@ -1,14 +1,14 @@
 pragma solidity 0.8.28;
 
 import "../../contracts/collection/features/erc721/ERC721Errors.sol";
-import {LockExternalTransferFeatureV01} from "../../contracts/collection/features/LockExternalTransferFeatureV01.sol";
+import {LockExternalTransferFeatureV02} from "../../contracts/collection/features/LockExternalTransferFeatureV02.sol";
 import "../../contracts/collection/features/shared/LibFeatureCommonV02.sol";
 import "../../contracts/name/Contracts.sol";
 
 import "./StartrailTestBase.sol";
 
 contract LockExternalTransferFeatureTest is StartrailTestBase {
-    LockExternalTransferFeatureV01 internal lockExternalTransferFeature;
+    LockExternalTransferFeatureV02 internal lockExternalTransferFeature;
 
     address internal collectionAddress;
     address internal collectionOwnerLU;
@@ -18,7 +18,7 @@ contract LockExternalTransferFeatureTest is StartrailTestBase {
         super.setUp();
         collectionOwnerLU = licensedUser1Address;
         collectionAddress = createCollection(collectionOwnerLU);
-        lockExternalTransferFeature = LockExternalTransferFeatureV01(
+        lockExternalTransferFeature = LockExternalTransferFeatureV02(
             collectionAddress
         );
         tokenId = createSRRWithDefaults(
@@ -73,7 +73,7 @@ contract LockExternalTransferFeatureTest is StartrailTestBase {
     {
         vm.prank(trustedForwarder);
         vm.expectRevert(
-            ILockExternalTransferFeatureV01.OnlyIssuerOrCollectionOwner.selector
+            ILockExternalTransferFeatureV02.OnlyIssuerOrCollectionOwner.selector
         );
         (bool success, ) = collectionAddress.call(
             eip2771AppendSender(
@@ -84,9 +84,25 @@ contract LockExternalTransferFeatureTest is StartrailTestBase {
                     tokenId,
                     true
                 ),
-                admin
+                licensedUser2Address
             )
         );
         assertTrue(success, "expectRevert: call did not revert");
+    }
+
+    function testSetLockExternalTransferFromDeployedLUW() public {
+        vm.prank(admin);
+        licensedUserManager.deploy("salt1", collectionOwnerLU);
+        require(
+            setLockExternalTransfer(
+                collectionAddress,
+                collectionOwnerLU,
+                collectionOwnerLU,
+                tokenId
+            )
+        );
+        assertTrue(
+            lockExternalTransferFeature.getLockExternalTransfer(tokenId)
+        );
     }
 }

@@ -669,7 +669,7 @@ describe('StartrailRegistry', () => {
       // send from wallet other than the trusted forwarder
       const startrailRegistryNotTrusted =
         startrailRegistry.connect(noAuthWallet)
-      await assertRevert(
+      await expect(
         startrailRegistryNotTrusted[fnName](
           isPrimaryIssuer,
           artistAddress,
@@ -678,8 +678,9 @@ describe('StartrailRegistry', () => {
           recipient,
           ZERO_ADDRESS,
           0
-        ),
-        `Function can only be called through the trusted Forwarder`
+        )
+      ).to.eventually.be.rejectedWith(
+        `reverted with custom error 'OnlyTrustedForwarderOrActiveDeployedWallet()'`
       )
     })
 

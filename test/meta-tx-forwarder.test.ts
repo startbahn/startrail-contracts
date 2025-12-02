@@ -133,14 +133,14 @@ describe('MetaTxForwarder', () => {
 
       before(async () => {
         for (const testCase of EXEC_TEST_CASES) {
-          const { walletAddress } = await createLicensedUserWalletDirect(
-            hre,
-            {
+          const { walletAddress } = await createLicensedUserWalletDirect({
+            hreArg: hre,
+            detailsOverride: {
               owners: testCase.ownerAddresses,
               threshold: testCase.threshold,
             },
-            adminEOAWallet
-          )
+            adminWallet: adminEOAWallet,
+          })
           testCase.luAddress = walletAddress
         }
       })
@@ -197,13 +197,13 @@ describe('MetaTxForwarder', () => {
       it(`should execute transaction with calldata (data field) [STARTRAIL-737]`, async () => {
         // Setup an LUW and issue a token
         const { walletAddress: fromAddress } =
-          await createLicensedUserWalletDirect(
-            hre,
-            {
+          await createLicensedUserWalletDirect({
+            hreArg: hre,
+            detailsOverride: {
               owners: [handlerEOAWallet.address],
             },
-            adminEOAWallet
-          )
+            adminWallet: adminEOAWallet,
+          })
         const issueRequest = await createSRRRequest()
         const tokenId = await encodeSignExecute({
           requestTypeKey:
@@ -289,13 +289,13 @@ describe('MetaTxForwarder', () => {
 
     beforeEach(async () => {
       // createSRR from handerWallet
-      const { walletAddress } = await createLicensedUserWalletDirect(
-        hre,
-        {
+      const { walletAddress } = await createLicensedUserWalletDirect({
+        hreArg: hre,
+        detailsOverride: {
           owners: [handlerEOAWallet.address],
         },
-        adminEOAWallet
-      )
+        adminWallet: adminEOAWallet,
+      })
       fromAddress = walletAddress
       const issueRequest = await createSRRRequest()
       tokenId = await encodeSignExecute({

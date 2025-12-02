@@ -14,7 +14,6 @@ const {
 const { loadDeployJSON, updateDeployJSON } = require('./deploy-json')
 const { updateImplJSON } = require('./impl-json')
 
-
 const { logLine } = require('../logging')
 const {
   assertContractDeployed,
@@ -33,24 +32,25 @@ const {
   SINGLETON_FACTORY_ADDRESS,
 } = require('./deploy-eip2470-singleton-factory')
 
-const upgrade = async (hre: HardhatRuntimeEnvironment,
-  newImplementationAddress: string) => {
-  const proxy = await getContract(hre, "LicensedUserManager")
-  await upgradeFromAdmin(
-    hre,
-    proxy.address,
-    newImplementationAddress
+const upgrade = async (
+  hre: HardhatRuntimeEnvironment,
+  newImplementationAddress: string
+) => {
+  const proxy = await getContract(hre, 'LicensedUserManager')
+  await upgradeFromAdmin(hre, proxy.address, newImplementationAddress)
+  console.log(
+    `\nDeployed new LincensedUserManager at ${newImplementationAddress}\n`
   )
-  console.log(`\nDeployed new LincensedUserManager at ${newImplementationAddress}\n`)
 }
 
 const deployBeacon = async (hre: HardhatRuntimeEnvironment) => {
-  const {
+  const { nameRegistryProxyAddress, proxyAdminAddress } = loadDeployJSON(hre)
+  const upgradeableBeaconFactory =
+    await hre.ethers.getContractFactory('UpgradeableBeacon')
+  const licensedUserBeacon = await upgradeableBeaconFactory.deploy(
     nameRegistryProxyAddress,
-    proxyAdminAddress,
-  } = loadDeployJSON(hre)
-  const upgradeableBeaconFactory = await hre.ethers.getContractFactory('UpgradeableBeacon')
-  const licensedUserBeacon = await upgradeableBeaconFactory.deploy(nameRegistryProxyAddress, proxyAdminAddress)
+    proxyAdminAddress
+  )
   await licensedUserBeacon.deployed()
   return licensedUserBeacon
 }
@@ -90,13 +90,12 @@ const deployImplementation = async (hre, contractName: string) => {
 
   const ethers = hre.ethers
 
-  const { bytecode: lumBytecode } = await ethers.getContractFactory(
-    contractName
-  )
+  const { bytecode: lumBytecode } =
+    await ethers.getContractFactory(contractName)
   console.log(`lum bytecodeHash = ${ethers.utils.keccak256(lumBytecode)}`)
 
-  const config = hre.config.networks[hre.network.name];
-  const salt = config.licensedUserManager.salt.implementation;
+  const config = hre.config.networks[hre.network.name]
+  const salt = config.licensedUserManager.salt.implementation
 
   // Pre-compute the Create2 address
   const lumImplAddress = ethers.utils.getCreate2Address(
@@ -112,11 +111,7 @@ const deployImplementation = async (hre, contractName: string) => {
   )
 
   console.log(`\nInvoke deploySingleton to deploy LUM implementation:`)
-  const lumImplTx = await deploySingleton(
-    hre,
-    lumBytecode,
-    salt
-  )
+  const lumImplTx = await deploySingleton(hre, lumBytecode, salt)
   await waitTxHH(hre, lumImplTx)
   await assertContractDeployed(
     hre,
@@ -147,9 +142,8 @@ const computeCreateProxyInitcode = async (
   lumImplAddress
 ) => {
   const ethers = hre.ethers
-  const { bytecode: lumProxyBytecode } = await ethers.getContractFactory(
-    'StartrailProxyLUM'
-  )
+  const { bytecode: lumProxyBytecode } =
+    await ethers.getContractFactory('StartrailProxyLUM')
   const constructorCallBytecode = ethers.utils.defaultAbiCoder.encode(
     ['address', 'bytes'], // _logic
     [lumImplAddress, '0x'] // _data
@@ -187,8 +181,8 @@ const deployProxy = async (
 
   const ethers = hre.ethers
 
-  const config = hre.config.networks[hre.network.name] as any;
-  const salt = config.licensedUserManager.salt.proxy;
+  const config = hre.config.networks[hre.network.name] as any
+  const salt = config.licensedUserManager.salt.proxy
 
   const lumProxyInitcode = await computeCreateProxyInitcode(hre, lumImplAddress)
 
@@ -222,9 +216,8 @@ const deployProxy = async (
   // Encode StartrailProxyLUM.initializeAdmin transaction
   //
 
-  const lumProxyFactory = await hre.ethers.getContractFactory(
-    `StartrailProxyLUM`
-  )
+  const lumProxyFactory =
+    await hre.ethers.getContractFactory(`StartrailProxyLUM`)
   const initializeAdminEncoded = lumProxyFactory.interface.encodeFunctionData(
     lumProxyFactory.interface.functions['initializeAdmin(address)'],
     [proxyAdminAddress]
@@ -300,10 +293,7 @@ const deployProxy = async (
  * @param {HardhatRuntimeEnvironment} hre
  * @return {Record<string,string>} {lumProxyAddress, lumImplAddress}
  */
-const deployLUM = async (
-  hre,
-  newImplementationName
-) => {
+const deployLUM = async (hre, newImplementationName) => {
   console.log('\n=====    deployLUM invoked    ======\n')
 
   const {
@@ -326,14 +316,20 @@ const deployLUM = async (
   await assertContractDeployed(hre, 'NameRegistry', nameRegistryProxyAddress)
   await assertContractDeployed(hre, 'ProxyAdmin', proxyAdminAddress)
 
-  const isUpgrade = newImplementationName !== undefined;
-  let lumProxyAddress: string;
-  let lumImplAddress: string;
+  const isUpgrade = newImplementationName !== undefined
+  let lumProxyAddress: string
+  let lumImplAddress: string
 
   if (isUpgrade) {
-    const lumProxy = await getContract(hre, `LicensedUserManager`)
-    lumProxyAddress = lumProxy.address;
-    const lumImplAddress = await deployImplementation(hre, newImplementationName)
+    const lumProxy = await hre.ethers.getContractAt(
+      newImplementationName,
+      loadDeployJSON(hre).licensedUserManagerProxyAddress
+    )
+    lumProxyAddress = lumProxy.address
+    const lumImplAddress = await deployImplementation(
+      hre,
+      newImplementationName
+    )
     await upgrade(hre, lumImplAddress)
     return { lumProxyAddress, lumImplAddress, lumProxy }
   } else {
@@ -355,7 +351,11 @@ const deployLUM = async (
       licensedUserManagerProxyAddress: lumProxyAddress,
     })
 
-    await nameRegistrySet(hre, ContractKeys.LicensedUserManager, lumProxyAddress)
+    await nameRegistrySet(
+      hre,
+      ContractKeys.LicensedUserManager,
+      lumProxyAddress
+    )
     return { lumProxyAddress, lumImplAddress }
   }
 }

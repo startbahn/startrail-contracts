@@ -3,7 +3,6 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import _ from 'lodash'
 import { deployStartrailRegistry } from './deploy-startrail-registry'
 import { deployBulk } from './deploy-bulk'
-import { deployBulkIssue } from './deploy-bulk-issue'
 
 import {
   registerRequestTypes,

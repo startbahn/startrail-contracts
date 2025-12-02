@@ -2,10 +2,6 @@
 
 pragma solidity 0.8.28;
 
-import "./features/ERC721FeatureV01.sol";
-import "./features/OwnableFeatureV01.sol";
-import "./CollectionProxy.sol";
-
 /**
  * @title Registry of Startrail NFT Collection contracts
  * @author Chris Hatch - <chris.hatch@startbahn.jp>

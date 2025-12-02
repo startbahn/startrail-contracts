@@ -23,6 +23,8 @@ dataSources:
       eventHandlers:
         - event: CreateLicensedUserWallet(indexed address,address[],uint8,string,string,uint8,bytes32)
           handler: handleCreateLicensedUserWallet
+        - event: DeployLicensedUserWallet(indexed address,bytes32)
+          handler: handleDeployLicensedUserWallet
         - event: UpgradeLicensedUserWalletToMulti(indexed address,address[],uint8)
           handler: handleUpgradeLicensedUserWalletToMulti
         - event: UpdateLicensedUserDetail(indexed address,string,string)

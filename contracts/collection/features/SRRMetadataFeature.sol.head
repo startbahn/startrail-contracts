@@ -2,17 +2,18 @@
 
 pragma solidity 0.8.28;
 
-import "./interfaces/ISRRMetadataFeatureV01.sol";
+import "./interfaces/ISRRMetadataFeatureV02.sol";
 import "./storage/LibSRRMetadataStorage.sol";
 import "./shared/LibSRRMetadataEvents.sol";
-import "./shared/LibFeatureCommonV01.sol";
+import "./shared/LibFeatureCommonV03.sol";
 import "./storage/LibSRRStorage.sol";
+import "../shared/LibEIP2771Or4337.sol";
 
 /**
  * @title Feature that enables srr's metadata can be updated
  *   for a given token.
  */
-contract SRRMetadataFeatureV01 is ISRRMetadataFeatureV01 {
+contract SRRMetadataFeatureV02 is ISRRMetadataFeatureV02 {
     /**
      * @inheritdoc ISRRMetadataFeatureV01
      */
@@ -22,19 +23,26 @@ contract SRRMetadataFeatureV01 is ISRRMetadataFeatureV01 {
     ) external override {
         LibERC721Storage.onlyExistingToken(tokenId);
 
-        if (LibFeatureCommonV01.isEmptyString(metadataCID)) {
+        if (LibFeatureCommonV03.isEmptyString(metadataCID)) {
             revert LibSRRMetadataStorage.SRRMetadataNotEmpty();
         }
 
+        address sender = LibFeatureCommonV03.msgSender();
+        bool isCollectionOwner = LibFeatureCommonV03.isCollectionOwner(sender);
+        address aliasBackward = LibEIP2771Or4337
+            .licensedUserManager(
+                CollectionProxyStorage.layout().featureRegistry
+            )
+            .walletAddressAliasBackward(sender);
+
         LibSRRStorage.SRR storage srr = LibSRRStorage.layout().srrs[tokenId];
 
-        address sendingWallet = LibFeatureCommonV01.msgSender();
         if (
-            sendingWallet != srr.issuer &&
-            sendingWallet != srr.artist &&
-            sendingWallet != LibFeatureCommonV01.getCollectionOwner()
+            !isCollectionOwner &&
+            sender != srr.artist &&
+            aliasBackward != srr.artist
         ) {
-            revert LibFeatureCommonV01.OnlyIssuerOrArtistOrCollectionOwner();
+            revert LibFeatureCommonV03.OnlyArtistOrCollectionOwner();
         }
 
         LibSRRMetadataStorage.layout().srrs[tokenId] = metadataCID;

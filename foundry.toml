@@ -7,4 +7,6 @@ out = 'forge-out'
 libs = ['node_modules', 'lib']
 test = 'test/foundry'
 cache_path  = 'forge-cache'
-
+via_ir = true
+optimizer = true
+evm_version = "cancun"

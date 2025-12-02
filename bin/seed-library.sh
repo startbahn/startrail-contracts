@@ -1,7 +1,7 @@
 #!/bin/sh
 
 export HARDHAT_NETWORK=localhost
-export NODE="npx ts-node"
+export NODE="node -r ts-node/register/transpile-only"
 export TS_NODE_TRANSPILE_ONLY=1
 
 createLu() {

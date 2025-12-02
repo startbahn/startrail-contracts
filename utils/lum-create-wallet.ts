@@ -10,46 +10,53 @@ import {
   getContract,
 } from './hardhat-helpers'
 
-const lumCreateWallet = async ({
-  owners,
-  threshold,
-  userType,
-  englishName,
-  originalName,
-  salt,
-}, isLog = false): Promise<string> => {
+const lumCreateWallet = async (
+  {
+    owners,
+    threshold,
+    userType,
+    englishName,
+    originalName,
+    salt,
+    toDeploy = false,
+  },
+  isLog = false
+): Promise<string> => {
   const licensedUserManager: ethers.Contract = await getContract(
     hre,
-    "LicensedUserManager"
-  );
+    'LicensedUserManager'
+  )
 
-  const userTypeId = UserType[userType.toUpperCase()];
+  const userTypeId = UserType[userType.toUpperCase()]
   if (!Number.isInteger(userTypeId)) {
-    console.log(`userType [${userType}] is not valid`);
-    process.exit(-1);
+    console.log(`userType [${userType}] is not valid`)
+    process.exit(-1)
   }
 
-  const {
-    data: createLUCallData,
-  } = await licensedUserManager.populateTransaction.createWallet(
-    [owners, threshold, userTypeId, englishName, originalName],
-    salt
-  );
+  const { data: createLUCallData } = toDeploy
+    ? await licensedUserManager.populateTransaction.createAndDeploy(
+        [owners, threshold, userTypeId, englishName, originalName],
+        salt
+      )
+    : await licensedUserManager.populateTransaction.createWallet(
+        [owners, threshold, userTypeId, englishName, originalName],
+        salt
+      )
   // console.log(`calldata: ${JSON.stringify(createLUCallData)}`);
 
-  const admin = await getAdministratorInstance(hre);
+  const admin = await getAdministratorInstance(hre)
   const createLUTxReceipt = (await admin.execTransaction({
     to: licensedUserManager.address,
     data: createLUCallData,
-  })) as TransactionReceipt;
+  })) as TransactionReceipt
 
   const eventDecoded = decodeEventLog(
     licensedUserManager,
-    "CreateLicensedUserWallet",
+    'CreateLicensedUserWallet',
     createLUTxReceipt.logs[0]
-  );
+  )
 
-  const luAddress = eventDecoded[0];
+  const luAddress = eventDecoded[0]
 
   if (isLog) {
     console.log(
@@ -58,10 +65,10 @@ const lumCreateWallet = async ({
         null,
         2
       )}\n`
-    );
+    )
   }
 
-  return luAddress;
-};
+  return luAddress
+}
 
-export { lumCreateWallet };
+export { lumCreateWallet }

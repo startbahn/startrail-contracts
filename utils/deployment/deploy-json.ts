@@ -83,7 +83,8 @@ const getProxyAddressByContractName = (
 const updateContractsInitCodeHashJSON = (
   hre: HardhatRuntimeEnvironment,
   initCodeHashes: {
-    collectionProxy: string
+    collectionProxy?: string,
+    licensedUserWalletProxy?: string
   }
 ) => {
   const deployJSON = loadJSON(hre, CONTRACT_INIT_CODE_HASH_FILE_NAME)

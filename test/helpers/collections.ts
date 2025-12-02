@@ -122,13 +122,13 @@ const setupCollection = async (
   if (!collectionOwnerLUWAddress) {
     // create an LU owned by the given wallet
     ;({ walletAddress: collectionOwnerLUWAddress } =
-      await createLicensedUserWalletDirect(
-        hre,
-        {
+      await createLicensedUserWalletDirect({
+        hreArg: hre,
+        detailsOverride: {
           owners: [collectionOwnerWallet.address],
         },
-        adminWallet
-      ))
+        adminWallet,
+      }))
   }
 
   collectionAddress = await createCollection(

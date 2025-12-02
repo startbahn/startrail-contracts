@@ -2,7 +2,7 @@
 pragma solidity 0.8.28;
 
 import "../../contracts/collection/features/ERC721FeatureV04.sol";
-import "../../contracts/collection/features/shared/LibFeatureCommonV02.sol";
+import "../../contracts/collection/features/shared/LibFeatureCommonV03.sol";
 
 import "./StartrailTestBase.sol";
 
@@ -192,7 +192,7 @@ contract ERC721FeatureTest is StartrailTestBase {
     }
 
     function testRevert_AlreadyInitialized() public {
-        vm.expectRevert(ERC721FeatureAlreadyInitialized.selector);
+        vm.expectRevert(ERC721FeatureV05.ERC721FeatureAlreadyInitialized.selector);
         erc721Feature.__ERC721Feature_initialize(
             COLLECTION_NAME,
             COLLECTION_SYMBOL
@@ -200,22 +200,22 @@ contract ERC721FeatureTest is StartrailTestBase {
     }
 
     function testRevert_TransferFromLockedToken() public {
-        vm.expectRevert(LibFeatureCommonV02.ERC721ExternalTransferLocked.selector);
+        vm.expectRevert(LibFeatureCommonV03.ERC721ExternalTransferLocked.selector);
         erc721Feature.transferFrom(user1, user2, lockedTokenId);
     }
 
     function testRevert_SafeTransferFromLockedToken() public {
-        vm.expectRevert(LibFeatureCommonV02.ERC721ExternalTransferLocked.selector);
+        vm.expectRevert(LibFeatureCommonV03.ERC721ExternalTransferLocked.selector);
         erc721Feature.safeTransferFrom(user1, user2, lockedTokenId);
     }
 
     function testRevert_SafeTransferWithDataFromLockedToken() public {
-        vm.expectRevert(LibFeatureCommonV02.ERC721ExternalTransferLocked.selector);
+        vm.expectRevert(LibFeatureCommonV03.ERC721ExternalTransferLocked.selector);
         erc721Feature.safeTransferFrom(user1, user2, lockedTokenId, "");
     }
 
     function testRevert_approveLockedToken() public {
-        vm.expectRevert(LibFeatureCommonV02.ERC721ExternalTransferLocked.selector);
+        vm.expectRevert(LibFeatureCommonV03.ERC721ExternalTransferLocked.selector);
         erc721Feature.approve(user2, lockedTokenId);
     }
 }

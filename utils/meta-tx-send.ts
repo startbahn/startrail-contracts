@@ -44,7 +44,7 @@ const metaTxSend = async ({
     fromAddress,
     ethers.BigNumber.from(0)
   )
-  console.log(`nonce: ${JSON.stringify(nonce.toHexString(), null, 2)}`)
+  //console.log(`nonce: ${JSON.stringify(nonce.toHexString(), null, 2)}`)
 
   const metaTxRequest = {
     requestTypeKey,
@@ -56,7 +56,7 @@ const metaTxSend = async ({
   const signatures = await forwarder.signRequestTypedData(metaTxRequest, [
     signerWallet,
   ])
-  console.log(`\nsignature(s): ${signatures}`)
+  //console.log(`\nsignature(s): ${signatures}`)
 
   let execResult
   if (fromEOA && signatures.length == 1) {
@@ -72,7 +72,7 @@ const metaTxSend = async ({
       gasLimit,
     })
   }
-  console.log(`after exec ${JSON.stringify(execResult, null, 2)}`)
+  //console.log(`after exec ${JSON.stringify(execResult, null, 2)}`)
   return waitTxHH(hre, execResult, 0)
 }
 

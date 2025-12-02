@@ -16,17 +16,7 @@
   },
   {
     "inputs": [],
-    "name": "NotLicensedUser",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "NotTrustedForwarder",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "NotTrustedForwarder",
+    "name": "NotTrustedForwarderOrActiveDeployedWallet",
     "type": "error"
   },
   {

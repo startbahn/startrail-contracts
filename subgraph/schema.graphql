@@ -8,6 +8,7 @@ type LicensedUserWallet @entity {
   userType: String!
   owners: [Bytes!]!
   salt: Bytes!
+  isDeployed: Boolean!
 
   issuedSRRs: [SRR!]! @derivedFrom(field: "issuer")
 

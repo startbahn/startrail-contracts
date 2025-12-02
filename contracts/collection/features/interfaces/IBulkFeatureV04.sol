@@ -2,16 +2,6 @@
 
 pragma solidity 0.8.28;
 
-/**
- * @dev Handlers for performing actions from the Bulk contract.
- * These handlers trust the Bulk contract and perform the action if the
- * call came from the bulk contract.
- *
- * @notice The version has not been deployed yet.
- * Please refrain from creating a new version from this version.
- * Update the version when changes are made.
- * Remove this notice once the version is added to the deployment script.
- */
 interface IBulkFeatureV04 {
     /**
      * @dev Issue an SRR where the caller is a Bulk contract

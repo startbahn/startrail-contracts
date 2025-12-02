@@ -63,6 +63,7 @@ contract CollectionFactoryV01 is
         );
 
         __Ownable_init();
+        __ReentrancyGuard_init();
     }
 
     function _authorizeUpgrade(

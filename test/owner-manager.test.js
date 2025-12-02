@@ -96,14 +96,15 @@ describe('OwnerManager', function () {
     )
 
     luwOwnerList = [owner1Address, owner2Address]
-    const { walletAddress } = await createLicensedUserWalletDirect(
-      hre,
-      {
+    const { walletAddress } = await createLicensedUserWalletDirect({
+      hreArg: hre,
+      detailsOverride: {
         owners: luwOwnerList,
         threshold: 1,
       },
-      adminWallet
-    )
+      adminWallet,
+      toDeploy: true,
+    })
     luwAddress = walletAddress
   })
 
@@ -238,7 +239,7 @@ describe('OwnerManager', function () {
       const lumFromNonAdmin = lum.connect(owner1Wallet)
       return assertRevert(
         lumFromNonAdmin.addOwner(luwAddress, owner3Address, 2),
-        `Wallet function can only be called from trusted forwarder or admin`
+        `Wallet function can only be called from trusted forwarder, admin or active deployed wallet`
       )
     })
 
@@ -312,14 +313,14 @@ describe('OwnerManager', function () {
     beforeEach(async () => {
       // create wallet with 3 owners for removeOwner unit tests to use
       luw3OwnerList = [owner1Address, owner2Address, owner3Address]
-      const { walletAddress } = await createLicensedUserWalletDirect(
-        hre,
-        {
+      const { walletAddress } = await createLicensedUserWalletDirect({
+        hreArg: hre,
+        detailsOverride: {
           owners: [owner1Address, owner2Address, owner3Address],
           threshold: 1,
         },
-        adminWallet
-      )
+        adminWallet,
+      })
       luw3OwnersAddress = walletAddress
     })
 
@@ -378,7 +379,7 @@ describe('OwnerManager', function () {
           owner4Address,
           1
         ),
-        `Wallet function can only be called from trusted forwarder or admin`
+        `Wallet function can only be called from trusted forwarder, admin or active deployed wallet`
       )
     })
 
@@ -456,14 +457,14 @@ describe('OwnerManager', function () {
     beforeEach(async () => {
       // create wallet with 3 owners for swapOwner unit tests to use
       luw3OwnerList = [owner1Address, owner2Address, owner3Address]
-      const { walletAddress } = await createLicensedUserWalletDirect(
-        hre,
-        {
+      const { walletAddress } = await createLicensedUserWalletDirect({
+        hreArg: hre,
+        detailsOverride: {
           owners: luw3OwnerList,
           threshold: 1,
         },
-        adminWallet
-      )
+        adminWallet,
+      })
       luw3OwnersAddress = walletAddress
     })
 
@@ -525,7 +526,7 @@ describe('OwnerManager', function () {
           owner3Address,
           owner4Address
         ),
-        `Wallet function can only be called from trusted forwarder or admin`
+        `Wallet function can only be called from trusted forwarder, admin or active deployed wallet`
       )
     })
 
@@ -597,14 +598,14 @@ describe('OwnerManager', function () {
     beforeEach(async () => {
       // create wallet with 3 owners for changeThreshold unit tests to use
       luw3OwnerList = [owner1Address, owner2Address, owner3Address]
-      const { walletAddress } = await createLicensedUserWalletDirect(
-        hre,
-        {
+      const { walletAddress } = await createLicensedUserWalletDirect({
+        hreArg: hre,
+        detailsOverride: {
           owners: [owner1Address, owner2Address, owner3Address],
           threshold: 1,
         },
-        adminWallet
-      )
+        adminWallet,
+      })
       luw3OwnersAddress = walletAddress
     })
 
@@ -631,7 +632,7 @@ describe('OwnerManager', function () {
       const lumFromNonAdmin = lum.connect(owner1Wallet)
       return assertRevert(
         lumFromNonAdmin.changeThreshold(luwAddress, 2),
-        `Wallet function can only be called from trusted forwarder or admin`
+        `Wallet function can only be called from trusted forwarder, admin or active deployed wallet`
       )
     })
 
